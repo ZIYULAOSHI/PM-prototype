@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>新客专享礼包</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);color:#fff;min-height:100vh;display:flex;justify-content:center}
+.container{width:100%;max-width:420px;padding:0 16px 40px}
+.strategy-intro{margin-top:20px;background:#1e2a3a;border:1px solid #2a3a4a;border-radius:12px;padding:20px;margin-bottom:16px;position:relative;cursor:pointer}
+.strategy-intro .tag{position:absolute;top:0;left:0;background:#e74c3c;color:#fff;font-size:12px;padding:4px 12px;border-radius:12px 0 12px 0;font-weight:bold}
+.strategy-intro .intro-content{margin-top:16px;text-align:center}
+.strategy-intro .intro-title{font-size:20px;font-weight:bold;margin-bottom:8px}
+.strategy-intro .intro-sub{font-size:16px;color:#ccc}
+.strategy-intro .intro-img{margin-top:12px;background:#253345;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center;color:#667;font-size:13px;border:1px dashed #3a4a5a}
+.data-card{background:#1a2332;border:1px solid #2a3a4a;border-radius:12px;padding:16px 12px;margin-bottom:12px;cursor:pointer}
+
+.data-row{display:flex;justify-content:space-around;text-align:center}
+.data-item .value{font-size:22px;font-weight:bold;color:#ffd700;margin-bottom:4px}
+.data-item .label{font-size:12px;color:#8899aa}
+.chart-card{background:#1a2332;border:1px solid #2a3a4a;border-radius:12px;padding:16px;margin-bottom:20px;cursor:pointer}
+
+.chart-title{font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px}
+.chart-period{font-size:11px;color:#667;margin-bottom:8px}
+.chart-legend{display:flex;gap:16px;font-size:11px;margin-bottom:10px;color:#aaa}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.dot.red{background:#e74c3c}.dot.blue{background:#3498db}
+.chart-area{width:100%;height:180px}
+.chart-area canvas{width:100%;height:100%}
+.steps-title{text-align:center;font-size:16px;color:#ffd700;font-weight:bold;margin-bottom:16px}
+.steps-guide{display:flex;align-items:center;justify-content:center;margin-bottom:24px}
+.step-item{text-align:center;flex:1}
+.step-circle{width:64px;height:64px;border-radius:50%;border:2px solid #ffd700;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:12px;line-height:1.4;background:rgba(255,215,0,0.08)}
+.step-arrow{flex:0 0 30px;text-align:center;color:#ffd700;font-size:20px;margin-top:-20px}
+.form-area{padding:0 8px;margin-bottom:20px}
+.form-row{display:flex;align-items:center;margin-bottom:12px}
+.form-label{width:56px;font-size:14px;font-weight:bold;flex-shrink:0}
+.form-input-wrap{flex:1;display:flex;align-items:center;background:#fff;border-radius:6px;overflow:hidden;height:42px}
+.form-input-wrap input{flex:1;border:none;outline:none;padding:0 12px;font-size:15px;color:#333;height:100%;background:transparent}
+.form-input-wrap input::placeholder{color:#bbb}
+.sms-btn{flex-shrink:0;background:#3498db;color:#fff;border:none;padding:0 14px;height:100%;font-size:13px;cursor:pointer;white-space:nowrap}
+.sms-btn:disabled{background:#7f8c8d;cursor:not-allowed}
+.submit-btn{display:block;width:100%;margin:0 auto 20px;padding:14px;background:linear-gradient(135deg,#ffd700,#f0a500);color:#1a1a2e;font-size:18px;font-weight:bold;border:none;border-radius:8px;cursor:pointer;text-align:center;letter-spacing:2px}
+.submit-btn:active{transform:scale(0.98)}
+.risk-notice{text-align:center;font-size:11px;color:#667;padding:0 12px 20px;line-height:1.6}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.active{display:flex}
+.modal-box{background:#fff;color:#333;border-radius:12px;padding:24px 20px;max-width:340px;width:90%;text-align:center;animation:modalIn 0.2s ease}
+@keyframes modalIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-box h3{font-size:17px;margin-bottom:12px;color:#1a1a2e}
+.modal-box p{font-size:14px;line-height:1.8;color:#555;margin-bottom:16px;text-align:left}
+.modal-close{background:#3498db;color:#fff;border:none;padding:8px 32px;border-radius:6px;font-size:14px;cursor:pointer}
+.config-tag{display:inline-block;background:#fff3cd;color:#856404;font-size:12px;padding:2px 8px;border-radius:4px;margin:2px;border:1px solid #ffc107}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 3. 策略介绍 -->
+  <div class="strategy-intro" id="strategyIntro">
+    <div class="tag" id="strategyTag">限时免费</div>
+    <div class="intro-content">
+      <div class="intro-title">新客0元领！年化高、低估值选股策略</div>
+      <div class="intro-sub">价值万元 限时免费</div>
+      <div class="intro-img">[ 策略介绍图片 - 支持后台配置 ]</div>
+    </div>
+  </div>
+
+  <!-- 4. 图一：收益率数据 -->
+  <div class="data-card" id="card1">
+    <div class="data-row">
+      <div class="data-item"><div class="value" style="color:#e74c3c">213.26%</div><div class="label">策略回测收益率</div></div>
+      <div class="data-item"><div class="value" style="color:#e74c3c">26.85%</div><div class="label">策略历史回测收益率</div></div>
+      <div class="data-item"><div class="value" style="color:#e74c3c">53.42%</div><div class="label">回测成功率</div></div>
+    </div>
+  </div>
+
+  <!-- 6. 图三：收益曲线 -->
+  <div class="chart-card" id="card3">
+    <div class="chart-title">收益曲线</div>
+    <div class="chart-period">统计区间 2021-04-24 ~ 2026-04-24</div>
+    <div class="chart-legend">
+      <span><span class="dot red"></span>回测累计收益</span>
+      <span><span class="dot blue"></span>沪深300收益</span>
+    </div>
+    <div class="chart-area"><canvas id="chartCanvas"></canvas></div>
+  </div>
+
+  <!-- 7. 步骤引导文字 -->
+  <div class="steps-title">🚀 3步0元领取策略，开启低估值投资</div>
+
+  <!-- 8. 三步指引 -->
+  <div class="steps-guide">
+    <div class="step-item"><div class="step-circle">本页面<br>先注册</div></div>
+    <div class="step-arrow">→</div>
+    <div class="step-item"><div class="step-circle">下载<br>量化王APP</div></div>
+    <div class="step-arrow">→</div>
+    <div class="step-item"><div class="step-circle">新客礼包<br>直接领取</div></div>
+  </div>
+
+  <!-- 9. 手机号 & 验证码 -->
+  <div class="form-area">
+    <div class="form-row">
+      <div class="form-label">手机号</div>
+      <div class="form-input-wrap">
+        <input type="tel" id="phoneInput" maxlength="11" placeholder="输入手机号领取">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-label">验证码</div>
+      <div class="form-input-wrap">
+        <input type="text" id="codeInput" maxlength="6" placeholder="输入验证码">
+        <button class="sms-btn" id="smsBtn">获取验证码</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 立即领取 -->
+  <button class="submit-btn" id="submitBtn">立即领取</button>
+
+  <!-- 11. 风险提示 -->
+  <div class="risk-notice">⚠️ 注：以上为历史回测，过往收益不代表未来收益，不构成投资建议。</div>
+
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalContent"></p>
+    <button class="modal-close" id="modalCloseBtn">我知道了</button>
+  </div>
+</div>
+
+<script>
+// ========== 弹窗控制 ==========
+var modalOverlay = document.getElementById('modalOverlay');
+var modalTitle = document.getElementById('modalTitle');
+var modalContent = document.getElementById('modalContent');
+var modalCloseBtn = document.getElementById('modalCloseBtn');
+
+function showModal(title, html) {
+  modalTitle.textContent = title;
+  modalContent.innerHTML = html;
+  modalOverlay.classList.add('active');
+}
+function hideModal() { modalOverlay.classList.remove('active'); }
+modalCloseBtn.onclick = hideModal;
+modalOverlay.onclick = function(e) { if (e.target === modalOverlay) hideModal(); };
+
+// ========== 3. 策略介绍 - 可配置项说明 ==========
+document.getElementById('strategyIntro').onclick = function() {
+  showModal('后台可配置项说明',
+    '以下内容支持后台配置：<br><br>' +
+    '<span class="config-tag">🏷️ 左上角标签文本</span> 当前为"限时免费"，可自定义<br><br>' +
+    '<span class="config-tag">🖼️ 策略介绍图片</span> 图片区域支持后台上传替换<br><br>' +
+    '<span class="config-tag">📝 策略标题文案</span> 可配置<br><br>' +
+    '<span class="config-tag">💰 副标题文案</span> 可配置');
+};
+
+// ========== 4. 图一：收益率数据 ==========
+document.getElementById('card1').onclick = function() {
+  showModal('策略收益率数据',
+    '展示对应策略的收益率数据：<br><br>' +
+    '<b>策略回测收益率</b>：213.26%<br>' +
+    '<b>策略历史回测收益率</b>：26.85%<br>' +
+    '<b>回测成功率</b>：53.42%');
+};
+
+// ========== 6. 图三：收益曲线 ==========
+document.getElementById('card3').onclick = function() {
+  showModal('策略收益曲线',
+    '展示对应策略的收益曲线图表：<br><br>' +
+    '<b>红线</b>：回测累计收益<br>' +
+    '<b>蓝线</b>：沪深300收益（基准对比）<br><br>' +
+    '统计区间：2021-04-24 ~ 2026-04-24');
+};
+
+// ========== 绘制收益曲线 ==========
+(function drawChart() {
+  var canvas = document.getElementById('chartCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.parentElement.offsetWidth;
+  var H = canvas.parentElement.offsetHeight;
+  canvas.width = W * 2; canvas.height = H * 2;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(2, 2);
+
+  var pad = {top:10, right:10, bottom:30, left:45};
+  var cw = W - pad.left - pad.right;
+  var ch = H - pad.top - pad.bottom;
+
+  // 模拟数据
+  var n = 60;
+  var redLine = [], blueLine = [];
+  var rv = 0, bv = 0;
+  for (var i = 0; i < n; i++) {
+    rv += (Math.random() - 0.35) * 8;
+    bv += (Math.random() - 0.48) * 3;
+    if (rv < -30) rv = -30;
+    if (rv > 260) rv = 260;
+    if (bv < -50) bv = -50;
+    redLine.push(rv);
+    blueLine.push(bv);
+  }
+
+  var allVals = redLine.concat(blueLine);
+  var minV = Math.min.apply(null, allVals);
+  var maxV = Math.max.apply(null, allVals);
+  var range = maxV - minV || 1;
+
+  function toX(i) { return pad.left + (i / (n - 1)) * cw; }
+  function toY(v) { return pad.top + ch - ((v - minV) / range) * ch; }
+
+  // 网格
+  ctx.strokeStyle = '#2a3a4a'; ctx.lineWidth = 0.5;
+  for (var g = 0; g <= 4; g++) {
+    var gy = pad.top + (g / 4) * ch;
+    ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
+    var gv = maxV - (g / 4) * range;
+    ctx.fillStyle = '#667'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(gv.toFixed(0), pad.left - 4, gy + 3);
+  }
+
+  // 0线
+  if (minV < 0 && maxV > 0) {
+    ctx.strokeStyle = '#444'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(pad.left, toY(0)); ctx.lineTo(W - pad.right, toY(0)); ctx.stroke();
+  }
+
+  // 画线函数
+  function drawLine(data, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (var j = 0; j < data.length; j++) {
+      if (j === 0) ctx.moveTo(toX(j), toY(data[j]));
+      else ctx.lineTo(toX(j), toY(data[j]));
+    }
+    ctx.stroke();
+  }
+  drawLine(blueLine, '#3498db');
+  drawLine(redLine, '#e74c3c');
+
+  // X轴标签
+  var years = ['2021-04','2022-05','2023-05','2024-06','2025-06'];
+  ctx.fillStyle = '#667'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
+  for (var k = 0; k < years.length; k++) {
+    var xp = pad.left + (k / (years.length - 1)) * cw;
+    ctx.fillText(years[k], xp, H - 6);
+  }
+})();
+
+// ========== 9. 手机号点击自动填充 ==========
+var phoneInput = document.getElementById('phoneInput');
+var filled = false;
+phoneInput.addEventListener('focus', function() {
+  if (!filled) {
+    var prefixes = ['138','139','136','137','158','159','188','187','135','186'];
+    var p = prefixes[Math.floor(Math.random() * prefixes.length)];
+    for (var i = 0; i < 8; i++) p += Math.floor(Math.random() * 10);
+    phoneInput.value = p;
+    filled = true;
+  }
+});
+
+// ========== 9. 获取验证码倒计时 ==========
+var smsBtn = document.getElementById('smsBtn');
+var countdown = 0;
+smsBtn.onclick = function() {
+  if (countdown > 0) return;
+  if (!phoneInput.value || phoneInput.value.length < 11) {
+    showModal('提示', '请先输入正确的手机号');
+    return;
+  }
+  // 自动填验证码
+  var code = '';
+  for (var i = 0; i < 6; i++) code += Math.floor(Math.random() * 10);
+  document.getElementById('codeInput').value = code;
+
+  countdown = 60;
+  smsBtn.disabled = true;
+  smsBtn.textContent = countdown + 's';
+  var timer = setInterval(function() {
+    countdown--;
+    if (countdown <= 0) {
+      clearInterval(timer);
+      smsBtn.disabled = false;
+      smsBtn.textContent = '获取验证码';
+    } else {
+      smsBtn.textContent = countdown + 's';
+    }
+  }, 1000);
+};
+
+// ========== 10. 立即领取 ==========
+document.getElementById('submitBtn').onclick = function() {
+  showModal('提示', '跳转各应用市场APP下载');
+};
+</script>
+</body>
+</html>

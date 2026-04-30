@@ -1,0 +1,10 @@
+# Word 临时文件
+~$*
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code 配置（可选，不影响原型展示）
+.vscode/

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>新手引导流程图</title>
+<style>
+  body { margin: 0; background: #fff; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const dpr = window.devicePixelRatio || 1;
+const W = 1300, H = 720;
+canvas.width = W * dpr;
+canvas.height = H * dpr;
+canvas.style.width = W + 'px';
+canvas.style.height = H + 'px';
+ctx.scale(dpr, dpr);
+
+ctx.textBaseline = 'middle';
+ctx.textAlign = 'center';
+const F = '13px "PingFang SC","Microsoft YaHei",sans-serif';
+const FB = 'bold 14px "PingFang SC","Microsoft YaHei",sans-serif';
+const FT = 'bold 18px "PingFang SC","Microsoft YaHei",sans-serif';
+const FS = '11px "PingFang SC","Microsoft YaHei",sans-serif';
+
+// 绘图工具
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+function box(x,y,w,h,text,fill){
+  rr(x,y,w,h,6);ctx.fillStyle=fill||'#fff';ctx.fill();ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#333';ctx.font=F;
+  var lines=text.split('\n'),lh=16,sy=y+h/2-(lines.length-1)*lh/2;
+  lines.forEach(function(l){ctx.fillText(l,x+w/2,sy);sy+=lh;});
+  return {x:x,y:y,w:w,h:h,cx:x+w/2,cy:y+h/2,r:x+w,b:y+h,l:x,t:y};
+}
+
+function pill(x,y,w,h,text,fill){
+  rr(x,y,w,h,h/2);ctx.fillStyle=fill||'#e8e8e8';ctx.fill();ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#333';ctx.font=F;ctx.fillText(text,x+w/2,y+h/2);
+  return {x:x,y:y,w:w,h:h,cx:x+w/2,cy:y+h/2,r:x+w,b:y+h,l:x,t:y};
+}
+
+function diamond(cx,cy,rw,rh,text){
+  ctx.beginPath();ctx.moveTo(cx,cy-rh);ctx.lineTo(cx+rw,cy);ctx.lineTo(cx,cy+rh);ctx.lineTo(cx-rw,cy);ctx.closePath();
+  ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#333';ctx.font=F;ctx.fillText(text,cx,cy);
+  return {cx:cx,cy:cy,rw:rw,rh:rh,r:cx+rw,l:cx-rw,t:cy-rh,b:cy+rh};
+}
+
+function arr(x1,y1,x2,y2,label){
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  var a=Math.atan2(y2-y1,x2-x1),s=7;
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-s*Math.cos(a-.4),y2-s*Math.sin(a-.4));ctx.lineTo(x2-s*Math.cos(a+.4),y2-s*Math.sin(a+.4));ctx.closePath();ctx.fillStyle='#333';ctx.fill();
+  if(label){ctx.font=FS;ctx.fillStyle='#888';var mx=(x1+x2)/2,my=(y1+y2)/2;
+    if(Math.abs(x2-x1)>Math.abs(y2-y1)){ctx.fillText(label,mx,my-10);}
+    else{ctx.textAlign='left';ctx.fillText(label,mx+6,my);ctx.textAlign='center';}
+  }
+}
+
+// 拐弯箭头：先垂直再水平
+function arrDown(x1,y1,x2,y2,label){
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1,y2);ctx.lineTo(x2,y2);ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  var s=7,dir=x2>x1?1:-1;
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-dir*s,y2-s*0.4);ctx.lineTo(x2-dir*s,y2+s*0.4);ctx.closePath();ctx.fillStyle='#333';ctx.fill();
+  if(label){ctx.font=FS;ctx.fillStyle='#888';ctx.textAlign='left';ctx.fillText(label,x1+6,(y1+y2)/2);ctx.textAlign='center';}
+}
+
+// ===== 布局 =====
+var BW=125, BH=46, G=22;
+var R1=95, R2=235, R3=375;
+
+// 标题
+ctx.font=FT;ctx.fillStyle='#333';ctx.textAlign='left';
+ctx.fillText('量化王新客操作指引 · 引导流程图',40,35);
+ctx.font=FS;ctx.fillStyle='#888';
+ctx.fillText('每一步均可「X 关闭」或「跳过引导」退出 → 标记 skipped，不再触发',40,56);
+ctx.textAlign='center';
+
+// ===== 第一行：第一步 =====
+ctx.font=FB;ctx.fillStyle='#E65100';ctx.textAlign='left';
+ctx.fillText('第一步：创建策略',230,R1-25);
+ctx.textAlign='center';
+
+var x=40;
+var n0=pill(x,R1-18,70,36,'开始'); x+=70+G;
+var d1=diamond(x+55,R1,58,28,'新设备？'); x+=110+G;
+var n1=box(x,R1-23,BW,BH,'首页蒙版\n引导创建策略'); x+=BW+G;
+var n2=box(x,R1-23,BW,BH,'选择策略类型\n「股票择时」'); x+=BW+G;
+var n3=box(x,R1-23,BW,BH,'登录/注册','#f5f5f5'); x+=BW+G;
+var n4=box(x,R1-23,BW,BH,'编辑策略\n点击「回测」'); x+=BW+G;
+
+// 连线
+arr(n0.r,n0.cy,d1.l,d1.cy);
+arr(d1.r,d1.cy,n1.l,n1.cy,'是');
+arr(n1.r,n1.cy,n2.l,n2.cy);
+arr(n2.r,n2.cy,n3.l,n3.cy);
+arr(n3.r,n3.cy,n4.l,n4.cy);
+
+// 否分支
+arr(d1.cx,d1.b,d1.cx,d1.b+35,'否');
+pill(d1.cx-45,d1.b+35,90,28,'正常进入APP');
+
+// ===== 第二行：第二步 =====
+ctx.font=FB;ctx.fillStyle='#2E7D32';ctx.textAlign='left';
+ctx.fillText('第二步：保存策略',n4.r-BW-G-BW+10,R2-25);
+ctx.textAlign='center';
+
+// 从n4拐弯到第二行
+var r2x=n4.r-BW-G; // 第二行起始x（从右往左排）
+var n5=box(n4.l,R2-23,BW,BH,'回测结果页\n点击「仅保存」');
+var n6=box(n5.l-G-BW,R2-23,BW,BH,'首页：查看\n我的策略');
+
+arrDown(n4.cx,n4.b,n5.r,n5.cy);
+arr(n5.l,n5.cy,n6.r,n6.cy);
+
+// ===== 第二行续：第三步 =====
+ctx.font=FB;ctx.fillStyle='#1565C0';ctx.textAlign='left';
+ctx.fillText('第三步：大神策略',n6.l-G-BW+10,R2-25);
+ctx.textAlign='center';
+
+var n7=box(n6.l-G-BW,R2-23,BW,BH,'首页：查看\n大神策略');
+arr(n6.l,n6.cy,n7.r,n7.cy);
+
+// ===== 第三行：第四步 =====
+ctx.font=FB;ctx.fillStyle='#7B1FA2';ctx.textAlign='left';
+ctx.fillText('第四步：广场社群',n7.l+10,R3-25);
+ctx.textAlign='center';
+
+var n8=box(n7.l,R3-23,BW,BH,'广场社群\n引导互动');
+var n9=box(n8.r+G,R3-23,BW,BH,'进入广场页');
+var n10=box(n9.r+G,R3-23,BW+20,BH,'新手礼包弹窗','#FFF9C4');
+var n11=pill(n10.r+G,R3-5,90,36,'引导完成','#C8E6C9');
+
+arrDown(n7.cx,n7.b,n8.r,n8.cy);
+arr(n8.r,n8.cy,n9.l,n9.cy,'点击「开启\n量化之旅」');
+arr(n9.r,n9.cy,n10.l,n10.cy,'0.5s后弹出');
+arr(n10.r,n10.cy,n11.l,n11.cy);
+
+// 预留标记
+ctx.font='bold 10px sans-serif';ctx.fillStyle='#d32f2f';
+ctx.fillText('预留，暂不开发',n10.cx,n10.t-8);
+
+// ===== 状态流转 =====
+var NY=480;
+ctx.font=FB;ctx.fillStyle='#333';ctx.textAlign='left';
+ctx.fillText('引导状态流转',40,NY);
+
+// 状态节点
+var sy=NY+30;
+var sw=120,sh=32,sg=60;
+var sx=60;
+
+var st1=pill(sx,sy,sw,sh,'not_started','#E3F2FD');sx+=sw+sg;
+var st2=pill(sx,sy,sw,sh,'in_progress','#FFF3E0');sx+=sw+sg;
+var st3=pill(sx,sy,sw,sh,'skipped','#FFEBEE');sx+=sw+sg;
+var st4=pill(sx,sy,sw,sh,'completed','#E8F5E9');
+
+arr(st1.r,st1.cy,st2.l,st2.cy,'进入引导');
+arr(st2.r,st2.cy,st4.l,st4.cy,'完成全部步骤');
+
+// skipped 从 in_progress 向下拐弯
+arrDown(st2.cx+30,st2.b,st3.l,st3.cy,'主动跳过 /\n超24h未恢复');
+
+// not_started 也可直接到 skipped（首步就跳过）
+ctx.beginPath();
+ctx.moveTo(st1.cx,st1.b);
+ctx.lineTo(st1.cx,st3.cy);
+ctx.lineTo(st3.l,st3.cy);
+ctx.strokeStyle='#333';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+ctx.font=FS;ctx.fillStyle='#888';ctx.fillText('首步即跳过',st1.cx+50,st3.cy-10);
+
+// 说明文字
+ctx.font=F;ctx.fillStyle='#555';
+var notes=[
+  '• 登录前：状态存本地（device_id 为 key）',
+  '• 登录后：同步至后端（关联 device_id + user_id），后续双写',
+  '• 非主动退出（闪退/杀进程）：保持 in_progress，24小时内可恢复',
+];
+notes.forEach(function(n,i){
+  ctx.fillText(n,40+(ctx.measureText(n).width/2),sy+sh+30+i*22);
+});
+
+</script>
+</body>
+</html>
