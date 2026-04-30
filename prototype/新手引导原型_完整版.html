@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -64,14 +64,14 @@
     /* top/right/left/width/height 全部在各元素的 style 属性中设置 */
   }
 
-  /* ===== 引导气泡 ===== */
+  /* ===== 引导内容（蒙版直出，无气泡卡片） ===== */
   .bubble {
     position: absolute;
     z-index: 30;
     width: 300px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
     animation: bubbleIn .3s .1s ease forwards;
     opacity: 0;
   }
@@ -79,62 +79,83 @@
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .bubble-arrow {
+
+  /* 指示箭头（SVG，从内容区指向高亮区域） */
+  .guide-pointer {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0; height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
+    z-index: 25;
+    width: 40px; height: 40px;
+    animation: pointerPulse 1.2s ease-in-out infinite;
+    pointer-events: none;
   }
-  /* 箭头方向由 JS 动态设置 class */
-  .bubble-arrow.arrow-down {
-    bottom: -8px; top: auto;
-    border-top: 8px solid #fff;
-    border-bottom: none;
+  .guide-pointer svg { width: 100%; height: 100%; }
+  @keyframes pointerPulse {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(6px); opacity: 0.7; }
   }
-  .bubble-arrow.arrow-up {
-    top: -8px; bottom: auto;
-    border-bottom: 8px solid #fff;
-    border-top: none;
+  .guide-pointer.pointer-up svg { transform: rotate(180deg); }
+  .guide-pointer.pointer-up { animation-name: pointerPulseUp; }
+  @keyframes pointerPulseUp {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-6px); opacity: 0.7; }
   }
-  .bubble-close {
+
+  /* 隐藏旧的三角箭头 */
+  .bubble-arrow { display: none; }
+  /* 隐藏旧的独立关闭按钮和底部跳过文字 */
+  .bubble-close { display: none; }
+  .bubble-footer { display: none; }
+
+  /* 合并的跳过控件：icon + 文字，右上角 */
+  .skip-combined {
     position: absolute;
     top: 6px; right: 6px;
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: center; gap: 3px;
     cursor: pointer; border: none; background: none;
+    padding: 4px 8px;
+    border-radius: 12px;
+    opacity: 0.5;
+    transition: opacity .25s, background .25s;
+    z-index: 2;
   }
-  .bubble-close::before, .bubble-close::after {
+  .skip-combined:hover { opacity: 0.9; background: rgba(255,255,255,0.08); }
+  .skip-combined .skip-label {
+    font-size: 10px; color: rgba(255,255,255,0.7);
+    letter-spacing: 0.3px; line-height: 1;
+    white-space: nowrap;
+  }
+  .skip-combined .skip-icon {
+    position: relative;
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+  }
+  .skip-combined .skip-icon::before,
+  .skip-combined .skip-icon::after {
     content: ''; position: absolute;
-    width: 14px; height: 1.5px; background: #999;
+    top: 50%; left: 50%;
+    width: 10px; height: 1.2px;
+    background: rgba(255,255,255,0.7);
   }
-  .bubble-close::before { transform: rotate(45deg); }
-  .bubble-close::after { transform: rotate(-45deg); }
-  .bubble-close:hover::before, .bubble-close:hover::after { background: #333; }
+  .skip-combined .skip-icon::before { transform: translate(-50%,-50%) rotate(45deg); }
+  .skip-combined .skip-icon::after { transform: translate(-50%,-50%) rotate(-45deg); }
 
   .bubble-body {
     display: flex; align-items: flex-start;
-    padding: 14px; gap: 10px;
+    padding: 10px 14px; gap: 10px;
   }
   .mascot {
-    flex-shrink: 0; width: 48px; height: 48px;
+    flex-shrink: 0; width: 44px; height: 44px;
     border-radius: 50%; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.3);
   }
   .mascot img { width: 100%; height: 100%; object-fit: cover; }
-  .bubble-text { flex: 1; padding-right: 16px; }
-  .bubble-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
-  .bubble-desc { font-size: 13px; color: #666; line-height: 1.5; }
-  .bubble-footer { padding: 0 14px 12px; text-align: center; }
-  .skip-text {
-    font-size: 13px; color: #999; cursor: pointer;
-    border: none; background: none; padding: 4px 8px;
-  }
-  .skip-text:hover { color: #666; }
+  .bubble-text { flex: 1; padding-right: 60px; }
+  .bubble-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+  .bubble-desc { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
   /* 最后一步的完成按钮 */
   .btn-finish {
-    display: block; width: calc(100% - 28px); margin: 0 14px 12px;
+    display: block; width: calc(100% - 28px); margin: 0 14px 10px;
     padding: 10px 0; border: none; border-radius: 22px;
     background: #FF9800; color: #fff;
     font-size: 15px; font-weight: 600; cursor: pointer;
@@ -657,9 +678,8 @@ function syncGuide(hlId, holeId, bubId, arrId) {
   const hl = document.getElementById(hlId);
   const hole = document.getElementById(holeId);
   const bub = document.getElementById(bubId);
-  const arr = document.getElementById(arrId);
   const phone = document.getElementById('phone');
-  if (!hl || !hole || !bub || !arr) return;
+  if (!hl || !hole || !bub) return;
 
   const pr = phone.getBoundingClientRect();
   const hr = hl.getBoundingClientRect();
@@ -682,28 +702,45 @@ function syncGuide(hlId, holeId, bubId, arrId) {
   const isBottom = hCenterY > phoneH / 2;
 
   // 先让气泡可见以获取高度
-  const bubH = bub.offsetHeight || 140;
+  const bubH = bub.offsetHeight || 120;
 
   // 气泡水平定位
   let bubLeft = hLeft + hW / 2 - bubW / 2;
   bubLeft = Math.max(8, Math.min(bubLeft, phoneW - bubW - 8));
   bub.style.left = bubLeft + 'px';
 
-  if (isBottom) {
-    // 高亮在下半区：气泡在高亮上方，箭头朝下
-    bub.style.top = (hTop - bubH - 12) + 'px';
-    arr.className = 'bubble-arrow arrow-down';
-  } else {
-    // 高亮在上半区：气泡在高亮下方，箭头朝上
-    bub.style.top = (hTop + hH + 12) + 'px';
-    arr.className = 'bubble-arrow arrow-up';
+  // 指示箭头尺寸
+  const pointerSize = 36;
+  const pointerGap = 4;
+
+  // 创建或获取指示箭头
+  let pointer = bub.parentElement.querySelector('.guide-pointer[data-for="' + bubId + '"]');
+  if (!pointer) {
+    pointer = document.createElement('div');
+    pointer.className = 'guide-pointer';
+    pointer.setAttribute('data-for', bubId);
+    pointer.innerHTML = '<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M20 36L8 16h24L20 36z" fill="#FF9800" stroke="#fff" stroke-width="1.5"/>' +
+      '<circle cx="20" cy="10" r="4" fill="#FF9800" stroke="#fff" stroke-width="1.5"/>' +
+      '</svg>';
+    bub.parentElement.appendChild(pointer);
   }
 
-  // 箭头水平偏移
   const hCenterX = hLeft + hW / 2;
-  const arrowLeft = Math.max(20, Math.min(hCenterX - bubLeft, bubW - 20));
-  arr.style.left = arrowLeft + 'px';
-  arr.style.transform = 'translateX(-50%)';
+
+  if (isBottom) {
+    // 高亮在下半区：内容在高亮上方，箭头朝下指向高亮
+    bub.style.top = (hTop - bubH - pointerSize - pointerGap) + 'px';
+    pointer.className = 'guide-pointer';
+    pointer.style.left = (hCenterX - pointerSize / 2) + 'px';
+    pointer.style.top = (hTop - pointerSize - pointerGap) + 'px';
+  } else {
+    // 高亮在上半区：内容在高亮下方，箭头朝上指向高亮
+    bub.style.top = (hTop + hH + pointerSize + pointerGap) + 'px';
+    pointer.className = 'guide-pointer pointer-up';
+    pointer.style.left = (hCenterX - pointerSize / 2) + 'px';
+    pointer.style.top = (hTop + hH + pointerGap) + 'px';
+  }
 }
 
 function syncAll() {
@@ -718,6 +755,17 @@ function syncAll() {
 
 syncAll();
 window.addEventListener('resize', syncAll);
+
+// 为每个 bubble 注入合并的跳过控件（文字 + icon）
+document.querySelectorAll('.bubble').forEach(function(bub) {
+  // 跳过最后一步（有完成按钮的）
+  if (bub.querySelector('.btn-finish')) return;
+  var btn = document.createElement('button');
+  btn.className = 'skip-combined';
+  btn.onclick = function() { skip('skip_combined'); };
+  btn.innerHTML = '<span class="skip-label">跳过引导</span><span class="skip-icon"></span>';
+  bub.insertBefore(btn, bub.firstChild);
+});
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') skip('back_button');
