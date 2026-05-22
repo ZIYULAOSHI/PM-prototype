@@ -607,7 +607,7 @@
         </div>
         <!-- 用户分享策略时：展示该用户收益率最高的3个策略 -->
         <div class="section" id="userSharedStrategies">
-          <div class="section-title">TA的策略 <span style="font-size:11px;color:#999;font-weight:400;">（收益率最高的3个）</span></div>
+          <div class="section-title">TA的策略</div>
           <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8d6e00;line-height:1.5;">
             💡 以下为该用户公开分享的策略，按累计收益率从高到低展示前3个
           </div>
@@ -671,7 +671,7 @@
         </div>
         <!-- 用户不分享策略时：展示官方推荐策略 -->
         <div class="section" id="officialRecommendStrategies" style="display:none;">
-          <div class="section-title">推荐策略 <span style="font-size:11px;color:#999;font-weight:400;">（官方推荐）</span></div>
+          <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">推荐策略 <span style="font-size:12px;color:#2962ff;font-weight:400;cursor:pointer;">查看更多&gt;&gt;</span></div>
           <div style="background:#e3f2fd;border:1px solid #bbdefb;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#1565c0;line-height:1.5;">
             💡 该用户暂未公开分享策略，以下为官方智能推荐的同风格策略
           </div>
@@ -781,7 +781,7 @@
         <!-- 模块3：TA的策略 / 官方推荐策略（与头部用户相同逻辑） -->
         <!-- 用户分享策略时：展示该用户收益率最高的3个策略 -->
         <div class="section" id="normalUserSharedStrategies">
-          <div class="section-title">TA的策略 <span style="font-size:11px;color:#999;font-weight:400;">（收益率最高的3个）</span></div>
+          <div class="section-title">TA的策略</div>
           <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#8d6e00;line-height:1.5;">
             💡 以下为该用户公开分享的策略，按累计收益率从高到低展示前3个
           </div>
@@ -826,7 +826,7 @@
         </div>
         <!-- 用户不分享策略时：展示官方推荐策略 -->
         <div class="section" id="normalOfficialRecommendStrategies" style="display:none;">
-          <div class="section-title">推荐策略 <span style="font-size:11px;color:#999;font-weight:400;">（官方推荐）</span></div>
+          <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">推荐策略 <span style="font-size:12px;color:#2962ff;font-weight:400;cursor:pointer;">查看更多&gt;&gt;</span></div>
           <div style="background:#e3f2fd;border:1px solid #bbdefb;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#1565c0;line-height:1.5;">
             💡 该用户暂未公开分享策略，以下为官方智能推荐的同风格策略
           </div>
@@ -1052,17 +1052,6 @@
               </div>
             </div>
           </div>
-          <!-- 长按评论操作菜单（自己主页特有：含置顶+删除） -->
-          <div id="selfCommentMenuTop" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:999; background:#fff; border-radius:16px 16px 0 0; box-shadow:0 -4px 20px rgba(0,0,0,0.15); padding:20px 0 30px;">
-            <div style="display:flex; justify-content:space-around; padding:10px 20px;">
-              <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">📋</div><div style="font-size:12px;color:#333;">复制评论</div></div>
-              <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">💬</div><div style="font-size:12px;color:#333;">回复</div></div>
-              <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#fff8e1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">📌</div><div style="font-size:12px;color:#e65100;">置顶</div></div>
-              <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">🗑️</div><div style="font-size:12px;color:#c62828;">删除</div></div>
-              <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">⚠️</div><div style="font-size:12px;color:#333;">举报</div></div>
-            </div>
-            <div style="text-align:center; padding:12px; font-size:14px; color:#999; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')">取消</div>
-          </div>
         </div>
 
         <!-- 模块5：大师荣誉（暂时隐藏，后续补上） -->
@@ -1092,18 +1081,6 @@
               <div class="label">运行天数</div>
             </div>
             <div class="data-item">
-              <div class="value green">-4.2%</div>
-              <div class="label">最大回撤</div>
-            </div>
-            <div class="data-item">
-              <div class="value blue">79</div>
-              <div class="label">粉丝数</div>
-            </div>
-            <div class="data-item">
-              <div class="value blue">8</div>
-              <div class="label">获赞数</div>
-            </div>
-            <div class="data-item">
               <div class="value blue">2</div>
               <div class="label">策略数</div>
             </div>
@@ -1119,7 +1096,7 @@
         <div class="section">
           <div class="guide-area">
             <div class="guide-icon">🚀</div>
-            <div class="guide-title">创建你的第一个策略</div>
+            <div class="guide-title">创建更多策略</div>
             <div class="guide-desc">分享策略可以让更多人关注你<br>优秀策略有机会登上大师榜</div>
             <button class="guide-btn">立即创建策略</button>
           </div>
@@ -1144,7 +1121,7 @@
 
         <!-- 模块5：新手推荐策略 -->
         <div class="section">
-          <div class="section-title"><span class="icon">⭐</span> 推荐策略</div>
+          <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;"><span><span class="icon">⭐</span> 推荐策略</span><span style="font-size:12px;color:#2962ff;font-weight:400;cursor:pointer;">查看更多&gt;&gt;</span></div>
           <div style="font-size:12px; color:#999; margin-bottom:12px;">适合你当前阶段的策略，学习参考或直接收藏使用</div>
           <div class="strategy-card">
             <div class="strategy-header"><span class="strategy-name">稳健网格策略</span><span class="strategy-collect-btn">收藏</span></div>
@@ -1534,6 +1511,18 @@
   </div>
 </div>
 
+<!-- 长按评论操作菜单（移到.phone外部避免overflow:hidden裁切） -->
+<div id="selfCommentMenuTop" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999; background:#fff; border-radius:16px 16px 0 0; box-shadow:0 -4px 20px rgba(0,0,0,0.15); padding:20px 0 30px;">
+  <div style="display:flex; justify-content:space-around; padding:10px 20px;">
+    <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">📋</div><div style="font-size:12px;color:#333;">复制评论</div></div>
+    <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">💬</div><div style="font-size:12px;color:#333;">回复</div></div>
+    <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#fff8e1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">📌</div><div style="font-size:12px;color:#e65100;">置顶</div></div>
+    <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#fce4ec;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">🗑️</div><div style="font-size:12px;color:#c62828;">删除</div></div>
+    <div style="text-align:center; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')"><div style="width:48px;height:48px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:20px;">⚠️</div><div style="font-size:12px;color:#333;">举报</div></div>
+  </div>
+  <div style="text-align:center; padding:12px; font-size:14px; color:#999; cursor:pointer;" onclick="closeSelfCommentMenu('selfCommentMenuTop')">取消</div>
+</div>
+
 <!-- 框选区域的提示弹窗 -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -1920,7 +1909,18 @@ function switchNormalShareState(hasShare, el) {
 function showSelfCommentMenu(event, el) {
   event.stopPropagation();
   var menu = document.getElementById('selfCommentMenuTop');
-  if (menu) menu.style.display = 'block';
+  if (!menu) return;
+  var phone = document.getElementById('phone');
+  if (phone) {
+    var rect = phone.getBoundingClientRect();
+    menu.style.left = rect.left + 'px';
+    menu.style.width = rect.width + 'px';
+    menu.style.right = 'auto';
+    menu.style.bottom = '0px';
+  }
+  menu.style.display = 'block';
+  // 确保菜单在最顶层
+  menu.style.zIndex = '99999';
 }
 function closeSelfCommentMenu(id) {
   var menu = document.getElementById(id);
