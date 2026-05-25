@@ -401,6 +401,48 @@
   .sub-controls .sub-btn.active { background: #1a3a8a; color: #fff; }
   .sub-controls .sub-btn:hover { opacity: 0.85; }
 
+  /* ===== 消息中心 & 互动消息页样式 ===== */
+  .msg-page-header { display:flex; align-items:center; justify-content:center; position:relative; padding:14px 16px; background:#fff; border-bottom:1px solid #f0f0f0; }
+  .msg-page-header .back-arrow { position:absolute; left:16px; font-size:28px; font-weight:300; color:#333; cursor:pointer; line-height:1; }
+  .msg-page-header .header-title { font-size:17px; font-weight:600; color:#333; }
+  .msg-page-header .header-right { position:absolute; right:16px; font-size:13px; color:#333; cursor:pointer; }
+  .msg-list { background:#fff; }
+  .msg-item { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid #f5f5f5; cursor:pointer; }
+  .msg-item:active { background:#f8f8f8; }
+  .msg-avatar { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .msg-avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+  .msg-info { flex:1; min-width:0; }
+  .msg-name { font-size:15px; font-weight:600; color:#333; }
+  .msg-desc { font-size:13px; color:#999; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .msg-time { font-size:12px; color:#bbb; flex-shrink:0; }
+  .msg-badge { display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+  .msg-dot { width:8px; height:8px; border-radius:50%; background:#e53935; }
+  .interact-msg-item { display:flex; align-items:flex-start; gap:12px; padding:16px; border-bottom:1px solid #f5f5f5; cursor:pointer; }
+  .interact-msg-item:active { background:#f8f8f8; }
+  .interact-msg-avatar { width:40px; height:40px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; overflow:hidden; }
+  .interact-msg-avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+  .interact-msg-body { flex:1; min-width:0; }
+  .interact-msg-user { font-size:15px; font-weight:600; color:#333; display:flex; align-items:center; gap:6px; }
+  .interact-msg-user .vip-icon { color:#43a047; font-size:14px; }
+  .interact-msg-text { font-size:14px; color:#666; margin-top:4px; }
+  .interact-msg-time { font-size:12px; color:#bbb; margin-top:4px; }
+  .interact-msg-preview { width:80px; height:56px; border-radius:6px; background:#f8f8f8; border:1px solid #eee; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; margin-left:8px; }
+  .interact-msg-preview .preview-title { font-size:10px; color:#666; margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70px; }
+  .interact-msg-preview .preview-value { font-size:12px; font-weight:700; color:#333; }
+
+  /* 评论高亮闪烁动画 */
+  @keyframes commentHighlight {
+    0% { background-color: #fff3e0; }
+    25% { background-color: #ffe0b2; }
+    50% { background-color: #fff3e0; }
+    75% { background-color: #ffe0b2; }
+    100% { background-color: transparent; }
+  }
+  .comment-item.highlight-flash {
+    animation: commentHighlight 2s ease-out;
+    border-radius: 8px;
+  }
+
   /* ===== 首页 icon 覆盖层 ===== */
   #pageHome { position: relative; }
   .home-icons-overlay { position: absolute; left: 0; right: 0; top: 42%; background: #fff; padding: 14px 8px 10px; z-index: 5; }
@@ -1029,22 +1071,22 @@
         <div class="section" style="padding:16px;">
           <div class="section-title"><span class="icon">💬</span> 粉丝互动</div>
           <div style="display:flex; gap:10px; margin-bottom:14px;">
-            <div style="flex:1; text-align:center; padding:10px; background:#fff3e0; border-radius:8px; cursor:pointer;"><div style="font-size:18px; font-weight:700; color:#e65100;">12</div><div style="font-size:11px; color:#8d6e00;">待回复留言</div></div>
-            <div style="flex:1; text-align:center; padding:10px; background:#e3f2fd; border-radius:8px; cursor:pointer;"><div style="font-size:18px; font-weight:700; color:#1565c0;">5</div><div style="font-size:11px; color:#1565c0;">新私信</div></div>
+            <div style="flex:1; text-align:center; padding:10px; background:#fff3e0; border-radius:8px; cursor:pointer;" onclick="openMessageCenter()"><div style="font-size:18px; font-weight:700; color:#e65100;">12</div><div style="font-size:11px; color:#8d6e00;">待回复留言</div></div>
+            <div style="flex:1; text-align:center; padding:10px; background:#e3f2fd; border-radius:8px; cursor:pointer;" onclick="openMessageCenter()"><div style="font-size:18px; font-weight:700; color:#1565c0;">5</div><div style="font-size:11px; color:#1565c0;">新私信</div></div>
             <div style="flex:1; text-align:center; padding:10px; background:#e8f5e9; border-radius:8px; cursor:pointer;"><div style="font-size:18px; font-weight:700; color:#2e7d32;">28</div><div style="font-size:11px; color:#2e7d32;">今日新增粉丝</div></div>
           </div>
           <div class="comment-area">
             <div style="font-size:12px; color:#666; margin-bottom:8px;">最新粉丝留言</div>
             <div class="comment-input">回复粉丝留言...</div>
             <!-- 置顶评论 -->
-            <div class="comment-item" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
+            <div class="comment-item" id="comment-top-1" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
               <div class="comment-avatar"></div>
               <div class="comment-content">
                 <div class="comment-name">量化小白 <span style="font-size:10px; color:#e65100; background:#fff3e0; padding:1px 6px; border-radius:4px; margin-left:4px;">置顶</span></div>
                 <div class="comment-text">大佬，你的策略回撤控制得真好，能分享下思路吗？</div>
               </div>
             </div>
-            <div class="comment-item" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
+            <div class="comment-item" id="comment-top-2" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
               <div class="comment-avatar"></div>
               <div class="comment-content">
                 <div class="comment-name">交易达人</div>
@@ -1187,14 +1229,14 @@
           <div class="section-title"><span class="icon">💬</span> 互动留言</div>
           <div class="comment-area">
             <div class="comment-input">回复粉丝留言...</div>
-            <div class="comment-item" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
+            <div class="comment-item" id="comment-normal-1" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
               <div class="comment-avatar"></div>
               <div class="comment-content">
                 <div class="comment-name">策略新手 <span style="font-size:10px; color:#e65100; background:#fff3e0; padding:1px 6px; border-radius:4px; margin-left:4px;">置顶</span></div>
                 <div class="comment-text">加油！看好你的成长，策略思路很有意思</div>
               </div>
             </div>
-            <div class="comment-item" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
+            <div class="comment-item" id="comment-normal-2" style="position:relative;" onclick="showSelfCommentMenu(event, this)">
               <div class="comment-avatar"></div>
               <div class="comment-content">
                 <div class="comment-name">量化爱好者</div>
@@ -1508,6 +1550,127 @@
     </div>
   </div><!-- end pageUserDetail -->
 
+  <!-- ==================== 页面3：消息中心 ==================== -->
+  <div class="page" id="pageMessageCenter" style="background:#fff; min-height:100vh;">
+    <div class="msg-page-header">
+      <span class="back-arrow" onclick="goBackFromMsgCenter()">‹</span>
+      <span class="header-title">消息</span>
+      <span class="header-right">发现群聊</span>
+    </div>
+    <div class="msg-list">
+      <div class="msg-item">
+        <div class="msg-avatar" style="background:#e3f2fd;">👤</div>
+        <div class="msg-info">
+          <div class="msg-name">新关注我的</div>
+          <div class="msg-desc">Aaa建材老王 关注了您</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">15:02</span></div>
+      </div>
+      <div class="msg-item" onclick="showPage('pageInteractMsg')">
+        <div class="msg-avatar" style="background:#fff3e0;">💬</div>
+        <div class="msg-info">
+          <div class="msg-name">互动消息</div>
+          <div class="msg-desc">量化小白 给你留言了</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">15:02</span></div>
+      </div>
+      <div class="msg-item">
+        <div class="msg-avatar" style="background:#e8f5e9;">🏢</div>
+        <div class="msg-info">
+          <div class="msg-name">量化王高校大赛活动群</div>
+          <div class="msg-desc">[101条] "lhw_***7oElVJmr"加入群组</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">15:00</span><span class="msg-dot"></span></div>
+      </div>
+      <div class="msg-item">
+        <div class="msg-avatar" style="background:#f3e5f5;">👥</div>
+        <div class="msg-info">
+          <div class="msg-name">量化小白交流群</div>
+          <div class="msg-desc">量化王-客服: [46条] 量化大赛直播即...</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">14:57</span><span class="msg-dot"></span></div>
+      </div>
+      <div class="msg-item">
+        <div class="msg-avatar" style="background:#e0f7fa;">📚</div>
+        <div class="msg-info">
+          <div class="msg-name">量化高手训练营</div>
+          <div class="msg-desc">量化王客服: [143条] 量化大赛直播即...</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">14:57</span><span class="msg-dot"></span></div>
+      </div>
+      <div class="msg-item">
+        <div class="msg-avatar" style="background:#fce4ec;">💻</div>
+        <div class="msg-info">
+          <div class="msg-name">程序化交易交流群</div>
+          <div class="msg-desc">量化王客服: [206条] 量化大赛直播即...</div>
+        </div>
+        <div class="msg-badge"><span class="msg-time">14:57</span><span class="msg-dot"></span></div>
+      </div>
+    </div>
+  </div><!-- end pageMessageCenter -->
+
+  <!-- ==================== 页面4：互动消息 ==================== -->
+  <div class="page" id="pageInteractMsg" style="background:#fff; min-height:100vh;">
+    <div class="msg-page-header">
+      <span class="back-arrow" onclick="showPage('pageMessageCenter')">‹</span>
+      <span class="header-title">互动消息</span>
+    </div>
+    <div style="background:#fff;">
+      <div class="interact-msg-item" onclick="goToCommentFromMsg('comment-top-1', 'self-top')">
+        <div class="interact-msg-avatar" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">🌱</div>
+        <div class="interact-msg-body">
+          <div class="interact-msg-user">量化小白 <span class="vip-icon">✓</span></div>
+          <div class="interact-msg-text">给你留言了</div>
+          <div class="interact-msg-time">2分钟前</div>
+        </div>
+        <div class="interact-msg-preview">
+          <div class="preview-title">市盈率...</div>
+          <div style="font-size:10px;color:#999;">今日收益</div>
+          <div class="preview-value">0.00%</div>
+        </div>
+      </div>
+      <div class="interact-msg-item" onclick="goToCommentFromMsg('comment-top-2', 'self-top')">
+        <div class="interact-msg-avatar" style="background:linear-gradient(135deg,#fff8e1,#ffe082);">🔥</div>
+        <div class="interact-msg-body">
+          <div class="interact-msg-user">交易达人 <span class="vip-icon">✓</span></div>
+          <div class="interact-msg-text">回复了你的留言</div>
+          <div class="interact-msg-time">5分钟前</div>
+        </div>
+        <div class="interact-msg-preview">
+          <div class="preview-title">貔貅纳财</div>
+          <div style="font-size:10px;color:#999;">今日收益</div>
+          <div class="preview-value">+1.23%</div>
+        </div>
+      </div>
+      <div class="interact-msg-item" onclick="goToCommentFromMsg('comment-normal-1', 'self-normal')">
+        <div class="interact-msg-avatar" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);">⭐</div>
+        <div class="interact-msg-body">
+          <div class="interact-msg-user">策略新手</div>
+          <div class="interact-msg-text">给你留言了</div>
+          <div class="interact-msg-time">10分钟前</div>
+        </div>
+        <div class="interact-msg-preview">
+          <div class="preview-title">均线交叉</div>
+          <div style="font-size:10px;color:#999;">今日收益</div>
+          <div class="preview-value">+0.56%</div>
+        </div>
+      </div>
+      <div class="interact-msg-item" onclick="goToCommentFromMsg('comment-normal-2', 'self-normal')">
+        <div class="interact-msg-avatar" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);">💡</div>
+        <div class="interact-msg-body">
+          <div class="interact-msg-user">量化爱好者</div>
+          <div class="interact-msg-text">回复了你的留言</div>
+          <div class="interact-msg-time">15分钟前</div>
+        </div>
+        <div class="interact-msg-preview">
+          <div class="preview-title">网格捕手</div>
+          <div style="font-size:10px;color:#999;">今日收益</div>
+          <div class="preview-value">-0.12%</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end pageInteractMsg -->
+
   </div>
 </div>
 
@@ -1739,7 +1902,66 @@ function showPage(id) {
     document.getElementById('specList').style.display = 'none';
     document.getElementById('specUserDetail').style.display = 'none';
     document.getElementById('userControls').style.display = 'none';
+  } else if (id === 'pageMessageCenter' || id === 'pageInteractMsg') {
+    document.getElementById('specList').style.display = 'none';
+    document.getElementById('specUserDetail').style.display = 'none';
+    document.getElementById('userControls').style.display = 'none';
   }
+}
+
+// ===== 消息中心相关 =====
+function openMessageCenter() {
+  showPage('pageMessageCenter');
+}
+
+function goBackFromMsgCenter() {
+  showPage('pageUserDetail');
+}
+
+// 从互动消息跳转回个人主页并定位到对应评论
+function goToCommentFromMsg(commentId, state) {
+  // 切换到个人主页
+  showPage('pageUserDetail');
+  // 切换到对应的状态
+  document.querySelectorAll('.page-state').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('state-' + state).classList.add('active');
+  // 更新左侧按钮状态
+  document.querySelectorAll('.user-controls > button').forEach(function(btn) { btn.classList.remove('active'); });
+  document.querySelectorAll('.user-controls > button').forEach(function(btn) {
+    if (state === 'self-top' && btn.textContent.indexOf('个人主页（头部') !== -1) btn.classList.add('active');
+    else if (state === 'self-normal' && btn.textContent.indexOf('个人主页（非头部') !== -1) btn.classList.add('active');
+  });
+  // 隐藏子选项
+  var subControls = document.getElementById('subControlsTop');
+  var subControlsNormal = document.getElementById('subControlsNormal');
+  if (subControls) subControls.style.display = 'none';
+  if (subControlsNormal) subControlsNormal.style.display = 'none';
+  // 切换为编辑个人资料按钮
+  var followBtn = document.querySelector('.follow-btn');
+  if (followBtn) {
+    followBtn.textContent = '编辑资料';
+    followBtn.style.background = '#f5f5f5';
+    followBtn.style.color = '#333';
+    followBtn.style.border = '1.5px solid #e0e0e0';
+  }
+  // 确保策略 tab 显示
+  var strategyTab = document.querySelector('.profile-tab[data-ptab="strategy"]');
+  if (strategyTab) strategyTab.style.display = '';
+  // 延迟后滚动到评论并高亮
+  setTimeout(function() {
+    var commentEl = document.getElementById(commentId);
+    if (commentEl) {
+      commentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 触发高亮闪烁
+      setTimeout(function() {
+        commentEl.classList.add('highlight-flash');
+        // 动画结束后移除类
+        setTimeout(function() {
+          commentEl.classList.remove('highlight-flash');
+        }, 2000);
+      }, 400);
+    }
+  }, 300);
 }
 
 function switchTab(el) {
