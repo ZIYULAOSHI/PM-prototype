@@ -491,6 +491,7 @@
   </div>
   <button onclick="switchState('self-top')">个人主页（头部用户）</button>
   <button onclick="switchState('self-normal')">个人主页（非头部用户）</button>
+  <button onclick="showPage('pageMessageCenter')" style="background:#ff9800;color:#fff;border-color:#ff9800;">💬 消息中心</button>
   <button onclick="showPage('pageList')" style="background:#e53935;color:#fff;border-color:#e53935;">← 返回榜单</button>
 </div>
 
@@ -1070,11 +1071,6 @@
         <!-- 模块4：粉丝互动管理 -->
         <div class="section" style="padding:16px;">
           <div class="section-title"><span class="icon">💬</span> 粉丝互动</div>
-          <div style="display:flex; gap:10px; margin-bottom:14px;">
-            <div style="flex:1; text-align:center; padding:10px; background:#fff3e0; border-radius:8px; cursor:pointer;" onclick="openMessageCenter()"><div style="font-size:18px; font-weight:700; color:#e65100;">12</div><div style="font-size:11px; color:#8d6e00;">待回复留言</div></div>
-            <div style="flex:1; text-align:center; padding:10px; background:#e3f2fd; border-radius:8px; cursor:pointer;" onclick="openMessageCenter()"><div style="font-size:18px; font-weight:700; color:#1565c0;">5</div><div style="font-size:11px; color:#1565c0;">新私信</div></div>
-            <div style="flex:1; text-align:center; padding:10px; background:#e8f5e9; border-radius:8px; cursor:pointer;"><div style="font-size:18px; font-weight:700; color:#2e7d32;">28</div><div style="font-size:11px; color:#2e7d32;">今日新增粉丝</div></div>
-          </div>
           <div class="comment-area">
             <div style="font-size:12px; color:#666; margin-bottom:8px;">最新粉丝留言</div>
             <div class="comment-input">回复粉丝留言...</div>
@@ -1911,7 +1907,7 @@ function showPage(id) {
 
 // ===== 消息中心相关 =====
 function openMessageCenter() {
-  showPage('pageMessageCenter');
+  showPage('pageInteractMsg');
 }
 
 function goBackFromMsgCenter() {
