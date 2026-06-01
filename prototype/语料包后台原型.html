@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化王管理后台 - 语料包管理</title>
+<style>
+:root {
+  --bg: #f4f5f8;
+  --surface: #fafbfd;
+  --sidebar-bg: #1a1d24;
+  --sidebar-text: #9ba3b4;
+  --sidebar-active: #e8edf5;
+  --sidebar-active-bg: rgba(74, 108, 247, 0.1);
+  --text: #1e2130;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7ed;
+  --accent: #3b6df0;
+  --accent-light: #e8edf9;
+  --danger: #e5484d;
+  --danger-light: #fef2f2;
+  --success: #30a46c;
+  --success-light: #eef9f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8edf5;
+  letter-spacing: .5px;
+}
+
+.sidebar-logo span {
+  font-size: 11px;
+  color: var(--sidebar-text);
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.nav-section {
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 13px;
+  gap: 10px;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-item.active {
+  color: #c8d4f7;
+  background: rgba(59, 109, 240, 0.12);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-item .icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item.active .icon { opacity: 0.9; }
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 13px;
+  gap: 10px;
+  transition: all var(--transition);
+}
+
+.nav-group-header:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-group-header .arrow {
+  margin-left: auto;
+  font-size: 10px;
+  transition: transform var(--transition);
+}
+
+.nav-group.open .nav-group-header .arrow {
+  transform: rotate(90deg);
+}
+
+.nav-sub {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 250ms ease;
+}
+
+.nav-group.open .nav-sub {
+  max-height: 200px;
+}
+
+.nav-sub .nav-item {
+  padding-left: 46px;
+  font-size: 12.5px;
+}
+
+/* Main Area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-bar {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb span {
+  color: var(--text-muted);
+  margin: 0 6px;
+}
+
+.breadcrumb .current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="text"],
+.filter-bar select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.filter-bar input[type="text"]:focus,
+.filter-bar select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.filter-bar input[type="text"] {
+  width: 220px;
+}
+
+.filter-bar select {
+  width: 130px;
+}
+
+.filter-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #2f5cd6;
+}
+
+.btn-default {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-default:hover {
+  background: var(--bg);
+  border-color: #cdd2db;
+}
+
+.btn-new {
+  margin-left: auto;
+}
+
+.btn-danger-text {
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.btn-danger-text:hover {
+  background: var(--danger-light);
+}
+
+.btn-edit-text {
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-edit-text:hover {
+  background: var(--accent-light);
+}
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: #f8f9fb;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f1f5;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #fafbfd;
+}
+
+.td-ellipsis {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.td-similar {
+  max-width: 200px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.td-answer {
+  max-width: 220px;
+  font-size: 13px;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 22px;
+  transition: all 200ms ease;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider {
+  background: var(--success);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.enabled { color: var(--success); }
+.status-badge.enabled::before { background: var(--success); }
+.status-badge.disabled { color: var(--text-muted); }
+.status-badge.disabled::before { background: var(--text-muted); }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  gap: 6px;
+  border-top: 1px solid #f0f1f5;
+}
+
+.pagination .page-info {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-right: 10px;
+}
+
+.pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+
+.pagination button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pagination button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Category Tag */
+.category-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cat-open { background: #eef2ff; color: #4f46e5; }
+.cat-fee { background: #fef3c7; color: #b45309; }
+.cat-strategy { background: #ecfdf5; color: #047857; }
+.cat-indicator { background: #fdf2f8; color: #be185d; }
+.cat-broker { background: #eff6ff; color: #2563eb; }
+.cat-tech { background: #fef2f2; color: #dc2626; }
+.cat-other { background: #f9fafb; color: #6b7280; }
+
+.category-classes {
+  '开户': 'cat-open',
+  '收费': 'cat-fee',
+  '策略': 'cat-strategy',
+  '指标': 'cat-indicator',
+  '券商': 'cat-broker',
+  '技术问题': 'cat-tech',
+  '其他': 'cat-other'
+}
+
+/* Delete Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 150ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.modal p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Right Side Drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 480px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Edit Form */
+.form-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  max-width: none;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group label .required {
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form-group .hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-group textarea[name="similar"] {
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-cancel {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-cancel:hover {
+  background: var(--bg);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2130;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 2000;
+  animation: toastIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.toast.success { background: #166534; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>量化王管理后台</h1>
+    <span>QuantKing Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="#">
+      <span class="icon">⌂</span> 首页
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⬇</span> 安装包管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⚙</span> 功能管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">◈</span> 策略管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">◎</span> 量化圈子管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">▣</span> 课程管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⬡</span> 券商管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">☷</span> 文章管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">☺</span> 老师管理
+    </a>
+    <div class="nav-section">
+      <div class="nav-group open" onclick="this.classList.toggle('open')">
+        <div class="nav-group-header">
+          <span class="icon">◫</span> 群聊管理
+          <span class="arrow">▶</span>
+        </div>
+        <div class="nav-sub">
+          <a class="nav-item active" href="#" onclick="switchView('list'); return false;">语料包管理</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-item" href="#">
+      <span class="icon">▤</span> 数据统计
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<div class="main-area">
+  <div class="top-bar">
+    <div class="breadcrumb" id="breadcrumb">
+      <span>首页</span><span>›</span><span>群聊管理</span><span>›</span><span class="current">语料包管理</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ====== 列表页 ====== -->
+    <div class="view active" id="view-list">
+      <div class="page-header">
+        <h2>语料包管理</h2>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="问题关键词" id="searchInput">
+        <select id="catFilter">
+          <option value="">所属分类</option>
+          <option value="开户">开户</option>
+          <option value="收费">收费</option>
+          <option value="策略">策略</option>
+          <option value="指标">指标</option>
+          <option value="券商">券商</option>
+          <option value="技术问题">技术问题</option>
+          <option value="其他">其他</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">状态</option>
+          <option value="启用">启用</option>
+          <option value="禁用">禁用</option>
+        </select>
+        <button class="btn btn-default" onclick="resetFilters()">重置</button>
+        <button class="btn btn-default" onclick="filterData()">查询</button>
+        <button class="btn btn-primary btn-new" onclick="goEdit('new')">新建</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:80px">所属分类</th>
+              <th style="width:180px">标准提问</th>
+              <th style="width:200px">相似问法</th>
+              <th style="width:220px">答案</th>
+              <th style="width:80px">状态</th>
+              <th style="width:100px">更新时间</th>
+              <th style="width:70px">更新人</th>
+              <th style="width:90px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+          </tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ====== 编辑页 ====== -->
+    <!-- replaced by drawer below -->
+
+  </div>
+</div>
+
+<!-- Edit Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <h3 id="editTitle">编辑语料</h3>
+  </div>
+  <div class="drawer-body">
+    <div class="form-group">
+      <label><span class="required">*</span> 所属分类</label>
+      <select id="editCategory">
+        <option value="">请选择分类</option>
+        <option value="开户">开户</option>
+        <option value="收费">收费</option>
+        <option value="策略">策略</option>
+        <option value="指标">指标</option>
+        <option value="券商">券商</option>
+        <option value="技术问题">技术问题</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label><span class="required">*</span> 标准提问</label>
+      <input type="text" id="editQuestion" placeholder="请输入标准问题描述">
+    </div>
+    <div class="form-group">
+      <label>相似问法 <span class="hint">（一行一个相似问法，换行分隔）</span></label>
+      <textarea id="editSimilar" placeholder="怎么开户？&#10;需要什么条件？&#10;怎么加入量化交易？"></textarea>
+    </div>
+    <div class="form-group">
+      <label><span class="required">*</span> 答案</label>
+      <textarea id="editAnswer" placeholder="请输入对应答案" style="min-height:140px"></textarea>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-cancel" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-primary" id="btnSave" onclick="saveCorpus()">保存</button>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal" style="display:none">
+  <div class="modal">
+    <h3>删除语料</h3>
+    <p>确定删除该语料吗？删除后不可恢复。</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+// ===== 数据 =====
+let corpusData = [
+  {
+    id: 1,
+    category: '开户',
+    question: '如何开通量化交易账户',
+    similar: ['怎么开户', '开通账户需要什么条件', '怎么加入量化交易', '如何注册量化账户', '量化开户流程是什么', '开户要准备哪些材料', '个人可以开通吗'],
+    answer: '您可以在量化王APP中点击「我的」-「量化交易」-「立即开通」，按照指引完成身份认证和风险测评，选择券商即可开通量化交易账户。目前支持山西证券、华兴证券、国新证券。',
+    status: true,
+    updateTime: '2026-05-28 14:30',
+    updater: '李向梅'
+  },
+  {
+    id: 2,
+    category: '收费',
+    question: '量化王软件是免费的还是收费的',
+    similar: ['收费吗', '多少钱', '免费吗', '需要付费吗'],
+    answer: '量化王APP基础功能免费使用，包括行情查看、基础策略研究和模拟交易。量化交易实盘功能需要开通合作券商账户，具体费用以券商为准。部分高级策略和课程为付费内容。',
+    status: true,
+    updateTime: '2026-05-27 10:15',
+    updater: '王静'
+  },
+  {
+    id: 3,
+    category: '券商',
+    question: '量化王目前支持哪些券商',
+    similar: ['量化必须得开通山西证券账户才能做吗', '只能用山西证券吗', '不能用别的证券账户吗', '支持华泰证券吗'],
+    answer: '目前量化王支持山西证券、华兴证券、国新证券进行实盘交易，您可以在页面底部「开户」-「立即开通」，选择心仪的券商并开户。其他券商暂时不支持，我们会搜集用户需求，逐步开放更多券商的实盘功能。',
+    status: true,
+    updateTime: '2026-05-26 16:45',
+    updater: '李向梅'
+  },
+  {
+    id: 4,
+    category: '指标',
+    question: '中期彩带是什么指标',
+    similar: ['彩带指标怎么看', '中期彩带怎么用'],
+    answer: '中期彩带是量化王的趋势判断指标，粉色表示上升趋势，蓝色表示下降趋势。该指标基于多条移动平均线计算，不含未来函数。可在策略编辑页面的指标列表中查看详细说明。',
+    status: true,
+    updateTime: '2026-05-25 09:20',
+    updater: '张磊'
+  },
+  {
+    id: 5,
+    category: '技术问题',
+    question: 'APP使用中点击不响应卡顿怎么办',
+    similar: ['闪退', '卡顿', '经常死机', '打开就闪退'],
+    answer: '如遇到卡顿或闪退问题，请尝试以下操作：1. 清理APP缓存（设置-通用-清理缓存）；2. 检查APP是否为最新版本；3. 重启手机后重试。如问题仍然存在，请提供录屏并联系客服。',
+    status: false,
+    updateTime: '2026-05-24 11:00',
+    updater: '王静'
+  }
+];
+
+let nextId = 6;
+let currentDeleteId = null;
+let editingId = null;
+
+// ===== 渲染表格 =====
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, idx) => {
+    const catClassMap = {
+      '开户': 'cat-open', '收费': 'cat-fee', '策略': 'cat-strategy',
+      '指标': 'cat-indicator', '券商': 'cat-broker', '技术问题': 'cat-tech', '其他': 'cat-other'
+    };
+    const similarText = item.similar.join('，');
+    const answerText = item.answer;
+    const statusBadge = item.status
+      ? '<span class="status-badge enabled">启用</span>'
+      : '<span class="status-badge disabled">禁用</span>';
+    const checked = item.status ? 'checked' : '';
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td><span class="category-tag ${catClassMap[item.category] || 'cat-other'}">${item.category}</span></td>
+        <td><div class="td-ellipsis" title="${escapeHtml(item.question)}">${escapeHtml(item.question)}</div></td>
+        <td><div class="td-similar" title="${escapeHtml(similarText)}">${escapeHtml(similarText)}</div></td>
+        <td><div class="td-answer" title="${escapeHtml(answerText)}">${escapeHtml(answerText)}</div></td>
+        <td>
+          <label class="switch" onclick="toggleStatus(${item.id}, event)">
+            <input type="checkbox" ${checked}>
+            <span class="slider"></span>
+          </label>
+        </td>
+        <td>${item.updateTime}</td>
+        <td>${item.updater}</td>
+        <td>
+          <button class="btn-edit-text" onclick="goEdit(${item.id})">编辑</button>
+          <button class="btn-danger-text" onclick="openDeleteModal(${item.id})">删除</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderPagination(total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return '';
+  let html = `<span class="page-info">共 ${total} 条</span>`;
+  html += `<button ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})">‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})">›</button>`;
+  return html;
+}
+
+let currentPage = 1;
+const pageSize = 10;
+
+function refreshTable() {
+  const search = document.getElementById('searchInput')?.value || '';
+  const cat = document.getElementById('catFilter')?.value || '';
+  const status = document.getElementById('statusFilter')?.value || '';
+  let data = corpusData;
+  if (search) {
+    const q = search.toLowerCase();
+    data = data.filter(d => d.question.toLowerCase().includes(q) || d.similar.some(s => s.toLowerCase().includes(q)));
+  }
+  if (cat) data = data.filter(d => d.category === cat);
+  if (status) {
+    const s = status === '启用';
+    data = data.filter(d => d.status === s);
+  }
+  const total = data.length;
+  const start = (currentPage - 1) * pageSize;
+  const paged = data.slice(start, start + pageSize);
+  renderTable(paged);
+  document.getElementById('pagination').innerHTML = renderPagination(total, currentPage, pageSize);
+}
+
+function goPage(page) {
+  currentPage = page;
+  refreshTable();
+}
+
+function filterData() {
+  currentPage = 1;
+  refreshTable();
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  currentPage = 1;
+  refreshTable();
+}
+
+// ===== Switch切换 =====
+function toggleStatus(id, event) {
+  event.stopPropagation();
+  event.preventDefault();
+  const item = corpusData.find(d => d.id === id);
+  if (item) {
+    item.status = !item.status;
+    item.updateTime = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+    refreshTable();
+    showToast(item.status ? '已启用' : '已禁用', 'success');
+  }
+}
+
+// ===== 删除 =====
+function openDeleteModal(id) {
+  currentDeleteId = id;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeModal() {
+  currentDeleteId = null;
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+  if (currentDeleteId !== null) {
+    corpusData = corpusData.filter(d => d.id !== currentDeleteId);
+    currentDeleteId = null;
+    document.getElementById('deleteModal').style.display = 'none';
+    refreshTable();
+    showToast('语料已删除');
+  }
+}
+
+// ===== 抽屉开关 =====
+function openDrawer() {
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  editingId = null;
+}
+
+// ===== 编辑/新建 =====
+function goEdit(id) {
+  editingId = id;
+  if (id === 'new') {
+    document.getElementById('editTitle').textContent = '新建语料';
+    document.getElementById('editCategory').value = '';
+    document.getElementById('editQuestion').value = '';
+    document.getElementById('editSimilar').value = '';
+    document.getElementById('editAnswer').value = '';
+  } else {
+    const item = corpusData.find(d => d.id === id);
+    if (!item) return;
+    document.getElementById('editTitle').textContent = '编辑语料';
+    document.getElementById('editCategory').value = item.category;
+    document.getElementById('editQuestion').value = item.question;
+    document.getElementById('editSimilar').value = item.similar.join('\n');
+    document.getElementById('editAnswer').value = item.answer;
+  }
+  openDrawer();
+}
+
+function saveCorpus() {
+  const category = document.getElementById('editCategory').value;
+  const question = document.getElementById('editQuestion').value.trim();
+  const similarRaw = document.getElementById('editSimilar').value.trim();
+  const answer = document.getElementById('editAnswer').value.trim();
+
+  if (!category || !question || !answer) {
+    showToast('请填写所有必填字段');
+    return;
+  }
+
+  const similar = similarRaw ? similarRaw.split('\n').map(s => s.trim()).filter(s => s) : [];
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+
+  if (editingId && editingId !== 'new') {
+    const item = corpusData.find(d => d.id === editingId);
+    if (item) {
+      item.category = category;
+      item.question = question;
+      item.similar = similar;
+      item.answer = answer;
+      item.updateTime = now;
+      item.updater = '当前用户';
+    }
+  } else {
+    corpusData.unshift({
+      id: nextId++,
+      category,
+      question,
+      similar,
+      answer,
+      status: true,
+      updateTime: now,
+      updater: '当前用户'
+    });
+  }
+
+  showToast('保存成功', 'success');
+  closeDrawer();
+  refreshTable();
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ===== 初始化 =====
+refreshTable();
+</script>
+
+</body>
+</html>
