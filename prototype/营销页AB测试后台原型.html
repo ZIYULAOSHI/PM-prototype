@@ -1071,6 +1071,18 @@ tbody tr:hover {
   </div>
 </div>
 
+<!-- Conflict Modal -->
+<div class="modal-overlay" id="conflictModal" style="display:none">
+  <div class="modal">
+    <h3>启用冲突提示</h3>
+    <p id="conflictMsg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeConflictModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmEnableWithConflict()">确认启用</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div id="toastContainer"></div>
 
@@ -1111,7 +1123,7 @@ let experiments = [
       { groupName: 'C', weight: 20, pageTitle: '回归有礼', algorithm: '均值回归', startDate: '2022-06-01', endDate: '2026-03-15', image: 'trend_h.png' },
       { groupName: 'D', weight: 20, pageTitle: '回归有礼', algorithm: '龙头战法', startDate: '2023-01-10', endDate: '2026-03-15', image: 'trend_i.png' }
     ],
-    url: 'https://m.quantking.cn/landing/recall',
+    url: 'https://m.quantking.cn/landing/new-user',
     createTime: '2026-04-10 14:00',
     creator: '张磊'
   },
@@ -1509,15 +1521,55 @@ function saveExperiment() {
 }
 
 // ===== Switch切换 =====
+let pendingEnableId = null;
+
 function toggleStatus(id, event) {
   event.stopPropagation();
   event.preventDefault();
   const item = experiments.find(e => e.id === id);
-  if (item) {
-    item.status = !item.status;
+  if (!item) return;
+
+  // 禁用操作直接执行
+  if (item.status) {
+    item.status = false;
     refreshTable();
-    showToast(item.status ? '已启用' : '已禁用', 'success');
+    showToast('已禁用', 'success');
+    return;
   }
+
+  // 启用操作：检查同URL是否有其他启用中的实验
+  const conflicts = experiments.filter(e => e.id !== id && e.url === item.url && e.status === true);
+  if (conflicts.length > 0) {
+    pendingEnableId = id;
+    const names = conflicts.map(e => '「' + e.name + '」').join('、');
+    document.getElementById('conflictMsg').innerHTML = `该落地页URL已有启用中的实验：${names}。<br><br>确认启用当前实验后，以上实验将自动禁用。`;
+    document.getElementById('conflictModal').style.display = 'flex';
+  } else {
+    item.status = true;
+    refreshTable();
+    showToast('已启用', 'success');
+  }
+}
+
+function closeConflictModal() {
+  pendingEnableId = null;
+  document.getElementById('conflictModal').style.display = 'none';
+}
+
+function confirmEnableWithConflict() {
+  const item = experiments.find(e => e.id === pendingEnableId);
+  if (item) {
+    // 禁用同URL的其他启用实验
+    experiments.forEach(e => {
+      if (e.id !== item.id && e.url === item.url && e.status === true) {
+        e.status = false;
+      }
+    });
+    item.status = true;
+    refreshTable();
+    showToast('已启用，冲突实验已自动禁用', 'success');
+  }
+  closeConflictModal();
 }
 
 function toggleDrawerStatus(e) {
