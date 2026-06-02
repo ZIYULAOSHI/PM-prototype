@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化王管理后台 - 营销页管理</title>
+<style>
+:root {
+  --bg: #f4f5f8;
+  --surface: #fafbfd;
+  --sidebar-bg: #1a1d24;
+  --sidebar-text: #9ba3b4;
+  --sidebar-active: #e8edf5;
+  --sidebar-active-bg: rgba(74, 108, 247, 0.1);
+  --text: #1e2130;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7ed;
+  --accent: #3b6df0;
+  --primary: #3b6df0;
+  --accent-light: #e8edf9;
+  --danger: #e5484d;
+  --danger-light: #fef2f2;
+  --success: #30a46c;
+  --success-light: #eef9f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8edf5;
+  letter-spacing: .5px;
+}
+
+.sidebar-logo span {
+  font-size: 11px;
+  color: var(--sidebar-text);
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.nav-section {
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 13px;
+  gap: 10px;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-item.active {
+  color: #c8d4f7;
+  background: rgba(59, 109, 240, 0.12);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-item .icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item.active .icon { opacity: 0.9; }
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 13px;
+  gap: 10px;
+  transition: all var(--transition);
+}
+
+.nav-group-header:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-group-header .arrow {
+  margin-left: auto;
+  font-size: 10px;
+  transition: transform var(--transition);
+}
+
+.nav-group.open .nav-group-header .arrow {
+  transform: rotate(90deg);
+}
+
+.nav-sub {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 250ms ease;
+}
+
+.nav-group.open .nav-sub {
+  max-height: 200px;
+}
+
+.nav-sub .nav-item {
+  padding-left: 46px;
+  font-size: 12.5px;
+}
+
+/* Main Area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-bar {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb span {
+  color: var(--text-muted);
+  margin: 0 6px;
+}
+
+.breadcrumb .current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="text"],
+.filter-bar select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.filter-bar input[type="text"]:focus,
+.filter-bar select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.filter-bar input[type="text"] {
+  width: 220px;
+}
+
+.filter-bar select {
+  width: 130px;
+}
+
+.filter-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #2f5cd6;
+}
+
+.btn-default {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-default:hover {
+  background: var(--bg);
+  border-color: #cdd2db;
+}
+
+.btn-new {
+  margin-left: auto;
+}
+
+.btn-danger-text {
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.btn-danger-text:hover {
+  background: var(--danger-light);
+}
+
+.btn-edit-text {
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-edit-text:hover {
+  background: var(--accent-light);
+}
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: #f8f9fb;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f1f5;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #fafbfd;
+}
+
+.td-ellipsis {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.running { color: var(--success); }
+.status-badge.running::before { background: var(--success); }
+.status-badge.paused { color: var(--warning); }
+.status-badge.paused::before { background: var(--warning); }
+.status-badge.draft { color: var(--text-muted); }
+.status-badge.draft::before { background: var(--text-muted); }
+
+/* Weight Bar */
+.weight-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weight-bar-track {
+  flex: 1;
+  height: 6px;
+  background: #e8eaef;
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 60px;
+}
+
+.weight-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.weight-bar-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 32px;
+}
+
+/* Group Tags */
+.group-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.group-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.group-tag-a { background: #eef2ff; color: #4f46e5; }
+.group-tag-b { background: #ecfdf5; color: #047857; }
+.group-tag-c { background: #fef3c7; color: #b45309; }
+.group-tag-d { background: #fdf2f8; color: #be185d; }
+.group-tag-e { background: #eff6ff; color: #2563eb; }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  gap: 6px;
+  border-top: 1px solid #f0f1f5;
+}
+
+.pagination .page-info {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-right: 10px;
+}
+
+.pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+
+.pagination button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pagination button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 22px;
+  transition: all 200ms ease;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider {
+  background: var(--success);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+/* Delete Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 150ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.modal p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Right Side Drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 560px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Edit Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group label .required {
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form-group .hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="date"]:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Disabled form state for view mode */
+.form-group select:disabled,
+.form-group input[type="text"]:disabled,
+.form-group input[type="number"]:disabled,
+.form-group input[type="date"]:disabled,
+.form-group textarea:disabled {
+  background: #f4f5f8;
+  color: var(--text-secondary);
+  cursor: default;
+  border-color: #e8e9ee;
+  opacity: 1;
+  -webkit-text-fill-color: var(--text-secondary);
+}
+
+.btn-cancel {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-cancel:hover {
+  background: var(--bg);
+}
+
+/* Group Card */
+.group-section {
+  margin-top: 16px;
+}
+
+.group-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.group-section-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.group-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fff;
+  position: relative;
+}
+
+.group-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f1f5;
+}
+
+.group-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.group-card-remove {
+  color: var(--danger);
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+}
+.group-card-remove:hover {
+  background: var(--danger-light);
+}
+
+.group-card .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.group-card .form-group {
+  margin-bottom: 12px;
+}
+
+.group-card .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Image Upload */
+.upload-area {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: #fafbfd;
+}
+
+.upload-area:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.upload-area .upload-icon {
+  font-size: 24px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.upload-area .upload-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.upload-area .upload-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Weight Summary */
+.weight-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8f9fb;
+  border-radius: var(--radius);
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.weight-summary .weight-total {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.weight-summary.error {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.weight-summary.error .weight-total {
+  color: var(--danger);
+}
+
+/* Switch Row */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.switch-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* 禁用态 Switch 视觉弱化 */
+#expStatus:disabled + .slider,
+#expStatus:disabled ~ .slider {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.switch:has(#expStatus:disabled) {
+  cursor: not-allowed;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2130;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 2000;
+  animation: toastIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.toast.success { background: #166534; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Experiment Detail Info */
+.detail-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8f9fb;
+  border-radius: var(--radius-lg);
+}
+
+.detail-info-item {
+  font-size: 13px;
+}
+
+.detail-info-item .label {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.detail-info-item .value {
+  color: var(--text);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>量化王管理后台</h1>
+    <span>QuantKing Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="#">
+      <span class="icon">⌂</span> 首页
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⬇</span> 安装包管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⚙</span> 功能管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">◈</span> 策略管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">◎</span> 量化圈子管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">▣</span> 课程管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⬡</span> 券商管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">☷</span> 文章管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">☺</span> 老师管理
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">◫</span> 群聊管理
+    </a>
+    <div class="nav-section">
+      <div class="nav-group open" onclick="this.classList.toggle('open')">
+        <div class="nav-group-header">
+          <span class="icon">◉</span> 营销页管理
+          <span class="arrow">▶</span>
+        </div>
+        <div class="nav-sub">
+          <a class="nav-item active" href="#" onclick="return false;">
+            <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h5v5H2V3zm7 0h5v5H9V3zM2 9.5h5v4H2v-4zm7 0h5v4H9v-4z" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+            A/B 测试
+          </a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-item" href="#">
+      <span class="icon">▤</span> 数据统计
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<div class="main-area">
+  <div class="top-bar">
+    <div class="breadcrumb">
+      <span>首页</span><span>›</span><span>营销页管理</span><span>›</span><span class="current">A/B 测试</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ====== 列表页 ====== -->
+    <div id="view-list">
+      <div class="page-header">
+        <h2>落地页 A/B 测试管理</h2>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="实验名称 / 页面标题" id="searchInput">
+        <select id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="true">启用</option>
+          <option value="false">禁用</option>
+        </select>
+        <button class="btn btn-default" onclick="resetFilters()">重置</button>
+        <button class="btn btn-default" onclick="filterData()">查询</button>
+        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">新建实验</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:180px">实验名称</th>
+              <th style="width:260px">组别 / 算法 / 权重</th>
+              <th style="width:240px">落地页URL</th>
+              <th style="width:100px">状态</th>
+              <th style="width:140px">创建时间</th>
+              <th style="width:80px">创建人</th>
+              <th style="width:130px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+          </tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <h3 id="editTitle">新建实验</h3>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <!-- Form content rendered by JS -->
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-cancel" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-primary" id="btnSave" onclick="saveExperiment()">保存</button>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal" style="display:none">
+  <div class="modal">
+    <h3>删除实验</h3>
+    <p>确定删除该实验吗？删除后不可恢复，关联的分组数据也将被清除。</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+// ===== 数据 =====
+let experiments = [
+  {
+    id: 1,
+    name: '新客落地页算法对比-第1轮',
+    status: true,
+    groups: [
+      { groupName: 'A', weight: 100, pageTitle: '新客福利', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-04-24', image: 'trend_a.png' }
+    ],
+    url: 'https://m.quantking.cn/landing/new-user',
+    createTime: '2026-05-20 10:30',
+    creator: '李向梅'
+  },
+  {
+    id: 2,
+    name: '5月活动页转化优化',
+    status: true,
+    groups: [
+      { groupName: 'A', weight: 40, pageTitle: '限时体验', algorithm: '趋势跟踪', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_c.png' },
+      { groupName: 'B', weight: 30, pageTitle: '限时体验', algorithm: '均值回归', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_d.png' },
+      { groupName: 'C', weight: 30, pageTitle: '限时体验', algorithm: '动量突破', startDate: '2024-01-01', endDate: '2026-05-30', image: 'trend_e.png' }
+    ],
+    url: 'https://m.quantking.cn/landing/may-promo',
+    createTime: '2026-05-18 09:15',
+    creator: '王静'
+  },
+  {
+    id: 3,
+    name: '老用户召回页测试',
+    status: false,
+    groups: [
+      { groupName: 'A', weight: 30, pageTitle: '回归有礼', algorithm: '行业轮动', startDate: '2022-03-15', endDate: '2026-03-15', image: 'trend_f.png' },
+      { groupName: 'B', weight: 30, pageTitle: '回归有礼', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-03-15', image: 'trend_g.png' },
+      { groupName: 'C', weight: 20, pageTitle: '回归有礼', algorithm: '均值回归', startDate: '2022-06-01', endDate: '2026-03-15', image: 'trend_h.png' },
+      { groupName: 'D', weight: 20, pageTitle: '回归有礼', algorithm: '龙头战法', startDate: '2023-01-10', endDate: '2026-03-15', image: 'trend_i.png' }
+    ],
+    url: 'https://m.quantking.cn/landing/recall',
+    createTime: '2026-04-10 14:00',
+    creator: '张磊'
+  },
+  {
+    id: 4,
+    name: '618活动页策略展示',
+    status: true,
+    groups: [
+      { groupName: 'A', weight: 50, pageTitle: '618量化狂欢', algorithm: 'AI选股', startDate: '2024-06-01', endDate: '2026-06-18', image: '' },
+      { groupName: 'B', weight: 50, pageTitle: '618量化狂欢', algorithm: '龙头战法', startDate: '2024-06-01', endDate: '2026-06-18', image: '' }
+    ],
+    url: 'https://m.quantking.cn/landing/618',
+    createTime: '2026-05-30 16:20',
+    creator: '李向梅'
+  }
+];
+
+let nextId = 5;
+let currentDeleteId = null;
+let editingId = null;
+let drawerMode = 'new'; // 'new' | 'edit' | 'view'
+
+const groupTagClasses = ['group-tag-a', 'group-tag-b', 'group-tag-c', 'group-tag-d', 'group-tag-e'];
+
+// ===== 渲染表格 =====
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, idx) => {
+    const visibleGroups = item.groups.slice(0, 3);
+    const extraCount = item.groups.length - 3;
+    let groupsHtml = visibleGroups.map((g, gi) => {
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+        <span class="group-tag ${groupTagClasses[gi % groupTagClasses.length]}">${g.groupName}组</span>
+        <span style="font-size:12px;color:var(--text);min-width:60px">${escapeHtml(g.algorithm)}</span>
+        <div class="weight-bar">
+          <div class="weight-bar-track"><div class="weight-bar-fill" style="width:${g.weight}%"></div></div>
+          <span class="weight-bar-text">${g.weight}%</span>
+        </div>
+      </div>`;
+    }).join('');
+    if (extraCount > 0) {
+      groupsHtml += `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">+${extraCount} 组</div>`;
+    }
+
+    const checked = item.status ? 'checked' : '';
+
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td><div class="td-ellipsis" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div></td>
+        <td>${groupsHtml}</td>
+        <td><a href="#" style="font-size:12px;color:var(--accent);word-break:break-all;" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a></td>
+        <td>
+          <label class="switch" onclick="toggleStatus(${item.id}, event)">
+            <input type="checkbox" ${checked}>
+            <span class="slider"></span>
+          </label>
+        </td>
+        <td>${item.createTime}</td>
+        <td>${item.creator}</td>
+        <td>
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-danger-text" onclick="openDeleteModal(${item.id})">删除</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderPagination(total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return '';
+  let html = `<span class="page-info">共 ${total} 条</span>`;
+  html += `<button ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})">‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})">›</button>`;
+  return html;
+}
+
+let currentPage = 1;
+const pageSize = 10;
+
+function refreshTable() {
+  const search = document.getElementById('searchInput')?.value || '';
+  const status = document.getElementById('statusFilter')?.value || '';
+  let data = experiments;
+  if (search) {
+    const q = search.toLowerCase();
+    data = data.filter(d => d.name.toLowerCase().includes(q) || d.groups.some(g => g.pageTitle.toLowerCase().includes(q)));
+  }
+  if (status) {
+    const s = status === 'true';
+    data = data.filter(d => d.status === s);
+  }
+  const total = data.length;
+  const start = (currentPage - 1) * pageSize;
+  const paged = data.slice(start, start + pageSize);
+  renderTable(paged);
+  document.getElementById('pagination').innerHTML = renderPagination(total, currentPage, pageSize);
+}
+
+function goPage(page) { currentPage = page; refreshTable(); }
+function filterData() { currentPage = 1; refreshTable(); }
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = '';
+  currentPage = 1;
+  refreshTable();
+}
+
+// ===== 抽屉 =====
+function openDrawer(mode, id) {
+  drawerMode = mode;
+  editingId = (mode === 'new') ? null : id;
+
+  const titleMap = { new: '新建实验', edit: '编辑实验', view: '实验详情' };
+  document.getElementById('editTitle').textContent = titleMap[mode];
+
+  const isView = (mode === 'view');
+  document.getElementById('btnSave').style.display = isView ? 'none' : '';
+
+  let exp = null;
+  if (id && mode !== 'new') {
+    exp = experiments.find(e => e.id === id);
+  }
+
+  renderDrawerForm(exp, isView);
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  editingId = null;
+}
+
+function renderDrawerForm(exp, isView) {
+  const body = document.getElementById('drawerBody');
+  const disabled = isView ? 'disabled' : '';
+  const name = exp ? exp.name : '';
+  const url = exp ? (exp.url || '') : '';
+  const status = exp ? exp.status : false;
+  const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, pageTitle: '', algorithm: '', startDate: '', endDate: '', image: '' }];
+
+  let html = '';
+
+  // Experiment Name
+  html += `
+    <div class="form-group">
+      <label><span class="required">*</span> 实验名称</label>
+      <input type="text" id="expName" value="${escapeHtml(name)}" placeholder="输入实验名称，如：新客落地页算法对比" ${disabled}>
+    </div>
+  `;
+
+  // URL
+  html += `
+    <div class="form-group">
+      <label><span class="required">*</span> 落地页URL <span class="hint">（填写基础路径，不含 ?channel=xxx 参数）</span></label>
+      <input type="text" id="expUrl" value="${escapeHtml(url)}" placeholder="如：https://m.quantking.cn/landing/new-user" ${disabled}>
+    </div>
+  `;
+
+  // Status
+  const statusChecked = status ? 'checked' : '';
+  html += `
+    <div class="form-group">
+      <label>实验状态</label>
+      <div class="switch-row">
+        <label class="switch" onclick="toggleDrawerStatus(event)">
+          <input type="checkbox" id="expStatus" ${statusChecked} ${disabled}>
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label" id="drawerStatusLabel">${status ? '启用' : '禁用'}</span>
+      </div>
+    </div>
+  `;
+
+  // Groups
+  html += `
+    <div class="group-section">
+      <div class="group-section-header">
+        <h4>分组配置 <span class="hint">（权重之和须为100%）</span></h4>
+        ${!isView ? '<button class="btn btn-default" style="height:28px;padding:0 10px;font-size:12px" onclick="addGroup()">+ 添加组别</button>' : ''}
+      </div>
+      <div id="groupsContainer">
+  `;
+
+  groups.forEach((g, i) => {
+    html += renderGroupCard(g, i, isView);
+  });
+
+  html += `
+      </div>
+      <div class="weight-summary" id="weightSummary"></div>
+    </div>
+  `;
+
+  body.innerHTML = html;
+  updateWeightSummary();
+  if (!isView) updateSingleGroupWeight();
+}
+
+function renderGroupCard(g, index, isView) {
+  const disabled = isView ? 'disabled' : '';
+  return `
+    <div class="group-card" data-index="${index}">
+      <div class="group-card-header">
+        <span class="group-card-title">组别 ${g.groupName}</span>
+        ${!isView ? `<button class="group-card-remove" onclick="removeGroup(${index})">移除</button>` : ''}
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 组别标识</label>
+          <input type="text" class="group-name" value="${escapeHtml(g.groupName)}" placeholder="如 A / B / C" maxlength="10" ${disabled} onchange="updateGroupTitle(this, ${index})">
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> 权重（%）</label>
+          <input type="number" class="group-weight" value="${g.weight}" placeholder="如 50" min="1" max="100" ${disabled} onchange="updateWeightSummary()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 页面标题</label>
+          <input type="text" class="group-page-title" value="${escapeHtml(g.pageTitle)}" placeholder="如：新客福利" ${disabled}>
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> 算法名称</label>
+          <input type="text" class="group-algorithm" value="${escapeHtml(g.algorithm)}" placeholder="如：研报精选" ${disabled}>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 回测开始日期</label>
+          <input type="date" class="group-start-date" value="${g.startDate}" ${disabled}>
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> 回测结束日期</label>
+          <input type="date" class="group-end-date" value="${g.endDate}" ${disabled}>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><span class="required">*</span> 走势图片</label>
+        <div class="upload-area" ${isView ? 'style="pointer-events:none;opacity:0.6"' : ''}>
+          <div class="upload-icon">🖼</div>
+          <div class="upload-text">${g.image ? g.image : '点击或拖拽上传走势图片'}</div>
+          <div class="upload-hint">支持 PNG / JPG，建议尺寸 750×420</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function addGroup() {
+  const container = document.getElementById('groupsContainer');
+  const cards = container.querySelectorAll('.group-card');
+  const nextLetter = String.fromCharCode(65 + cards.length); // A=65
+  const newCard = document.createElement('div');
+  newCard.innerHTML = renderGroupCard({ groupName: nextLetter, weight: 0, pageTitle: '', algorithm: '', startDate: '', endDate: '', image: '' }, cards.length, false);
+  container.appendChild(newCard.firstElementChild);
+  updateWeightSummary();
+  updateSingleGroupWeight();
+  // 自动滚动到底部
+  setTimeout(() => {
+    const drawerBody = document.querySelector('.drawer-body');
+    drawerBody.scrollTo({ top: drawerBody.scrollHeight, behavior: 'smooth' });
+  }, 50);
+}
+
+function updateSingleGroupWeight() {
+  const container = document.getElementById('groupsContainer');
+  if (!container) return;
+  const cards = container.querySelectorAll('.group-card');
+  const weightInputs = container.querySelectorAll('.group-weight');
+  if (cards.length === 1) {
+    weightInputs[0].value = 100;
+    weightInputs[0].disabled = true;
+    updateWeightSummary();
+  } else {
+    weightInputs.forEach(input => {
+      input.disabled = false;
+    });
+  }
+}
+
+function removeGroup(index) {
+  const container = document.getElementById('groupsContainer');
+  const cards = container.querySelectorAll('.group-card');
+  if (cards.length <= 1) {
+    showToast('至少需要保留1个组别');
+    return;
+  }
+  cards[index].remove();
+  // Re-index
+  container.querySelectorAll('.group-card').forEach((card, i) => {
+    card.dataset.index = i;
+    const removeBtn = card.querySelector('.group-card-remove');
+    if (removeBtn) removeBtn.setAttribute('onclick', `removeGroup(${i})`);
+  });
+  updateWeightSummary();
+  updateSingleGroupWeight();
+}
+
+function updateGroupTitle(input, index) {
+  const card = input.closest('.group-card');
+  const title = card.querySelector('.group-card-title');
+  title.textContent = '组别 ' + input.value;
+}
+
+function updateWeightSummary() {
+  const container = document.getElementById('groupsContainer');
+  if (!container) return;
+  const weights = container.querySelectorAll('.group-weight');
+  let total = 0;
+  weights.forEach(w => { total += parseInt(w.value) || 0; });
+  const summary = document.getElementById('weightSummary');
+  if (!summary) return;
+  const isError = total !== 100;
+  summary.className = 'weight-summary' + (isError ? ' error' : '');
+  summary.innerHTML = `当前权重合计：<span class="weight-total">${total}%</span>${isError ? '（权重之和需等于100%）' : ' ✓'}`;
+}
+
+// ===== 保存 =====
+function saveExperiment() {
+  const name = document.getElementById('expName').value.trim();
+  const url = document.getElementById('expUrl').value.trim();
+  const status = document.getElementById('expStatus').checked;
+
+  if (!name) { showToast('请输入实验名称'); return; }
+  if (!url) { showToast('请输入落地页URL'); return; }
+
+  const container = document.getElementById('groupsContainer');
+  const cards = container.querySelectorAll('.group-card');
+  const groups = [];
+  let weightTotal = 0;
+  let valid = true;
+
+  cards.forEach(card => {
+    const gName = card.querySelector('.group-name').value.trim();
+    const gWeight = parseInt(card.querySelector('.group-weight').value) || 0;
+    const gPageTitle = card.querySelector('.group-page-title').value.trim();
+    const gAlgorithm = card.querySelector('.group-algorithm').value.trim();
+    const gStartDate = card.querySelector('.group-start-date').value;
+    const gEndDate = card.querySelector('.group-end-date').value;
+
+    if (!gName || !gWeight || !gPageTitle || !gAlgorithm || !gStartDate || !gEndDate) {
+      valid = false;
+    }
+    weightTotal += gWeight;
+    groups.push({ groupName: gName, weight: gWeight, pageTitle: gPageTitle, algorithm: gAlgorithm, startDate: gStartDate, endDate: gEndDate, image: '' });
+  });
+
+  if (!valid) { showToast('请完整填写所有分组必填字段'); return; }
+  if (weightTotal !== 100) { showToast('权重之和必须等于100%'); return; }
+
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+
+  if (editingId) {
+    const exp = experiments.find(e => e.id === editingId);
+    if (exp) {
+      exp.name = name;
+      exp.url = url;
+      exp.status = status;
+      exp.groups = groups;
+    }
+  } else {
+    experiments.unshift({
+      id: nextId++,
+      name,
+      url,
+      status,
+      groups,
+      createTime: now,
+      creator: '当前用户'
+    });
+  }
+
+  showToast('保存成功', 'success');
+  closeDrawer();
+  refreshTable();
+}
+
+// ===== Switch切换 =====
+function toggleStatus(id, event) {
+  event.stopPropagation();
+  event.preventDefault();
+  const item = experiments.find(e => e.id === id);
+  if (item) {
+    item.status = !item.status;
+    refreshTable();
+    showToast(item.status ? '已启用' : '已禁用', 'success');
+  }
+}
+
+function toggleDrawerStatus(e) {
+  e.stopPropagation();
+  const cb = document.getElementById('expStatus');
+  if (cb.disabled) return;
+  cb.checked = !cb.checked;
+  document.getElementById('drawerStatusLabel').textContent = cb.checked ? '启用' : '禁用';
+}
+
+// ===== 删除 =====
+function openDeleteModal(id) {
+  currentDeleteId = id;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeModal() {
+  currentDeleteId = null;
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+  if (currentDeleteId !== null) {
+    experiments = experiments.filter(e => e.id !== currentDeleteId);
+    currentDeleteId = null;
+    document.getElementById('deleteModal').style.display = 'none';
+    refreshTable();
+    showToast('实验已删除');
+  }
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ===== 初始化 =====
+refreshTable();
+</script>
+
+</body>
+</html>
