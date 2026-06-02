@@ -17,6 +17,7 @@
   --text-muted: #9ca3af;
   --border: #e5e7ed;
   --accent: #3b6df0;
+  --primary: #3b6df0;
   --accent-light: #e8edf9;
   --danger: #e5484d;
   --danger-light: #fef2f2;
@@ -731,6 +732,77 @@ tbody tr:hover {
   background: var(--bg);
 }
 
+/* Disabled form state for view mode */
+.form-group select:disabled,
+.form-group input[type="text"]:disabled,
+.form-group textarea:disabled {
+  background: #f4f5f8;
+  color: var(--text-secondary);
+  cursor: default;
+  border-color: #e8e9ee;
+  opacity: 1;
+  -webkit-text-fill-color: var(--text-secondary);
+}
+
+/* 内联添加分类 */
+.category-add-row {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+.category-add-row.show {
+  display: flex;
+}
+.category-add-row input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+.category-add-row .btn-inline {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+.category-add-row .btn-inline-confirm {
+  background: var(--primary);
+  color: #fff;
+}
+.category-add-row .btn-inline-cancel {
+  background: #f0f1f5;
+  color: var(--text-secondary);
+  border: 1px solid #e0e1e6;
+}
+
+/* 抽屉内 Switch 行 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.switch-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* 禁用态 Switch 视觉弱化 */
+#editStatus:disabled + .slider,
+#editStatus:disabled ~ .slider {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.switch:has(#editStatus:disabled) {
+  cursor: not-allowed;
+}
+
 /* Toast */
 .toast {
   position: fixed;
@@ -798,7 +870,10 @@ tbody tr:hover {
           <span class="arrow">▶</span>
         </div>
         <div class="nav-sub">
-          <a class="nav-item active" href="#" onclick="switchView('list'); return false;">语料包管理</a>
+          <a class="nav-item active" href="#" onclick="return false;">
+            <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="4.5" y1="6.5" x2="11.5" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="4.5" y1="9.5" x2="8.5" y2="9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            语料包管理
+          </a>
         </div>
       </div>
     </div>
@@ -858,7 +933,7 @@ tbody tr:hover {
               <th style="width:80px">状态</th>
               <th style="width:100px">更新时间</th>
               <th style="width:70px">更新人</th>
-              <th style="width:90px">操作</th>
+              <th style="width:120px">操作</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -878,12 +953,12 @@ tbody tr:hover {
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="editDrawer">
   <div class="drawer-header">
-    <h3 id="editTitle">编辑语料</h3>
+    <h3 id="editTitle">编辑</h3>
   </div>
   <div class="drawer-body">
     <div class="form-group">
       <label><span class="required">*</span> 所属分类</label>
-      <select id="editCategory">
+      <select id="editCategory" onchange="onCategoryChange(this)">
         <option value="">请选择分类</option>
         <option value="开户">开户</option>
         <option value="收费">收费</option>
@@ -892,7 +967,13 @@ tbody tr:hover {
         <option value="券商">券商</option>
         <option value="技术问题">技术问题</option>
         <option value="其他">其他</option>
+        <option value="__add__" style="color:var(--primary);font-weight:600">＋ 添加新分类</option>
       </select>
+      <div class="category-add-row" id="catAddRow_drawer">
+        <input type="text" id="catAddInput_drawer" placeholder="输入新分类名称" maxlength="20">
+        <button class="btn-inline btn-inline-confirm" onclick="confirmAddCategory('drawer')">确定</button>
+        <button class="btn-inline btn-inline-cancel" onclick="cancelAddCategory('drawer')">取消</button>
+      </div>
     </div>
     <div class="form-group">
       <label><span class="required">*</span> 标准提问</label>
@@ -906,10 +987,20 @@ tbody tr:hover {
       <label><span class="required">*</span> 答案</label>
       <textarea id="editAnswer" placeholder="请输入对应答案" style="min-height:140px"></textarea>
     </div>
+    <div class="form-group">
+      <label>状态</label>
+      <div class="switch-row">
+        <label class="switch" id="drawerSwitch" onclick="toggleDrawerStatus(event)">
+          <input type="checkbox" id="editStatus">
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label" id="drawerStatusLabel">禁用</span>
+      </div>
+    </div>
   </div>
   <div class="drawer-footer">
     <button class="btn btn-cancel" onclick="closeDrawer()">取消</button>
-    <button class="btn btn-primary" id="btnSave" onclick="saveCorpus()">保存</button>
+    <button class="btn btn-primary" id="btnSave" onclick="saveCorpus()" style="display:none">保存</button>
   </div>
 </div>
 
@@ -987,6 +1078,81 @@ let nextId = 6;
 let currentDeleteId = null;
 let editingId = null;
 
+// ===== 动态分类管理 =====
+let categories = ['开户', '收费', '策略', '指标', '券商', '技术问题', '其他'];
+
+function refreshCategoryOptions() {
+  // 重建抽屉分类下拉（含 __add__）
+  const editSel = document.getElementById('editCategory');
+  const editVal = editSel.value;
+  const addOpt = editSel.querySelector('option[value="__add__"]');
+  editSel.innerHTML = '';
+  const emptyOpt = document.createElement('option');
+  emptyOpt.value = '';
+  emptyOpt.textContent = '请选择分类';
+  editSel.appendChild(emptyOpt);
+  categories.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    if (c === editVal) o.selected = true;
+    editSel.appendChild(o);
+  });
+  if (addOpt) editSel.appendChild(addOpt);
+
+  // 重建过滤栏分类下拉（不含 __add__）
+  const filterSel = document.getElementById('catFilter');
+  const filterVal = filterSel.value;
+  filterSel.innerHTML = '';
+  const fEmpty = document.createElement('option');
+  fEmpty.value = '';
+  fEmpty.textContent = '所属分类';
+  filterSel.appendChild(fEmpty);
+  categories.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    if (c === filterVal) o.selected = true;
+    filterSel.appendChild(o);
+  });
+}
+
+function onCategoryChange(sel) {
+  if (sel.value === '__add__') {
+    // 确定来源标识
+    const source = sel.id === 'catFilter' ? 'filter' : 'drawer';
+    const row = document.getElementById('catAddRow_' + source);
+    const input = document.getElementById('catAddInput_' + source);
+    row.classList.add('show');
+    input.value = '';
+    input.focus();
+    sel.value = ''; // 保持下拉回到空白选项
+  }
+}
+
+function confirmAddCategory(source) {
+  const input = document.getElementById('catAddInput_' + source);
+  const name = input.value.trim();
+  if (!name) return;
+  if (categories.includes(name)) {
+    showToast('该分类已存在');
+    return;
+  }
+  categories.push(name);
+  categories.sort((a, b) => a.localeCompare(b, 'zh'));
+  refreshCategoryOptions();
+  cancelAddCategory(source);
+  // 选中新分类
+  const targetSel = source === 'filter' ? document.getElementById('catFilter') : document.getElementById('editCategory');
+  targetSel.value = name;
+  showToast('分类「' + name + '」已添加', 'success');
+}
+
+function cancelAddCategory(source) {
+  document.getElementById('catAddRow_' + source).classList.remove('show');
+  document.getElementById('catAddInput_' + source).value = '';
+}
+
 // ===== 渲染表格 =====
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
@@ -1001,6 +1167,7 @@ function renderTable(data) {
     };
     const similarText = item.similar.join('，');
     const answerText = item.answer;
+    const answerHtml = escapeHtml(answerText).replace(/\n/g, '<br>');
     const statusBadge = item.status
       ? '<span class="status-badge enabled">启用</span>'
       : '<span class="status-badge disabled">禁用</span>';
@@ -1011,7 +1178,7 @@ function renderTable(data) {
         <td><span class="category-tag ${catClassMap[item.category] || 'cat-other'}">${item.category}</span></td>
         <td><div class="td-ellipsis" title="${escapeHtml(item.question)}">${escapeHtml(item.question)}</div></td>
         <td><div class="td-similar" title="${escapeHtml(similarText)}">${escapeHtml(similarText)}</div></td>
-        <td><div class="td-answer" title="${escapeHtml(answerText)}">${escapeHtml(answerText)}</div></td>
+        <td><div class="td-answer" title="${escapeHtml(answerText)}">${answerHtml}</div></td>
         <td>
           <label class="switch" onclick="toggleStatus(${item.id}, event)">
             <input type="checkbox" ${checked}>
@@ -1021,6 +1188,7 @@ function renderTable(data) {
         <td>${item.updateTime}</td>
         <td>${item.updater}</td>
         <td>
+          <button class="btn-edit-text" onclick="goView(${item.id})">查看</button>
           <button class="btn-edit-text" onclick="goEdit(${item.id})">编辑</button>
           <button class="btn-danger-text" onclick="openDeleteModal(${item.id})">删除</button>
         </td>
@@ -1132,27 +1300,72 @@ function openDrawer() {
 function closeDrawer() {
   document.getElementById('drawerOverlay').classList.remove('open');
   document.getElementById('editDrawer').classList.remove('open');
+  // 恢复表单为可编辑状态
+  document.getElementById('editCategory').disabled = false;
+  document.getElementById('editQuestion').disabled = false;
+  document.getElementById('editSimilar').disabled = false;
+  document.getElementById('editAnswer').disabled = false;
+  document.getElementById('editStatus').disabled = false;
+  // 隐藏内联添加分类行
+  cancelAddCategory('drawer');
   editingId = null;
 }
 
 // ===== 编辑/新建 =====
+function toggleDrawerStatus(e) {
+  e.stopPropagation();
+  if (document.getElementById('editStatus').disabled) return;
+  const cb = document.getElementById('editStatus');
+  cb.checked = !cb.checked;
+  document.getElementById('drawerStatusLabel').textContent = cb.checked ? '启用' : '禁用';
+}
+
+function setFormEditable(editable) {
+  document.getElementById('editCategory').disabled = !editable;
+  document.getElementById('editQuestion').disabled = !editable;
+  document.getElementById('editSimilar').disabled = !editable;
+  document.getElementById('editAnswer').disabled = !editable;
+  document.getElementById('editStatus').disabled = !editable;
+  document.getElementById('btnSave').style.display = editable ? '' : 'none';
+}
+
 function goEdit(id) {
   editingId = id;
+  setFormEditable(true);
   if (id === 'new') {
-    document.getElementById('editTitle').textContent = '新建语料';
+    document.getElementById('editTitle').textContent = '新建';
     document.getElementById('editCategory').value = '';
     document.getElementById('editQuestion').value = '';
     document.getElementById('editSimilar').value = '';
     document.getElementById('editAnswer').value = '';
+    document.getElementById('editStatus').checked = false;
+    document.getElementById('drawerStatusLabel').textContent = '禁用';
   } else {
     const item = corpusData.find(d => d.id === id);
     if (!item) return;
-    document.getElementById('editTitle').textContent = '编辑语料';
+    document.getElementById('editTitle').textContent = '编辑';
     document.getElementById('editCategory').value = item.category;
     document.getElementById('editQuestion').value = item.question;
     document.getElementById('editSimilar').value = item.similar.join('\n');
     document.getElementById('editAnswer').value = item.answer;
+    document.getElementById('editStatus').checked = item.status;
+    document.getElementById('drawerStatusLabel').textContent = item.status ? '启用' : '禁用';
   }
+  openDrawer();
+}
+
+function goView(id) {
+  const item = corpusData.find(d => d.id === id);
+  if (!item) return;
+  editingId = null;
+  setFormEditable(false);
+  document.getElementById('editTitle').textContent = '查看';
+  document.getElementById('editCategory').value = item.category;
+  document.getElementById('editQuestion').value = item.question;
+  document.getElementById('editSimilar').value = item.similar.join('\n');
+  document.getElementById('editAnswer').value = item.answer;
+  document.getElementById('editStatus').checked = item.status;
+  document.getElementById('drawerStatusLabel').textContent = item.status ? '启用' : '禁用';
   openDrawer();
 }
 
@@ -1161,6 +1374,7 @@ function saveCorpus() {
   const question = document.getElementById('editQuestion').value.trim();
   const similarRaw = document.getElementById('editSimilar').value.trim();
   const answer = document.getElementById('editAnswer').value.trim();
+  const status = document.getElementById('editStatus').checked;
 
   if (!category || !question || !answer) {
     showToast('请填写所有必填字段');
@@ -1177,6 +1391,7 @@ function saveCorpus() {
       item.question = question;
       item.similar = similar;
       item.answer = answer;
+      item.status = status;
       item.updateTime = now;
       item.updater = '当前用户';
     }
@@ -1187,7 +1402,7 @@ function saveCorpus() {
       question,
       similar,
       answer,
-      status: true,
+      status: status,
       updateTime: now,
       updater: '当前用户'
     });
