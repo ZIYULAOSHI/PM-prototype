@@ -1017,7 +1017,7 @@ tbody tr:hover {
         </select>
         <button class="btn btn-default" onclick="resetFilters()">重置</button>
         <button class="btn btn-default" onclick="filterData()">查询</button>
-        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">新建实验</button>
+        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">新建</button>
       </div>
 
       <div class="table-container">
@@ -1048,7 +1048,7 @@ tbody tr:hover {
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="editDrawer">
   <div class="drawer-header">
-    <h3 id="editTitle">新建实验</h3>
+    <h3 id="editTitle">新建</h3>
   </div>
   <div class="drawer-body" id="drawerBody">
     <!-- Form content rendered by JS -->
@@ -1252,7 +1252,7 @@ function openDrawer(mode, id) {
   drawerMode = mode;
   editingId = (mode === 'new') ? null : id;
 
-  const titleMap = { new: '新建实验', edit: '编辑实验', view: '实验详情' };
+  const titleMap = { new: '新建', edit: '编辑实验', view: '实验详情' };
   document.getElementById('editTitle').textContent = titleMap[mode];
 
   const isView = (mode === 'view');
