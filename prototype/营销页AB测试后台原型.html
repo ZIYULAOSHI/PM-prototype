@@ -862,6 +862,98 @@ tbody tr:hover {
   color: var(--danger);
 }
 
+/* Channel Selector */
+.channel-default-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.channel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.channel-chip:hover {
+  border-color: var(--accent);
+}
+
+.channel-chip.selected {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.channel-chip .chip-remove {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.channel-chip .chip-remove:hover {
+  color: var(--danger);
+}
+
+.channel-add {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.channel-add input {
+  flex: 1;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+
+.channel-add input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+/* Channel mini tags in table */
+.channel-mini {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #eef2ff;
+  color: #4f46e5;
+  margin: 1px 3px 1px 0;
+  white-space: nowrap;
+}
+
+.channel-mini.default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 /* Switch Row */
 .switch-row {
   display: flex;
@@ -1027,7 +1119,8 @@ tbody tr:hover {
               <th style="width:50px">序号</th>
               <th style="width:180px">实验名称</th>
               <th style="width:260px">组别 / 算法 / 权重</th>
-              <th style="width:240px">落地页URL</th>
+              <th style="width:220px">落地页URL</th>
+              <th style="width:140px">适用渠道</th>
               <th style="width:100px">状态</th>
               <th style="width:140px">创建时间</th>
               <th style="width:80px">创建人</th>
@@ -1074,11 +1167,10 @@ tbody tr:hover {
 <!-- Conflict Modal -->
 <div class="modal-overlay" id="conflictModal" style="display:none">
   <div class="modal">
-    <h3>启用冲突提示</h3>
+    <h3>无法启用</h3>
     <p id="conflictMsg"></p>
     <div class="modal-actions">
-      <button class="btn btn-cancel" onclick="closeConflictModal()">取消</button>
-      <button class="btn btn-primary" onclick="confirmEnableWithConflict()">确认启用</button>
+      <button class="btn btn-primary" onclick="closeConflictModal()">知道了</button>
     </div>
   </div>
 </div>
@@ -1093,6 +1185,7 @@ let experiments = [
     id: 1,
     name: '新客落地页算法对比-第1轮',
     status: true,
+    channels: ['baidu'],
     groups: [
       { groupName: 'A', weight: 100, pageTitle: '新客福利', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-04-24', image: 'trend_a.png' }
     ],
@@ -1104,6 +1197,7 @@ let experiments = [
     id: 2,
     name: '5月活动页转化优化',
     status: true,
+    channels: ['xiaohongshu', 'douyin'],
     groups: [
       { groupName: 'A', weight: 40, pageTitle: '限时体验', algorithm: '趋势跟踪', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_c.png' },
       { groupName: 'B', weight: 30, pageTitle: '限时体验', algorithm: '均值回归', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_d.png' },
@@ -1117,6 +1211,7 @@ let experiments = [
     id: 3,
     name: '老用户召回页测试',
     status: false,
+    channels: ['gongzhonghao'],
     groups: [
       { groupName: 'A', weight: 30, pageTitle: '回归有礼', algorithm: '行业轮动', startDate: '2022-03-15', endDate: '2026-03-15', image: 'trend_f.png' },
       { groupName: 'B', weight: 30, pageTitle: '回归有礼', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-03-15', image: 'trend_g.png' },
@@ -1131,6 +1226,7 @@ let experiments = [
     id: 4,
     name: '618活动页策略展示',
     status: true,
+    channels: ['weibo', 'baidu'],
     groups: [
       { groupName: 'A', weight: 50, pageTitle: '618量化狂欢', algorithm: 'AI选股', startDate: '2024-06-01', endDate: '2026-06-18', image: '' },
       { groupName: 'B', weight: 50, pageTitle: '618量化狂欢', algorithm: '龙头战法', startDate: '2024-06-01', endDate: '2026-06-18', image: '' }
@@ -1146,13 +1242,44 @@ let currentDeleteId = null;
 let editingId = null;
 let drawerMode = 'new'; // 'new' | 'edit' | 'view'
 
+// ===== 渠道相关 =====
+const presetChannels = [
+  { value: 'xiaohongshu', label: '小红书' },
+  { value: 'douyin', label: '抖音' },
+  { value: 'shipinhao', label: '视频号' },
+  { value: 'gongzhonghao', label: '公众号' },
+  { value: 'weibo', label: '微博' },
+  { value: 'baidu', label: '百度' }
+];
+let editingChannels = [];   // 当前编辑中选中的渠道值
+let editingIsView = false;
+
+function channelLabel(value) {
+  const p = presetChannels.find(c => c.value === value);
+  return p ? p.label : value;
+}
+
+function channelsOverlap(a, b) {
+  const ca = a.channels || [];
+  const cb = b.channels || [];
+  return ca.some(c => cb.includes(c));
+}
+
+// 返回两个实验重叠的渠道文本标签
+function getOverlapChannelLabels(a, b) {
+  const labels = [];
+  const cb = b.channels || [];
+  (a.channels || []).forEach(c => { if (cb.includes(c)) labels.push(channelLabel(c)); });
+  return labels;
+}
+
 const groupTagClasses = ['group-tag-a', 'group-tag-b', 'group-tag-c', 'group-tag-d', 'group-tag-e'];
 
 // ===== 渲染表格 =====
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
     return;
   }
   tbody.innerHTML = data.map((item, idx) => {
@@ -1180,6 +1307,7 @@ function renderTable(data) {
         <td><div class="td-ellipsis" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div></td>
         <td>${groupsHtml}</td>
         <td><a href="#" style="font-size:12px;color:var(--accent);word-break:break-all;" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a></td>
+        <td>${renderChannelTags(item)}</td>
         <td>
           <label class="switch" onclick="toggleStatus(${item.id}, event)">
             <input type="checkbox" ${checked}>
@@ -1202,6 +1330,15 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function renderChannelTags(item) {
+  let html = '';
+  (item.channels || []).forEach(c => {
+    html += `<span class="channel-mini">${escapeHtml(channelLabel(c))}</span>`;
+  });
+  if (!html) html = '<span style="color:var(--text-muted);font-size:12px">—</span>';
+  return html;
 }
 
 function renderPagination(total, page, pageSize) {
@@ -1283,6 +1420,10 @@ function renderDrawerForm(exp, isView) {
   const status = exp ? exp.status : false;
   const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, pageTitle: '', algorithm: '', startDate: '', endDate: '', image: '' }];
 
+  // 初始化渠道编辑状态
+  editingChannels = exp ? [...(exp.channels || [])] : [];
+  editingIsView = isView;
+
   let html = '';
 
   // Experiment Name
@@ -1296,8 +1437,16 @@ function renderDrawerForm(exp, isView) {
   // URL
   html += `
     <div class="form-group">
-      <label><span class="required">*</span> 落地页URL <span class="hint">（填写基础路径，不含 ?channel=xxx 参数）</span></label>
+      <label><span class="required">*</span> 落地页URL <span class="hint">（填写基础路径，渠道通过下方“适用渠道”配置）</span></label>
       <input type="text" id="expUrl" value="${escapeHtml(url)}" placeholder="如：https://m.quantking.cn/landing/new-user" ${disabled}>
+    </div>
+  `;
+
+  // 适用渠道
+  html += `
+    <div class="form-group">
+      <label><span class="required">*</span> 适用渠道 <span class="hint">（按 ?channel= 参数匹配，可多选；未选中的渠道及无参数访问展示默认页）</span></label>
+      <div id="channelArea">${renderChannelInner(isView)}</div>
     </div>
   `;
 
@@ -1460,6 +1609,33 @@ function updateWeightSummary() {
   summary.innerHTML = `当前权重合计：<span class="weight-total">${total}%</span>${isError ? '（权重之和需等于100%）' : ' ✓'}`;
 }
 
+// ===== 渠道选择器 =====
+function renderChannelInner(isView) {
+  let chips = presetChannels.map(o => {
+    const sel = editingChannels.includes(o.value);
+    if (isView && !sel) return '';
+    const click = isView ? '' : `onclick="toggleChannel('${o.value}')"`;
+    return `<span class="channel-chip ${sel ? 'selected' : ''}" ${click}>${escapeHtml(o.label)}</span>`;
+  }).join('');
+
+  const chipsHtml = `<div class="channel-chips">${chips || '<span style="color:var(--text-muted);font-size:12px">' + (isView ? '—' : '请选择渠道') + '</span>'}</div>`;
+
+  return chipsHtml;
+}
+
+function refreshChannelArea() {
+  const area = document.getElementById('channelArea');
+  if (area) area.innerHTML = renderChannelInner(editingIsView);
+}
+
+function toggleChannel(value) {
+  const i = editingChannels.indexOf(value);
+  if (i >= 0) editingChannels.splice(i, 1);
+  else editingChannels.push(value);
+  refreshChannelArea();
+}
+
+
 // ===== 保存 =====
 function saveExperiment() {
   const name = document.getElementById('expName').value.trim();
@@ -1468,6 +1644,7 @@ function saveExperiment() {
 
   if (!name) { showToast('请输入实验名称'); return; }
   if (!url) { showToast('请输入落地页URL'); return; }
+  if (editingChannels.length === 0) { showToast('请至少选择一个适用渠道'); return; }
 
   const container = document.getElementById('groupsContainer');
   const cards = container.querySelectorAll('.group-card');
@@ -1495,6 +1672,8 @@ function saveExperiment() {
 
   const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
 
+  const channels = [...editingChannels];
+
   if (editingId) {
     const exp = experiments.find(e => e.id === editingId);
     if (exp) {
@@ -1502,6 +1681,7 @@ function saveExperiment() {
       exp.url = url;
       exp.status = status;
       exp.groups = groups;
+      exp.channels = channels;
     }
   } else {
     experiments.unshift({
@@ -1509,6 +1689,7 @@ function saveExperiment() {
       name,
       url,
       status,
+      channels,
       groups,
       createTime: now,
       creator: '当前用户'
@@ -1521,7 +1702,6 @@ function saveExperiment() {
 }
 
 // ===== Switch切换 =====
-let pendingEnableId = null;
 
 function toggleStatus(id, event) {
   event.stopPropagation();
@@ -1537,12 +1717,15 @@ function toggleStatus(id, event) {
     return;
   }
 
-  // 启用操作：检查同URL是否有其他启用中的实验
-  const conflicts = experiments.filter(e => e.id !== id && e.url === item.url && e.status === true);
+  // 启用操作：检查同URL、渠道有交集是否有其他启用中的实验
+  const conflicts = experiments.filter(e => e.id !== id && e.url === item.url && e.status === true && channelsOverlap(e, item));
   if (conflicts.length > 0) {
-    pendingEnableId = id;
-    const names = conflicts.map(e => '「' + e.name + '」').join('、');
-    document.getElementById('conflictMsg').innerHTML = `该落地页URL已有启用中的实验：${names}。<br><br>确认启用当前实验后，以上实验将自动禁用。`;
+    // 方案2：阻止启用，指出具体被占用的渠道及占用实验
+    const lines = conflicts.map(e => {
+      const ch = getOverlapChannelLabels(e, item).map(l => '<b>' + l + '</b>').join('、');
+      return `· ${ch} —— 已被「${escapeHtml(e.name)}」占用`;
+    }).join('<br>');
+    document.getElementById('conflictMsg').innerHTML = `该落地页URL下，以下渠道已被其他启用中的实验占用，无法启用：<br><br>${lines}<br><br>请先从占用实验中移除对应渠道，或先禁用占用实验，再启用当前实验。`;
     document.getElementById('conflictModal').style.display = 'flex';
   } else {
     item.status = true;
@@ -1552,24 +1735,7 @@ function toggleStatus(id, event) {
 }
 
 function closeConflictModal() {
-  pendingEnableId = null;
   document.getElementById('conflictModal').style.display = 'none';
-}
-
-function confirmEnableWithConflict() {
-  const item = experiments.find(e => e.id === pendingEnableId);
-  if (item) {
-    // 禁用同URL的其他启用实验
-    experiments.forEach(e => {
-      if (e.id !== item.id && e.url === item.url && e.status === true) {
-        e.status = false;
-      }
-    });
-    item.status = true;
-    refreshTable();
-    showToast('已启用，冲突实验已自动禁用', 'success');
-  }
-  closeConflictModal();
 }
 
 function toggleDrawerStatus(e) {
