@@ -1161,10 +1161,6 @@ function renderTable(data) {
     return;
   }
   tbody.innerHTML = data.map((item, idx) => {
-    const catClassMap = {
-      '开户': 'cat-open', '收费': 'cat-fee', '策略': 'cat-strategy',
-      '指标': 'cat-indicator', '券商': 'cat-broker', '技术问题': 'cat-tech', '其他': 'cat-other'
-    };
     const similarText = item.similar.join('，');
     const answerText = item.answer;
     const answerHtml = escapeHtml(answerText).replace(/\n/g, '<br>');
@@ -1175,7 +1171,7 @@ function renderTable(data) {
     return `
       <tr>
         <td>${idx + 1}</td>
-        <td><span class="category-tag ${catClassMap[item.category] || 'cat-other'}">${item.category}</span></td>
+        <td>${item.category}</td>
         <td><div class="td-ellipsis" title="${escapeHtml(item.question)}">${escapeHtml(item.question)}</div></td>
         <td><div class="td-similar" title="${escapeHtml(similarText)}">${escapeHtml(similarText)}</div></td>
         <td><div class="td-answer" title="${escapeHtml(answerText)}">${answerHtml}</div></td>
