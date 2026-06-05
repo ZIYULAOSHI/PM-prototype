@@ -936,6 +936,36 @@ tbody tr:hover {
   box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
 }
 
+/* Group content JSON textarea */
+.group-content-json {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  resize: vertical;
+  line-height: 1.6;
+  box-sizing: border-box;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+.group-content-json:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.group-content-json:disabled {
+  background: #f5f6f8;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
 /* Channel mini tags in table */
 .channel-mini {
   display: inline-block;
@@ -1118,7 +1148,7 @@ tbody tr:hover {
             <tr>
               <th style="width:50px">序号</th>
               <th style="width:180px">实验名称</th>
-              <th style="width:260px">组别 / 算法 / 权重</th>
+              <th style="width:90px">组别数</th>
               <th style="width:220px">落地页URL</th>
               <th style="width:140px">适用渠道</th>
               <th style="width:100px">状态</th>
@@ -1187,7 +1217,7 @@ let experiments = [
     status: true,
     channels: ['baidu'],
     groups: [
-      { groupName: 'A', weight: 100, pageTitle: '新客福利', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-04-24', image: 'trend_a.png' }
+      { groupName: 'A', weight: 100, content: { pageTitle: '新客福利', algorithm: '研报精选', backtestStart: '2021-04-26', backtestEnd: '2026-04-24' } }
     ],
     url: 'https://m.quantking.cn/landing/new-user',
     createTime: '2026-05-20 10:30',
@@ -1199,9 +1229,9 @@ let experiments = [
     status: true,
     channels: ['xiaohongshu', 'douyin'],
     groups: [
-      { groupName: 'A', weight: 40, pageTitle: '限时体验', algorithm: '趋势跟踪', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_c.png' },
-      { groupName: 'B', weight: 30, pageTitle: '限时体验', algorithm: '均值回归', startDate: '2023-06-01', endDate: '2026-05-30', image: 'trend_d.png' },
-      { groupName: 'C', weight: 30, pageTitle: '限时体验', algorithm: '动量突破', startDate: '2024-01-01', endDate: '2026-05-30', image: 'trend_e.png' }
+      { groupName: 'A', weight: 40, content: { pageTitle: '限时体验', algorithm: '趋势跟踪', backtestStart: '2023-06-01', backtestEnd: '2026-05-30' } },
+      { groupName: 'B', weight: 30, content: { pageTitle: '限时体验', algorithm: '均值回归', backtestStart: '2023-06-01', backtestEnd: '2026-05-30' } },
+      { groupName: 'C', weight: 30, content: { pageTitle: '限时体验', algorithm: '动量突破', backtestStart: '2024-01-01', backtestEnd: '2026-05-30' } }
     ],
     url: 'https://m.quantking.cn/landing/may-promo',
     createTime: '2026-05-18 09:15',
@@ -1213,10 +1243,10 @@ let experiments = [
     status: false,
     channels: ['gongzhonghao'],
     groups: [
-      { groupName: 'A', weight: 30, pageTitle: '回归有礼', algorithm: '行业轮动', startDate: '2022-03-15', endDate: '2026-03-15', image: 'trend_f.png' },
-      { groupName: 'B', weight: 30, pageTitle: '回归有礼', algorithm: '研报精选', startDate: '2021-04-26', endDate: '2026-03-15', image: 'trend_g.png' },
-      { groupName: 'C', weight: 20, pageTitle: '回归有礼', algorithm: '均值回归', startDate: '2022-06-01', endDate: '2026-03-15', image: 'trend_h.png' },
-      { groupName: 'D', weight: 20, pageTitle: '回归有礼', algorithm: '龙头战法', startDate: '2023-01-10', endDate: '2026-03-15', image: 'trend_i.png' }
+      { groupName: 'A', weight: 30, content: { pageTitle: '回归有礼', algorithm: '行业轮动', backtestStart: '2022-03-15', backtestEnd: '2026-03-15' } },
+      { groupName: 'B', weight: 30, content: { pageTitle: '回归有礼', algorithm: '研报精选', backtestStart: '2021-04-26', backtestEnd: '2026-03-15' } },
+      { groupName: 'C', weight: 20, content: { pageTitle: '回归有礼', algorithm: '均值回归', backtestStart: '2022-06-01', backtestEnd: '2026-03-15' } },
+      { groupName: 'D', weight: 20, content: { pageTitle: '回归有礼', algorithm: '龙头战法', backtestStart: '2023-01-10', backtestEnd: '2026-03-15' } }
     ],
     url: 'https://m.quantking.cn/landing/new-user',
     createTime: '2026-04-10 14:00',
@@ -1228,8 +1258,8 @@ let experiments = [
     status: true,
     channels: ['weibo', 'baidu'],
     groups: [
-      { groupName: 'A', weight: 50, pageTitle: '618量化狂欢', algorithm: 'AI选股', startDate: '2024-06-01', endDate: '2026-06-18', image: '' },
-      { groupName: 'B', weight: 50, pageTitle: '618量化狂欢', algorithm: '龙头战法', startDate: '2024-06-01', endDate: '2026-06-18', image: '' }
+      { groupName: 'A', weight: 50, content: { pageTitle: '618量化狂欢', algorithm: 'AI选股', backtestStart: '2024-06-01', backtestEnd: '2026-06-18' } },
+      { groupName: 'B', weight: 50, content: { pageTitle: '618量化狂欢', algorithm: '龙头战法', backtestStart: '2024-06-01', backtestEnd: '2026-06-18' } }
     ],
     url: 'https://m.quantking.cn/landing/618',
     createTime: '2026-05-30 16:20',
@@ -1283,21 +1313,7 @@ function renderTable(data) {
     return;
   }
   tbody.innerHTML = data.map((item, idx) => {
-    const visibleGroups = item.groups.slice(0, 3);
-    const extraCount = item.groups.length - 3;
-    let groupsHtml = visibleGroups.map((g, gi) => {
-      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-        <span class="group-tag ${groupTagClasses[gi % groupTagClasses.length]}">${g.groupName}组</span>
-        <span style="font-size:12px;color:var(--text);min-width:60px">${escapeHtml(g.algorithm)}</span>
-        <div class="weight-bar">
-          <div class="weight-bar-track"><div class="weight-bar-fill" style="width:${g.weight}%"></div></div>
-          <span class="weight-bar-text">${g.weight}%</span>
-        </div>
-      </div>`;
-    }).join('');
-    if (extraCount > 0) {
-      groupsHtml += `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">+${extraCount} 组</div>`;
-    }
+    const groupsHtml = `<span style="font-size:13px;color:var(--text);">${item.groups.length} 组</span>`;
 
     const checked = item.status ? 'checked' : '';
 
@@ -1362,7 +1378,10 @@ function refreshTable() {
   let data = experiments;
   if (search) {
     const q = search.toLowerCase();
-    data = data.filter(d => d.name.toLowerCase().includes(q) || d.groups.some(g => g.pageTitle.toLowerCase().includes(q)));
+    data = data.filter(d => d.name.toLowerCase().includes(q) || d.groups.some(g => {
+      const c = g.content || {};
+      return Object.values(c).some(v => typeof v === 'string' && v.toLowerCase().includes(q));
+    }));
   }
   if (status) {
     const s = status === 'true';
@@ -1418,7 +1437,7 @@ function renderDrawerForm(exp, isView) {
   const name = exp ? exp.name : '';
   const url = exp ? (exp.url || '') : '';
   const status = exp ? exp.status : false;
-  const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, pageTitle: '', algorithm: '', startDate: '', endDate: '', image: '' }];
+  const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, content: { pageTitle: '', algorithm: '' } }];
 
   // 初始化渠道编辑状态
   editingChannels = exp ? [...(exp.channels || [])] : [];
@@ -1508,33 +1527,9 @@ function renderGroupCard(g, index, isView) {
           <input type="number" class="group-weight" value="${g.weight}" placeholder="如 50" min="1" max="100" ${disabled} onchange="updateWeightSummary()">
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label><span class="required">*</span> 页面标题</label>
-          <input type="text" class="group-page-title" value="${escapeHtml(g.pageTitle)}" placeholder="如：新客福利" ${disabled}>
-        </div>
-        <div class="form-group">
-          <label><span class="required">*</span> 算法名称</label>
-          <input type="text" class="group-algorithm" value="${escapeHtml(g.algorithm)}" placeholder="如：研报精选" ${disabled}>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label><span class="required">*</span> 回测开始日期</label>
-          <input type="date" class="group-start-date" value="${g.startDate}" ${disabled}>
-        </div>
-        <div class="form-group">
-          <label><span class="required">*</span> 回测结束日期</label>
-          <input type="date" class="group-end-date" value="${g.endDate}" ${disabled}>
-        </div>
-      </div>
       <div class="form-group">
-        <label><span class="required">*</span> 走势图片</label>
-        <div class="upload-area" ${isView ? 'style="pointer-events:none;opacity:0.6"' : ''}>
-          <div class="upload-icon">🖼</div>
-          <div class="upload-text">${g.image ? g.image : '点击或拖拽上传走势图片'}</div>
-          <div class="upload-hint">支持 PNG / JPG，建议尺寸 750×420</div>
-        </div>
+        <label><span class="required">*</span> 页面内容配置（JSON）</label>
+        <textarea class="group-content-json" rows="8" placeholder='{\n  "pageTitle": "新客福利",\n  "algorithm": "研报精选"\n}' ${disabled}>${escapeHtml(JSON.stringify(g.content || {}, null, 2))}</textarea>
       </div>
     </div>
   `;
@@ -1545,7 +1540,7 @@ function addGroup() {
   const cards = container.querySelectorAll('.group-card');
   const nextLetter = String.fromCharCode(65 + cards.length); // A=65
   const newCard = document.createElement('div');
-  newCard.innerHTML = renderGroupCard({ groupName: nextLetter, weight: 0, pageTitle: '', algorithm: '', startDate: '', endDate: '', image: '' }, cards.length, false);
+  newCard.innerHTML = renderGroupCard({ groupName: nextLetter, weight: 0, content: { pageTitle: '', algorithm: '' } }, cards.length, false);
   container.appendChild(newCard.firstElementChild);
   updateWeightSummary();
   updateSingleGroupWeight();
@@ -1651,23 +1646,33 @@ function saveExperiment() {
   const groups = [];
   let weightTotal = 0;
   let valid = true;
+  let jsonError = '';
 
-  cards.forEach(card => {
+  cards.forEach((card, i) => {
     const gName = card.querySelector('.group-name').value.trim();
     const gWeight = parseInt(card.querySelector('.group-weight').value) || 0;
-    const gPageTitle = card.querySelector('.group-page-title').value.trim();
-    const gAlgorithm = card.querySelector('.group-algorithm').value.trim();
-    const gStartDate = card.querySelector('.group-start-date').value;
-    const gEndDate = card.querySelector('.group-end-date').value;
+    const contentRaw = card.querySelector('.group-content-json').value.trim();
+    const label = `第${i + 1}组${gName ? '（' + gName + '）' : ''}`;
 
-    if (!gName || !gWeight || !gPageTitle || !gAlgorithm || !gStartDate || !gEndDate) {
-      valid = false;
+    if (!gName || !gWeight) valid = false;
+
+    let content = {};
+    if (!contentRaw) {
+      if (!jsonError) jsonError = `${label}的页面内容配置不能为空`;
+    } else {
+      try {
+        content = JSON.parse(contentRaw);
+      } catch (e) {
+        if (!jsonError) jsonError = `${label}的页面内容 JSON 格式不正确`;
+      }
     }
+
     weightTotal += gWeight;
-    groups.push({ groupName: gName, weight: gWeight, pageTitle: gPageTitle, algorithm: gAlgorithm, startDate: gStartDate, endDate: gEndDate, image: '' });
+    groups.push({ groupName: gName, weight: gWeight, content });
   });
 
-  if (!valid) { showToast('请完整填写所有分组必填字段'); return; }
+  if (!valid) { showToast('请完整填写所有组别的标识与权重'); return; }
+  if (jsonError) { showToast(jsonError); return; }
   if (weightTotal !== 100) { showToast('权重之和必须等于100%'); return; }
 
   const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
