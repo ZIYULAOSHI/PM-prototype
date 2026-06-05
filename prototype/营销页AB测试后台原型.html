@@ -1131,7 +1131,7 @@ tbody tr:hover {
       </div>
 
       <div class="filter-bar">
-        <input type="text" placeholder="实验名称 / 页面标题" id="searchInput">
+        <input type="text" placeholder="搜索实验名称" id="searchInput">
         <select id="statusFilter">
           <option value="">全部状态</option>
           <option value="true">启用</option>
@@ -1378,10 +1378,7 @@ function refreshTable() {
   let data = experiments;
   if (search) {
     const q = search.toLowerCase();
-    data = data.filter(d => d.name.toLowerCase().includes(q) || d.groups.some(g => {
-      const c = g.content || {};
-      return Object.values(c).some(v => typeof v === 'string' && v.toLowerCase().includes(q));
-    }));
+    data = data.filter(d => d.name.toLowerCase().includes(q));
   }
   if (status) {
     const s = status === 'true';
