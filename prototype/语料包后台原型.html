@@ -258,6 +258,98 @@ body {
   color: var(--text-muted);
 }
 
+/* Multi-select dropdown */
+.multiselect {
+  position: relative;
+  width: 160px;
+}
+
+.multiselect-display {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color var(--transition);
+  user-select: none;
+}
+
+.multiselect.open .multiselect-display {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.multiselect-display .ms-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multiselect-display .ms-text.placeholder {
+  color: var(--text-muted);
+}
+
+.multiselect-display .ms-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+
+.multiselect.open .ms-arrow {
+  transform: rotate(180deg);
+}
+
+.multiselect-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 4px;
+  z-index: 100;
+  display: none;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.multiselect.open .multiselect-dropdown {
+  display: block;
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ms-option:hover {
+  background: var(--bg);
+}
+
+.ms-option input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
 .btn {
   height: 34px;
   padding: 0 16px;
@@ -901,16 +993,13 @@ tbody tr:hover {
 
       <div class="filter-bar">
         <input type="text" placeholder="问题关键词" id="searchInput">
-        <select id="catFilter">
-          <option value="">所属分类</option>
-          <option value="开户">开户</option>
-          <option value="收费">收费</option>
-          <option value="策略">策略</option>
-          <option value="指标">指标</option>
-          <option value="券商">券商</option>
-          <option value="技术问题">技术问题</option>
-          <option value="其他">其他</option>
-        </select>
+        <div class="multiselect" id="catFilter">
+          <div class="multiselect-display" onclick="toggleCatDropdown(event)">
+            <span class="ms-text placeholder" id="catFilterText">所属分类</span>
+            <span class="ms-arrow">▾</span>
+          </div>
+          <div class="multiselect-dropdown" id="catFilterDropdown"></div>
+        </div>
         <select id="statusFilter">
           <option value="">状态</option>
           <option value="启用">启用</option>
@@ -1100,22 +1189,58 @@ function refreshCategoryOptions() {
   });
   if (addOpt) editSel.appendChild(addOpt);
 
-  // 重建过滤栏分类下拉（不含 __add__）
-  const filterSel = document.getElementById('catFilter');
-  const filterVal = filterSel.value;
-  filterSel.innerHTML = '';
-  const fEmpty = document.createElement('option');
-  fEmpty.value = '';
-  fEmpty.textContent = '所属分类';
-  filterSel.appendChild(fEmpty);
-  categories.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c;
-    o.textContent = c;
-    if (c === filterVal) o.selected = true;
-    filterSel.appendChild(o);
-  });
+  // 重建过滤栏分类多选下拉
+  renderCatFilterOptions();
 }
+
+// ===== 分类多选过滤 =====
+let selectedCategories = [];
+
+function renderCatFilterOptions() {
+  const dropdown = document.getElementById('catFilterDropdown');
+  // 清理已不存在的已选分类
+  selectedCategories = selectedCategories.filter(c => categories.includes(c));
+  dropdown.innerHTML = categories.map(c => `
+    <label class="ms-option" onclick="event.stopPropagation()">
+      <input type="checkbox" value="${escapeHtml(c)}" ${selectedCategories.includes(c) ? 'checked' : ''} onchange="onCatOptionToggle(this)">
+      <span>${escapeHtml(c)}</span>
+    </label>
+  `).join('');
+  updateCatFilterText();
+}
+
+function onCatOptionToggle(cb) {
+  const val = cb.value;
+  if (cb.checked) {
+    if (!selectedCategories.includes(val)) selectedCategories.push(val);
+  } else {
+    selectedCategories = selectedCategories.filter(c => c !== val);
+  }
+  updateCatFilterText();
+}
+
+function updateCatFilterText() {
+  const textEl = document.getElementById('catFilterText');
+  if (selectedCategories.length === 0) {
+    textEl.textContent = '所属分类';
+    textEl.classList.add('placeholder');
+  } else {
+    textEl.textContent = selectedCategories.length === 1
+      ? selectedCategories[0]
+      : `已选 ${selectedCategories.length} 个分类`;
+    textEl.classList.remove('placeholder');
+  }
+}
+
+function toggleCatDropdown(event) {
+  event.stopPropagation();
+  document.getElementById('catFilter').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('catFilter');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
 
 function onCategoryChange(sel) {
   if (sel.value === '__add__') {
@@ -1216,14 +1341,13 @@ const pageSize = 10;
 
 function refreshTable() {
   const search = document.getElementById('searchInput')?.value || '';
-  const cat = document.getElementById('catFilter')?.value || '';
   const status = document.getElementById('statusFilter')?.value || '';
   let data = corpusData;
   if (search) {
     const q = search.toLowerCase();
     data = data.filter(d => d.question.toLowerCase().includes(q) || d.similar.some(s => s.toLowerCase().includes(q)));
   }
-  if (cat) data = data.filter(d => d.category === cat);
+  if (selectedCategories.length > 0) data = data.filter(d => selectedCategories.includes(d.category));
   if (status) {
     const s = status === '启用';
     data = data.filter(d => d.status === s);
@@ -1247,7 +1371,8 @@ function filterData() {
 
 function resetFilters() {
   document.getElementById('searchInput').value = '';
-  document.getElementById('catFilter').value = '';
+  selectedCategories = [];
+  renderCatFilterOptions();
   document.getElementById('statusFilter').value = '';
   currentPage = 1;
   refreshTable();
@@ -1419,6 +1544,7 @@ function showToast(msg, type) {
 }
 
 // ===== 初始化 =====
+renderCatFilterOptions();
 refreshTable();
 </script>
 
