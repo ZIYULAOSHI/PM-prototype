@@ -1050,12 +1050,11 @@ tbody tr:hover {
       <select id="editCategory" onchange="onCategoryChange(this)">
         <option value="">请选择分类</option>
         <option value="开户">开户</option>
-        <option value="收费">收费</option>
+        <option value="量化交易">量化交易</option>
+        <option value="回测">回测</option>
+        <option value="创建策略">创建策略</option>
         <option value="策略">策略</option>
-        <option value="指标">指标</option>
-        <option value="券商">券商</option>
-        <option value="技术问题">技术问题</option>
-        <option value="其他">其他</option>
+        <option value="ETF相关">ETF相关</option>
         <option value="__add__" style="color:var(--primary);font-weight:600">＋ 添加新分类</option>
       </select>
       <div class="category-add-row" id="catAddRow_drawer">
@@ -1123,52 +1122,62 @@ let corpusData = [
   },
   {
     id: 2,
-    category: '收费',
-    question: '量化王软件是免费的还是收费的',
-    similar: ['收费吗', '多少钱', '免费吗', '需要付费吗'],
-    answer: '量化王APP基础功能免费使用，包括行情查看、基础策略研究和模拟交易。量化交易实盘功能需要开通合作券商账户，具体费用以券商为准。部分高级策略和课程为付费内容。',
+    category: '量化交易',
+    question: '量化交易是怎么自动下单的',
+    similar: ['量化怎么自动买卖', '策略到了信号会自动交易吗', '不盯盘也能交易吗', '量化交易需要手动操作吗'],
+    answer: '量化交易通过您选定的策略运行，当行情触发策略设定的买入或卖出信号时，系统会自动向已开通的券商账户发送委托下单，无需手动盯盘。您可在「量化交易」页面查看实时持仓和委托记录。',
     status: true,
     updateTime: '2026-05-27 10:15',
     updater: '王静'
   },
   {
     id: 3,
-    category: '券商',
-    question: '量化王目前支持哪些券商',
-    similar: ['量化必须得开通山西证券账户才能做吗', '只能用山西证券吗', '不能用别的证券账户吗', '支持华泰证券吗'],
-    answer: '目前量化王支持山西证券、华兴证券、国新证券进行实盘交易，您可以在页面底部「开户」-「立即开通」，选择心仪的券商并开户。其他券商暂时不支持，我们会搜集用户需求，逐步开放更多券商的实盘功能。',
+    category: '回测',
+    question: '如何对策略进行历史回测',
+    similar: ['策略怎么回测', '回测在哪里看', '怎么测试策略效果', '回测数据准确吗'],
+    answer: '在策略详情页点击「回测」，选择回测时间区间、初始资金和标的范围后点击开始，系统会基于历史行情数据模拟交易并给出收益曲线、最大回撤、胜率等指标。回测不含未来函数，结果仅供参考。',
     status: true,
     updateTime: '2026-05-26 16:45',
     updater: '李向梅'
   },
   {
     id: 4,
-    category: '指标',
-    question: '中期彩带是什么指标',
-    similar: ['彩带指标怎么看', '中期彩带怎么用'],
-    answer: '中期彩带是量化王的趋势判断指标，粉色表示上升趋势，蓝色表示下降趋势。该指标基于多条移动平均线计算，不含未来函数。可在策略编辑页面的指标列表中查看详细说明。',
+    category: '创建策略',
+    question: '如何创建一个自己的量化策略',
+    similar: ['怎么新建策略', '策略怎么编辑', '可以自定义策略吗', '不会编程能创建策略吗'],
+    answer: '在「策略管理」点击「创建策略」，可通过可视化方式选择指标、设置买卖条件和参数，无需编程基础。配置完成后保存即可进行回测与模拟，验证有效后再投入实盘。',
     status: true,
     updateTime: '2026-05-25 09:20',
     updater: '张磊'
   },
   {
     id: 5,
-    category: '技术问题',
-    question: 'APP使用中点击不响应卡顿怎么办',
-    similar: ['闪退', '卡顿', '经常死机', '打开就闪退'],
-    answer: '如遇到卡顿或闪退问题，请尝试以下操作：1. 清理APP缓存（设置-通用-清理缓存）；2. 检查APP是否为最新版本；3. 重启手机后重试。如问题仍然存在，请提供录屏并联系客服。',
-    status: false,
+    category: '策略',
+    question: '中期彩带策略适合什么行情',
+    similar: ['彩带策略怎么用', '中期彩带适合震荡市吗', '彩带策略效果好吗'],
+    answer: '中期彩带策略基于趋势判断，粉色表示上升趋势、蓝色表示下降趋势，更适合趋势明显的单边行情。在震荡市中信号可能频繁，建议结合仓位管理使用，并先通过回测验证效果。',
+    status: true,
     updateTime: '2026-05-24 11:00',
     updater: '王静'
+  },
+  {
+    id: 6,
+    category: 'ETF相关',
+    question: '量化王支持ETF交易吗',
+    similar: ['可以做ETF吗', 'ETF能用量化策略吗', '支持哪些ETF', 'ETF怎么交易'],
+    answer: '量化王支持主流场内ETF的行情查看、策略回测与实盘交易。您可以在创建策略时将ETF设为交易标的，结合趋势或网格等策略进行量化操作。具体可交易品种以券商账户支持范围为准。',
+    status: true,
+    updateTime: '2026-05-23 15:40',
+    updater: '李向梅'
   }
 ];
 
-let nextId = 6;
+let nextId = 7;
 let currentDeleteId = null;
 let editingId = null;
 
 // ===== 动态分类管理 =====
-let categories = ['开户', '收费', '策略', '指标', '券商', '技术问题', '其他'];
+let categories = ['开户', '量化交易', '回测', '创建策略', '策略', 'ETF相关'];
 
 function refreshCategoryOptions() {
   // 重建抽屉分类下拉（含 __add__）
