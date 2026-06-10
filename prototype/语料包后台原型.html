@@ -1264,27 +1264,46 @@ function onCategoryChange(sel) {
   }
 }
 
+// 待保存的新分类（点击保存后才真正写入分类库）
+let pendingCategory = null;
+
 function confirmAddCategory(source) {
   const input = document.getElementById('catAddInput_' + source);
   const name = input.value.trim();
   if (!name) return;
-  if (categories.includes(name)) {
+  const sel = document.getElementById('editCategory');
+  const exists = categories.includes(name) || Array.from(sel.options).some(o => o.value === name);
+  if (exists) {
     showToast('该分类已存在');
     return;
   }
-  categories.push(name);
-  categories.sort((a, b) => a.localeCompare(b, 'zh'));
-  refreshCategoryOptions();
+  // 仅作为"待保存"分类临时加入下拉，点保存后才真正生效
+  pendingCategory = name;
+  const addOpt = sel.querySelector('option[value="__add__"]');
+  const tmp = document.createElement('option');
+  tmp.value = name;
+  tmp.textContent = name;
+  tmp.dataset.pending = '1';
+  sel.insertBefore(tmp, addOpt);
+  sel.value = name;
   cancelAddCategory(source);
-  // 选中新分类
-  const targetSel = source === 'filter' ? document.getElementById('catFilter') : document.getElementById('editCategory');
-  targetSel.value = name;
-  showToast('分类「' + name + '」已添加', 'success');
+  showToast('新分类将在保存后生效');
 }
 
 function cancelAddCategory(source) {
   document.getElementById('catAddRow_' + source).classList.remove('show');
   document.getElementById('catAddInput_' + source).value = '';
+}
+
+// 丢弃未保存的新分类（取消/关闭抽屉时调用）
+function clearPendingCategory() {
+  const sel = document.getElementById('editCategory');
+  const tmp = sel.querySelector('option[data-pending="1"]');
+  if (tmp) {
+    if (sel.value === tmp.value) sel.value = '';
+    tmp.remove();
+  }
+  pendingCategory = null;
 }
 
 // ===== 渲染表格 =====
@@ -1438,6 +1457,8 @@ function closeDrawer() {
   document.getElementById('editStatus').disabled = false;
   // 隐藏内联添加分类行
   cancelAddCategory('drawer');
+  // 丢弃未保存的新分类
+  clearPendingCategory();
   editingId = null;
 }
 
@@ -1509,6 +1530,15 @@ function saveCorpus() {
   if (!category || !question || !answer) {
     showToast('请填写所有必填字段');
     return;
+  }
+
+  // 点击保存后，才把待保存的新分类正式写入分类库
+  if (pendingCategory && category === pendingCategory && !categories.includes(pendingCategory)) {
+    categories.push(pendingCategory);
+    categories.sort((a, b) => a.localeCompare(b, 'zh'));
+    pendingCategory = null;
+    refreshCategoryOptions();
+    document.getElementById('editCategory').value = category;
   }
 
   const similar = similarRaw ? similarRaw.split('\n').map(s => s.trim()).filter(s => s) : [];
