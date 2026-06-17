@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化王 - 站内信交互原型</title>
+<style>
+:root {
+  --bg: #f5f5f5;
+  --card: #fff;
+  --text: #1a1a1a;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --accent: #3b6df0;
+  --accent-light: #e8edf9;
+  --danger: #e5484d;
+  --success: #30a46c;
+  --warning: #f59e0b;
+  --border: #eee;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: #e8ecf1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.phone-frame {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 2px #333;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 状态栏 */
+.status-bar {
+  height: 44px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 页面容器 */
+.page {
+  flex: 1;
+  overflow-y: auto;
+  display: none;
+  flex-direction: column;
+}
+
+.page.active { display: flex; }
+
+/* 导航栏 */
+.nav-bar {
+  height: 48px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.nav-back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #333;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.nav-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 底部导航 */
+.bottom-nav {
+  height: 70px;
+  background: #fff;
+  display: flex;
+  border-top: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  gap: 3px;
+  position: relative;
+}
+
+.nav-tab.active { color: var(--accent); }
+
+.nav-tab .tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.nav-tab .badge {
+  position: absolute;
+  top: 2px;
+  right: 30%;
+  width: 16px;
+  height: 16px;
+  background: var(--danger);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+/* ===== 首页 ===== */
+.home-header {
+  background: linear-gradient(135deg, #1a1d2e 0%, #2a3f6e 100%);
+  padding: 16px 20px 20px;
+  color: #fff;
+}
+
+.home-asset-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.home-asset-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+
+.home-asset-value {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.home-profit-row {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+}
+
+.home-profit-item { color: rgba(255,255,255,0.7); }
+.home-profit-num { font-weight: 600; }
+.home-profit-num.up { color: #ff4d4f; }
+.home-profit-num.down { color: #30a46c; }
+
+.home-chart {
+  height: 60px;
+  margin-top: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-end;
+  padding: 4px;
+  gap: 3px;
+}
+
+.chart-bar {
+  flex: 1;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px 2px 0 0;
+}
+
+.chart-bar:nth-child(odd) { background: rgba(59,109,240,0.6); }
+
+/* 首页功能入口 */
+.home-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fff;
+}
+
+.home-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+}
+
+.home-btn.dark {
+  background: #1a1d2e;
+  color: #fff;
+}
+
+.home-btn.accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 快捷入口 */
+.home-shortcuts {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 20px;
+  background: #fff;
+  border-top: 1px solid var(--border);
+}
+
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.shortcut-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--accent-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* 站内信入口条 */
+.station-entry {
+  margin: 10px 20px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+
+.station-entry:hover { border-color: var(--accent); }
+
+.station-entry .entry-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.station-entry .entry-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.station-entry .entry-text {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.station-entry .entry-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.station-entry .entry-arrow {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.station-entry .entry-badge {
+  width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 首页内容区 */
+.home-section {
+  margin: 6px 20px;
+}
+
+.home-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+/* 量化课堂卡片 */
+.course-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.course-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.course-card p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.course-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ===== 消息中心 ===== */
+.msg-tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.msg-tab {
+  flex: 1;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.msg-tab.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+
+.msg-tab .tab-badge {
+  position: absolute;
+  top: 10px;
+  right: 28%;
+  min-width: 16px;
+  height: 16px;
+  background: var(--danger);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 16px;
+  padding: 0 5px;
+  font-weight: 600;
+}
+
+.msg-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.msg-item {
+  background: #fff;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: background 0.1s;
+}
+
+.msg-item:hover { background: #fafbfd; }
+
+.msg-item .unread-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.msg-item .msg-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-item .msg-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msg-item .msg-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msg-item .msg-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* ===== 站内信详情页 ===== */
+.detail-content {
+  padding: 16px;
+  background: #fff;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.detail-content h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.detail-content p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+.detail-content strong {
+  color: var(--text);
+}
+
+.detail-content ul, .detail-content ol {
+  margin: 8px 0 12px 18px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.detail-content li {
+  margin-bottom: 4px;
+}
+
+.detail-var {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.detail-image {
+  width: 100%;
+  height: 160px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.detail-action-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 16px 0 8px;
+}
+
+.detail-footer-link {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 8px;
+  text-decoration: none;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state .empty-text {
+  font-size: 13px;
+}
+
+/* 切换提示条 */
+.switch-hint {
+  background: #3b6df0;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.switch-hint:hover { background: #2c5ad4; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>WiFi ▮▮▮▮ 电池</span>
+  </div>
+
+  <!-- ===== 首页 ===== -->
+  <div class="page active" id="homePage">
+    <div class="home-header">
+      <div class="home-asset-row">
+        <div>
+          <div class="home-asset-label">模拟交易总览</div>
+          <div class="home-asset-value">¥2,221,580.38</div>
+        </div>
+      </div>
+      <div class="home-profit-row">
+        <div class="home-profit-item">今日 <span class="home-profit-num up">+12,580.00</span></div>
+        <div class="home-profit-item">本周 <span class="home-profit-num up">+45,200.00</span></div>
+        <div class="home-profit-item">累计 <span class="home-profit-num up">+221,580.38</span></div>
+      </div>
+      <div class="home-chart">
+        <div class="chart-bar" style="height:40%"></div><div class="chart-bar" style="height:55%"></div>
+        <div class="chart-bar" style="height:35%"></div><div class="chart-bar" style="height:70%"></div>
+        <div class="chart-bar" style="height:50%"></div><div class="chart-bar" style="height:80%"></div>
+        <div class="chart-bar" style="height:45%"></div><div class="chart-bar" style="height:90%"></div>
+        <div class="chart-bar" style="height:60%"></div><div class="chart-bar" style="height:100%"></div>
+      </div>
+    </div>
+
+    <div class="home-actions">
+      <button class="home-btn dark">我的策略</button>
+      <button class="home-btn accent">创建策略</button>
+    </div>
+
+    <div class="home-shortcuts">
+      <div class="shortcut"><div class="shortcut-icon">💬</div>社区广场</div>
+      <div class="shortcut"><div class="shortcut-icon">🎁</div>开户福利</div>
+      <div class="shortcut"><div class="shortcut-icon">🏆</div>量化大师榜</div>
+      <div class="shortcut"><div class="shortcut-icon">📊</div>行情中心</div>
+    </div>
+
+    <!-- 站内信入口 -->
+    <div class="station-entry" onclick="switchPage('msgCenter')">
+      <div class="entry-icon">🔔</div>
+      <div class="entry-content">
+        <div class="entry-text">您昨日的模拟账户总收益为 -6,305.97 元</div>
+        <div class="entry-time">06-12 08:00</div>
+      </div>
+      <div class="entry-badge"></div>
+      <div class="entry-arrow">›</div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-title">量化课堂</div>
+      <div class="course-card">
+        <h4>量化投资从入门到精通</h4>
+        <p>适合零基础用户，系统学习量化投资基础知识、策略构建与风险管理。</p>
+        <div class="course-meta"><span>12节课</span><span>1.2万次观看</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 消息中心 ===== -->
+  <div class="page" id="msgCenterPage">
+    <div class="nav-bar">
+      <button class="nav-back" onclick="switchPage('homePage')">‹</button>
+      <div class="nav-title">消息中心</div>
+    </div>
+
+    <div class="msg-tabs">
+      <div class="msg-tab active" onclick="showMsgTab('system')">
+        系统消息
+        <span class="tab-badge" id="sysBadge">3</span>
+      </div>
+      <div class="msg-tab" onclick="showMsgTab('community')">
+        社区消息
+        <span class="tab-badge" style="background:var(--text-muted)">2</span>
+      </div>
+    </div>
+
+    <div class="msg-list" id="systemMsgList">
+      <!-- 动态渲染 -->
+    </div>
+    <div class="msg-list" id="communityMsgList" style="display:none">
+      <div class="msg-item">
+        <div class="msg-body">
+          <div class="msg-title">新关注我的</div>
+          <div class="msg-subtitle">Aaa建材老王 关注了您</div>
+        </div>
+        <div class="msg-time">今天 09:42</div>
+      </div>
+      <div class="msg-item">
+        <div class="msg-body">
+          <div class="msg-title">互动消息</div>
+          <div class="msg-subtitle">Aaa建材老王评论了你</div>
+        </div>
+        <div class="msg-time">昨天 18:30</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 站内信详情页 ===== -->
+  <div class="page" id="detailPage">
+    <div class="nav-bar">
+      <button class="nav-back" onclick="switchPage('msgCenter')">‹</button>
+      <div class="nav-title">消息详情</div>
+    </div>
+    <div class="detail-content" id="detailContent">
+      <!-- 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <div class="bottom-nav">
+    <div class="nav-tab active"><span class="tab-icon">📈</span>量化</div>
+    <div class="nav-tab"><span class="tab-icon">⚡</span>策略</div>
+    <div class="nav-tab"><span class="tab-icon">💬</span>广场</div>
+    <div class="nav-tab"><span class="tab-icon">📊</span>行情</div>
+    <div class="nav-tab" onclick="switchPage('msgCenter')">
+      <span class="tab-icon">👤</span>我的
+      <span class="badge" id="bottomBadge">3</span>
+    </div>
+  </div>
+</div>
+
+<!-- 切换提示 -->
+<div class="switch-hint" onclick="cycleScenario()" id="scenarioHint">
+  当前场景：有未读消息 · 首页入口可见（点击切换场景）
+</div>
+
+<script>
+// ===== 消息数据 =====
+const messages = [
+  {
+    id: 1,
+    title: '您昨日的模拟账户总收益为 -6,305.97 元',
+    subtitle: '昨日总收益为 -6,305.97 元，您的策略「稳健增长一号」表现弱于大盘，建议关注持仓调整。',
+    time: '06-12 08:00',
+    isRead: false,
+    contentId: 0,
+    link: '',
+    detailTitle: '收益日报',
+    detailBody: '<p>您好，<span class="detail-var">张先生</span></p><p>以下是您昨日的模拟账户收益情况：</p><p>总收益：<span style="color:#ff4d4f;font-weight:600;">-6,305.97 元</span></p><p>当前策略：<span class="detail-var">稳健增长一号</span></p><p>收益排名：超过 <strong>32%</strong> 的用户</p><p>建议：昨日市场整体下行，您的策略表现弱于大盘。建议关注以下方面：</p><ol><li>适当降低高风险品种持仓比例</li><li>增加低波动防御型品种配置</li></ol>'
+  },
+  {
+    id: 2,
+    title: '调仓通知',
+    subtitle: '您的策略「稳健增长一号」执行买入操作：贵州茅台 100 股',
+    time: '06-11 14:30',
+    isRead: false,
+    contentId: 0,
+    link: 'app://strategy/detail',
+    detailTitle: '调仓通知',
+    detailBody: '<p>策略：<span class="detail-var">稳健增长一号</span></p><p>操作类型：<span style="color:#30a46c;font-weight:600;">买入</span></p><p>标的：贵州茅台（600519）</p><p>数量：100 股</p><p>成交价：1,680.00 元</p><p>操作理由：AI 模型检测到该标的出现超卖信号，预计短期反弹概率较高。</p><div class="detail-image">📊 K线走势图示意</div>'
+  },
+  {
+    id: 3,
+    title: '新客福利规则与教程',
+    subtitle: '欢迎来到量化王！我们为您准备了专属福利和操作教程，助您快速上手量化投资。',
+    time: '06-11 10:00',
+    isRead: false,
+    contentId: 1,
+    link: '',
+    detailTitle: '新客福利规则与教程',
+    detailBody: '<p>亲爱的<span class="detail-var">张先生</span>，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况：<span class="detail-var">昨日收益 +1,250.38 元</span></p>'
+  },
+  {
+    id: 4,
+    title: '5月收益复盘报告',
+    subtitle: '您5月的量化策略收益报告已生成，点击查看详细复盘分析和优化建议。',
+    time: '06-01 08:00',
+    isRead: true,
+    contentId: 3,
+    link: '',
+    detailTitle: '5月收益复盘报告',
+    detailBody: '<p><span class="detail-var">张先生</span>，您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>收益情况：<span class="detail-var">+45,200.38 元</span></p><p>当前策略：<span class="detail-var">稳健增长一号</span></p><p>登录时间：<span class="detail-var">2026年6月12日 09:41</span></p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>'
+  },
+  {
+    id: 5,
+    title: '618理财节即将开启',
+    subtitle: '618理财节限时来袭！多重专属福利等你解锁，6月15日 10:00 准时开启。',
+    time: '06-10 09:00',
+    isRead: true,
+    contentId: 2,
+    link: '',
+    detailTitle: '618理财节活动规则说明',
+    detailBody: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：<span class="detail-var">张先生</span>，您的登录时间为 <span class="detail-var">2026年6月12日 09:41</span>，请及时参与活动哦！</p>'
+  }
+];
+
+let currentMsgTab = 'system';
+let currentDetailId = null;
+
+// ===== 页面切换 =====
+function switchPage(page, data) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(page + 'Page').classList.add('active');
+
+  if (page === 'msgCenter') {
+    renderSystemMessages();
+    updateBadges();
+  } else if (page === 'detail') {
+    renderDetail(data);
+  } else if (page === 'homePage') {
+    updateHomeEntry();
+  }
+
+  // 更新底部导航高亮
+  const tabs = document.querySelectorAll('.bottom-nav .nav-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (page === 'homePage') tabs[0].classList.add('active');
+  else tabs[4].classList.add('active');
+}
+
+function showMsgTab(tab) {
+  currentMsgTab = tab;
+  document.querySelectorAll('.msg-tab').forEach(t => t.classList.remove('active'));
+  if (tab === 'system') {
+    document.querySelectorAll('.msg-tab')[0].classList.add('active');
+    document.getElementById('systemMsgList').style.display = '';
+    document.getElementById('communityMsgList').style.display = 'none';
+  } else {
+    document.querySelectorAll('.msg-tab')[1].classList.add('active');
+    document.getElementById('systemMsgList').style.display = 'none';
+    document.getElementById('communityMsgList').style.display = '';
+  }
+}
+
+// ===== 系统消息列表渲染 =====
+function renderSystemMessages() {
+  const list = document.getElementById('systemMsgList');
+  if (messages.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">暂无系统消息</div></div>`;
+    return;
+  }
+  list.innerHTML = messages.map(m => {
+    // 时间格式化
+    let timeDisplay = m.time;
+    if (m.time.startsWith('06-12')) timeDisplay = '今天 ' + m.time.split(' ')[1];
+    else if (m.time.startsWith('06-11')) timeDisplay = '昨天 ' + m.time.split(' ')[1];
+
+    return `
+      <div class="msg-item" onclick="openDetail(${m.id})">
+        ${m.isRead ? '<div style="width:8px;flex-shrink:0"></div>' : '<div class="unread-dot"></div>'}
+        <div class="msg-body">
+          <div class="msg-title" style="${m.isRead ? '' : 'font-weight:600;color:var(--text)'}">${m.title}</div>
+          <div class="msg-subtitle">${m.subtitle}</div>
+        </div>
+        <div class="msg-time">${timeDisplay}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== 详情页 =====
+function openDetail(id) {
+  currentDetailId = id;
+  const m = messages.find(e => e.id === id);
+  if (!m) return;
+  // 标记已读
+  if (!m.isRead) {
+    m.isRead = true;
+    renderSystemMessages();
+    updateBadges();
+    updateHomeEntry();
+  }
+  switchPage('detail', m);
+}
+
+function renderDetail(m) {
+  const container = document.getElementById('detailContent');
+  let html = `
+    <h1>${m.detailTitle}</h1>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">${m.time}</div>
+    <div>${m.detailBody}</div>
+  `;
+  html += `<a class="detail-footer-link" href="#" onclick="switchPage('msgCenter');return false;">‹ 返回消息列表</a>`;
+  container.innerHTML = html;
+}
+
+// ===== 角标更新 =====
+function updateBadges() {
+  const unread = messages.filter(m => !m.isRead).length;
+  document.getElementById('sysBadge').textContent = unread;
+  document.getElementById('bottomBadge').textContent = unread;
+  if (unread === 0) {
+    document.getElementById('sysBadge').style.display = 'none';
+    document.getElementById('bottomBadge').style.display = 'none';
+  } else {
+    document.getElementById('sysBadge').style.display = '';
+    document.getElementById('bottomBadge').style.display = '';
+  }
+}
+
+// ===== 首页入口更新 =====
+function updateHomeEntry() {
+  const unreadMsgs = messages.filter(m => !m.isRead);
+  const entry = document.querySelector('.station-entry');
+  if (!entry) return;
+  if (unreadMsgs.length === 0) {
+    entry.style.display = 'none';
+  } else {
+    entry.style.display = '';
+    const latest = unreadMsgs[0];
+    entry.querySelector('.entry-text').textContent = latest.title;
+    entry.querySelector('.entry-time').textContent = latest.time;
+  }
+}
+
+// ===== 场景切换演示 =====
+const scenarios = [
+  { name: '有未读消息 · 首页入口可见', unread: [1,2,3] },
+  { name: '全部已读 · 首页入口隐藏', unread: [] },
+  { name: '仅1条未读', unread: [1] },
+];
+let scenarioIdx = 0;
+
+function cycleScenario() {
+  scenarioIdx = (scenarioIdx + 1) % scenarios.length;
+  const sc = scenarios[scenarioIdx];
+  document.getElementById('scenarioHint').textContent = '当前场景：' + sc.name + '（点击切换场景）';
+
+  messages.forEach(m => {
+    m.isRead = !sc.unread.includes(m.id);
+  });
+
+  renderSystemMessages();
+  updateBadges();
+  updateHomeEntry();
+
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id === 'msgCenterPage') {
+    renderSystemMessages();
+  }
+}
+
+// ===== 初始化 =====
+renderSystemMessages();
+updateBadges();
+updateHomeEntry();
+</script>
+</body>
+</html>

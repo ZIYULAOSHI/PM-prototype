@@ -1,0 +1,2907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化王管理后台 - 推送管理</title>
+<style>
+:root {
+  --bg: #f4f5f8;
+  --surface: #fafbfd;
+  --sidebar-bg: #1a1d24;
+  --sidebar-text: #9ba3b4;
+  --sidebar-active: #e8edf5;
+  --sidebar-active-bg: rgba(74, 108, 247, 0.1);
+  --text: #1e2130;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7ed;
+  --accent: #3b6df0;
+  --primary: #3b6df0;
+  --accent-light: #e8edf9;
+  --danger: #e5484d;
+  --danger-light: #fef2f2;
+  --success: #30a46c;
+  --success-light: #eef9f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8edf5;
+  letter-spacing: .5px;
+}
+
+.sidebar-logo span {
+  font-size: 11px;
+  color: var(--sidebar-text);
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.nav-section { margin-bottom: 4px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 13px;
+  gap: 10px;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-item.active {
+  color: #c8d4f7;
+  background: rgba(59, 109, 240, 0.12);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-item .icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item.active .icon { opacity: 0.9; }
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 13px;
+  gap: 10px;
+  transition: all var(--transition);
+}
+
+.nav-group-header:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-group-header .arrow {
+  margin-left: auto;
+  font-size: 10px;
+  transition: transform var(--transition);
+}
+
+.nav-group.open .nav-group-header .arrow {
+  transform: rotate(90deg);
+}
+
+.nav-sub {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 250ms ease;
+}
+
+.nav-group.open .nav-sub {
+  max-height: 200px;
+}
+
+.nav-sub .nav-item {
+  padding-left: 46px;
+  font-size: 12.5px;
+}
+
+/* Main Area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-bar {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb span {
+  color: var(--text-muted);
+  margin: 0 6px;
+}
+
+.breadcrumb .current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="text"],
+.filter-bar select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.filter-bar input[type="text"]:focus,
+.filter-bar select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.filter-bar input[type="text"] { width: 220px; }
+.filter-bar select { width: 130px; }
+.filter-bar input::placeholder { color: var(--text-muted); }
+
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2f5cd6; }
+
+.btn-default {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-default:hover { background: var(--bg); border-color: #cdd2db; }
+
+.btn-new { margin-left: auto; }
+
+.btn-danger-text {
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.btn-danger-text:hover { background: var(--danger-light); }
+
+.btn-edit-text {
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-edit-text:hover { background: var(--accent-light); }
+
+.btn-send {
+  color: var(--success);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-send:hover { background: var(--success-light); }
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: #f8f9fb;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f1f5;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #fafbfd; }
+
+.td-ellipsis {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.running { color: var(--success); }
+.status-badge.running::before { background: var(--success); }
+.status-badge.paused { color: var(--warning); }
+.status-badge.paused::before { background: var(--warning); }
+
+/* Copy ID Button */
+.copy-id-btn {
+  cursor: pointer;
+  color: var(--accent);
+  margin-left: 6px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.copy-id-btn:hover { opacity: 1; }
+.copy-id-btn:active { opacity: 0.4; }
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  vertical-align: middle;
+}
+.toggle-switch input { display: none; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+/* 只读/禁用状态：明确不可点击 */
+.toggle-switch input:disabled + .toggle-slider { cursor: not-allowed; opacity: 0.45; }
+.toggle-switch.is-readonly { cursor: not-allowed; }
+.status-badge.draft { color: var(--text-muted); }
+.status-badge.draft::before { background: var(--text-muted); }
+.status-badge.sent { color: var(--accent); }
+.status-badge.sent::before { background: var(--accent); }
+.status-badge.pending { color: #7c5cff; }
+.status-badge.pending::before { background: #7c5cff; }
+
+/* Tags */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag-blue { background: #eef2ff; color: #4f46e5; }
+.tag-green { background: #ecfdf5; color: #047857; }
+.tag-orange { background: #fef3c7; color: #b45309; }
+
+.type-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.type-tag.manual { background: #eef2ff; color: #4f46e5; }
+.type-tag.auto { background: #fdf2f8; color: #be185d; }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  gap: 6px;
+  border-top: 1px solid #f0f1f5;
+}
+
+.pagination .page-info {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-right: 10px;
+}
+
+.pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+
+.pagination button:hover { border-color: var(--accent); color: var(--accent); }
+.pagination button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 22px;
+  transition: all 200ms ease;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider { background: var(--success); }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+
+/* Drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.drawer-overlay.open { opacity: 1; visibility: visible; }
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 560px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group label .required {
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form-group .hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="datetime-local"]:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ===== 变量插入 ===== */
+.var-tags {
+  display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap;
+}
+.var-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 4px;
+  background: #eef2ff; color: var(--accent);
+  font-size: 12px; cursor: pointer; user-select: none;
+  border: 1px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+}
+.var-tag:hover { border-color: var(--accent); background: #dfe4ff; }
+.var-tag .var-badge {
+  font-size: 10px; background: var(--accent); color: #fff;
+  border-radius: 2px; padding: 0 3px; line-height: 14px;
+}
+.char-counter { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+.char-counter.warn { color: #d97706; }
+.char-counter.over { color: #dc2626; }
+
+.form-group select:disabled,
+.form-group input:disabled,
+.form-group textarea:disabled {
+  background: #f4f5f8;
+  color: var(--text-secondary);
+  cursor: default;
+  border-color: #e8e9ee;
+  opacity: 1;
+  -webkit-text-fill-color: var(--text-secondary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+/* Conditional section */
+.conditional-section {
+  background: #f8f9fb;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.conditional-section h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Tag Selector */
+.tag-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.tag-chip:hover { border-color: var(--accent); }
+
+.tag-chip.selected {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Switch Row */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== 目标人群分组下拉多选 ===== */
+.audience-dropdown { position: relative; }
+.audience-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 40px; padding: 4px 10px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: #fff; cursor: pointer; gap: 8px;
+  transition: border-color var(--transition);
+}
+.audience-dropdown-trigger:hover { border-color: var(--accent); }
+.audience-dropdown-trigger:focus-within,
+.audience-dropdown.open > .audience-dropdown-trigger { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+.audience-dropdown-chips {
+  display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-width: 0;
+}
+.audience-dropdown-chips .placeholder {
+  color: var(--text-muted); font-size: 13px; padding: 4px 0;
+}
+.audience-dropdown-arrow {
+  font-size: 11px; color: var(--text-muted); flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.audience-dropdown.open > .audience-dropdown-trigger .audience-dropdown-arrow {
+  transform: rotate(180deg);
+}
+.audience-dropdown-panel {
+  display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  max-height: 320px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 100; padding: 8px 0;
+}
+.audience-dropdown.open > .audience-dropdown-panel { display: block; }
+.audience-dropdown-group-label {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  padding: 6px 14px 4px; text-transform: none;
+}
+.audience-dropdown-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px; font-size: 13px; color: var(--text-primary);
+  cursor: pointer; transition: background 0.15s;
+}
+.audience-dropdown-option:hover { background: #f3f4f6; }
+.audience-dropdown-option input[type="checkbox"] {
+  width: 15px; height: 15px; margin: 0; flex-shrink: 0;
+  accent-color: var(--accent); cursor: pointer;
+}
+.audience-dropdown-option input[type="checkbox"]:indeterminate {
+  accent-color: var(--accent);
+}
+.audience-dropdown-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 12px;
+  background: var(--accent-light); color: var(--accent);
+  font-size: 12px; font-weight: 500;
+}
+.audience-dropdown-chip .remove {
+  cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.6;
+}
+.audience-dropdown-chip .remove:hover { opacity: 1; }
+.switch-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Info Tip */
+.info-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: #2563eb;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* Preview box */
+.preview-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: #f6f7fb;
+  margin-top: 4px;
+}
+
+.preview-box .preview-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Notification card (mimics phone push) */
+.preview-notif {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.preview-notif .notif-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--primary, #2f6bff);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.preview-notif .notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-notif .notif-app {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.preview-notif .preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.preview-notif .preview-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-cancel:hover { background: var(--bg); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2130;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 2000;
+  animation: toastIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.toast.success { background: #166534; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  animation: modalIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.modal p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Rule badge in list */
+.rule-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.rule-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.rule-tag.active { background: #ecfdf5; color: #047857; }
+
+/* 文章变量高亮 */
+.var-highlight { background: #fef3c7; color: #92400e; padding: 0 2px; border-radius: 2px; font-weight: 500; }
+
+/* 文章编辑器工具栏 */
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fafbfd;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  align-items: center;
+}
+
+.editor-toolbar + textarea {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* 富文本可视化编辑器 */
+.rich-editor {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 12px 14px;
+  min-height: 160px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  outline: none;
+}
+.rich-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
+.rich-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.rich-editor p { margin: 0 0 10px 0; }
+.rich-editor p:last-child { margin-bottom: 0; }
+.rich-editor strong { font-weight: 600; }
+.rich-editor ul, .rich-editor ol { margin: 6px 0 10px 20px; }
+.rich-editor li { margin-bottom: 4px; }
+.rich-editor .var-highlight { user-select: all; cursor: default; }
+.rich-editor img { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
+
+/* 正文内 PDF 附件卡片 */
+.attach-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fafbfd;
+  text-decoration: none;
+  max-width: 340px;
+  cursor: pointer;
+  vertical-align: top;
+}
+.attach-card:hover { border-color: var(--accent); background: #f5f8ff; }
+.attach-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+}
+.attach-info { display: flex; flex-direction: column; min-width: 0; }
+.attach-name { font-size: 13px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-size { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* 内容预览框 */
+.content-preview-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 80px;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.content-preview-box p { margin: 0 0 10px 0; }
+.content-preview-box p:last-child { margin-bottom: 0; }
+.content-preview-box strong { color: var(--text); font-weight: 600; }
+.content-preview-box ul, .content-preview-box ol { margin: 6px 0 10px 20px; }
+.content-preview-box li { margin-bottom: 4px; }
+.content-preview-box img { max-width: 100%; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>量化王管理后台</h1>
+    <span>QuantKing Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="#"><span class="icon">⌂</span> 首页</a>
+    <a class="nav-item" href="#"><span class="icon">⬇</span> 安装包管理</a>
+    <a class="nav-item" href="#"><span class="icon">⚙</span> 功能管理</a>
+    <a class="nav-item" href="#"><span class="icon">◈</span> 策略管理</a>
+    <a class="nav-item" href="#"><span class="icon">◎</span> 量化圈子管理</a>
+    <a class="nav-item" href="#"><span class="icon">▣</span> 课程管理</a>
+    <a class="nav-item" href="#"><span class="icon">⬡</span> 券商管理</a>
+    <a class="nav-item" href="#"><span class="icon">☷</span> 文章管理</a>
+    <a class="nav-item" href="#"><span class="icon">☺</span> 老师管理</a>
+    <a class="nav-item" href="#"><span class="icon">◫</span> 群聊管理</a>
+    <div class="nav-section">
+      <div class="nav-group open" onclick="this.classList.toggle('open')">
+        <div class="nav-group-header">
+          <span class="icon">◉</span> 营销页管理
+          <span class="arrow">▶</span>
+        </div>
+        <div class="nav-sub">
+          <a class="nav-item" href="#" onclick="switchToPage('abTest');return false;">A/B 测试</a>
+          <a class="nav-item active" href="#" onclick="switchToPage('pushManage');return false;">推送管理</a>
+          <a class="nav-item" href="#" onclick="switchToPage('pushContent');return false;">推送内容</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-item" href="#">
+      <span class="icon">▤</span> 数据统计
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<div class="main-area">
+  <div class="top-bar">
+    <div class="breadcrumb" id="breadcrumb">
+      <span>首页</span><span>›</span><span class="current">推送管理</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- ===== 推送管理页面 ===== -->
+    <div id="pushManagePage">
+      <div class="page-header">
+        <h2>推送管理</h2>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="搜索推送名称" id="searchInput">
+        <select id="typeFilter">
+          <option value="">全部类型</option>
+          <option value="manual">手动推送</option>
+          <option value="auto">自动规则</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="pending">待发送</option>
+          <option value="running">运行中</option>
+          <option value="paused">已暂停</option>
+          <option value="sent">已发送</option>
+        </select>
+        <button class="btn btn-default" onclick="resetFilters()">重置</button>
+        <button class="btn btn-default" onclick="filterData()">查询</button>
+        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">+ 新建推送</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:160px">推送名称</th>
+              <th style="width:80px">推送类型</th>
+              <th style="width:100px">推送渠道</th>
+              <th style="width:140px">目标人群</th>
+              <th style="width:110px">触发方式</th>
+              <th style="width:60px">优先级</th>
+              <th style="width:80px">状态</th>
+              <th style="width:120px">创建时间</th>
+              <th style="width:140px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ===== 推送内容页面 ===== -->
+    <div id="pushContentPage" style="display:none">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <h2>推送内容</h2>
+        <button class="btn btn-primary" onclick="openContentDrawer('new')">+ 新建文章</button>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="搜索文章标题" id="contentSearchInput">
+        <select id="contentStatusFilter">
+          <option value="">全部状态</option>
+          <option value="enabled">已启用</option>
+          <option value="disabled">已禁用</option>
+        </select>
+        <button class="btn btn-default" onclick="resetContentFilters()">重置</button>
+        <button class="btn btn-default" onclick="filterContentData()">查询</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:160px">文章ID</th>
+              <th style="width:200px">文章标题</th>
+              <th style="width:80px">启用状态</th>
+              <th style="width:100px">关联推送数</th>
+              <th style="width:140px">更新时间</th>
+              <th style="width:140px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="contentTableBody"></tbody>
+        </table>
+        <div class="pagination" id="contentPagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <h3 id="editTitle">新建推送</h3>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <button class="btn btn-cancel" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-default" id="btnDraft" onclick="savePush('draft')">保存草稿</button>
+    <button class="btn btn-primary" id="btnSave" onclick="savePush('save')">保存并启用</button>
+  </div>
+</div>
+
+<!-- Send Confirm Modal -->
+<div class="modal-overlay" id="sendModal" style="display:none">
+  <div class="modal">
+    <h3>确认发送</h3>
+    <p id="sendModalMsg"></p>
+    <p id="sendModalWarning" style="font-size:12px;color:var(--warning);display:none"></p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeSendModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmSend()">确认发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal" style="display:none">
+  <div class="modal">
+    <h3 id="deleteModalTitle">删除确认</h3>
+    <p id="deleteModalMsg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDeleteModal()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Content Drawer (文章编辑器) -->
+<div class="drawer-overlay" id="contentDrawerOverlay" onclick="closeContentDrawer()"></div>
+<div class="drawer" id="contentDrawer">
+  <div class="drawer-header">
+    <h3 id="contentDrawerTitle">新建文章</h3>
+  </div>
+  <div class="drawer-body" id="contentDrawerBody"></div>
+  <div class="drawer-footer">
+    <button class="btn btn-cancel" id="btnContentCancel" onclick="closeContentDrawer()">取消</button>
+    <button class="btn btn-primary" id="btnContentSave" onclick="saveContent()">保存</button>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+// ===== 推送数据 =====
+let pushes = [
+  {
+    id: 1,
+    name: '新客24h未创建策略引导',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '注册后24小时',
+    priority: 2,
+    status: 'running',
+    title: '【量化王】新客福利，解锁低风险量化策略👉',
+    subtitle: '',
+    content_id: '',
+    body: '尊敬的量化王用户，您已完成注册但尚未创建策略。立即创建您的第一个量化策略，享受低风险高回报的投资体验！',
+    link: 'app://strategy/create',
+    pushTime: '',
+    noRepeat: true,
+    createTime: '2026-06-01 10:30',
+    creator: '李向梅'
+  },
+  {
+    id: 2,
+    name: '注册T+2福利教程',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['new_user'],
+    triggerType: 'relative',
+    triggerDesc: '注册后48小时',
+    priority: 3,
+    status: 'running',
+    title: '新客福利规则与教程',
+    subtitle: '欢迎来到量化王！我们为您准备了专属福利和操作教程，助您快速上手量化投资。',
+    content_id: 'ART_20260610_001',
+    body: '欢迎来到量化王！我们为您准备了专属福利和操作教程，助您快速上手量化投资。',
+    link: 'app://tutorial/newbie',
+    pushTime: '',
+    noRepeat: true,
+    createTime: '2026-06-01 14:00',
+    creator: '李向梅'
+  },
+  {
+    id: 3,
+    name: '7天未登录用户召回',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['warning', 'growing'],
+    triggerType: 'fixed',
+    triggerDesc: '每日 8:00',
+    triggerCycle: 'daily',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 2,
+    status: 'running',
+    title: '【量化王】您的策略收益更新了，快来看看',
+    subtitle: '您已有一段时间未登录，您关注的策略有了新的行情变化，点击查看最新收益。',
+    content_id: '',
+    body: '您已有一段时间未登录，您关注的策略有了新的行情变化，点击查看最新收益。',
+    link: 'app://dashboard',
+    pushTime: '',
+    noRepeat: true,
+    createTime: '2026-06-02 09:15',
+    creator: '王静'
+  },
+  {
+    id: 4,
+    name: '6月新功能推广活动',
+    type: 'manual',
+    channels: ['push'],
+    audience: ['growing', 'retained'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 0,
+    status: 'sent',
+    title: '【量化王】AI选股策略全新上线，限时免费体验',
+    subtitle: '',
+    content_id: '',
+    body: '重磅更新！全新AI选股策略已上线，基于深度学习算法，6月限时免费体验，立即查看！',
+    link: 'app://strategy/ai-stock',
+    pushTime: '2026-06-05 10:00',
+    noRepeat: false,
+    createTime: '2026-06-04 16:00',
+    creator: '张磊'
+  },
+  {
+    id: 5,
+    name: '每月收益复盘（6月）',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: 'fixed',
+    triggerDesc: '每月1日 8:00',
+    triggerCycle: 'monthly',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: 1,
+    triggerTime: '08:00',
+    priority: 3,
+    status: 'draft',
+    title: '【量化王】5月收益复盘报告',
+    subtitle: '您5月的量化策略收益报告已生成，点击查看详细复盘分析和优化建议。',
+    content_id: 'ART_20260605_001',
+    body: '您5月的量化策略收益报告已生成，点击查看详细复盘分析和优化建议。',
+    link: 'app://report/monthly',
+    pushTime: '',
+    noRepeat: false,
+    createTime: '2026-06-08 11:00',
+    creator: '李向梅'
+  },
+  {
+    id: 6,
+    name: '15天未登录用户进阶召回',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['growing', 'warning'],
+    triggerType: 'fixed',
+    triggerDesc: '每日 8:00',
+    triggerCycle: 'daily',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 2,
+    status: 'paused',
+    title: '【量化王】进阶量化策略推荐，助你提升收益',
+    subtitle: '',
+    content_id: '',
+    body: '发现你感兴趣的超额收益策略，基于市场最新行情为你推荐以下进阶策略。',
+    link: 'app://strategy/advanced',
+    pushTime: '',
+    noRepeat: true,
+    createTime: '2026-06-03 15:30',
+    creator: '张磊'
+  },
+  {
+    id: 7,
+    name: '618理财节预热推送',
+    type: 'manual',
+    channels: ['push', 'inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 0,
+    status: 'pending',
+    title: '【量化王】618理财节即将开启，专属福利抢先看',
+    subtitle: '618理财节限时来袭！多重专属福利等你解锁，6月15日 10:00 准时开启，敬请期待。',
+    content_id: '',
+    body: '618理财节限时来袭！多重专属福利等你解锁，6月15日 10:00 准时开启，敬请期待。',
+    link: 'app://activity/618',
+    pushTime: '2026-06-15 10:00',
+    noRepeat: false,
+    createTime: '2026-06-10 09:00',
+    creator: '张磊'
+  }
+];
+
+let nextId = 8;
+let editingId = null;
+let drawerMode = 'new';
+
+// ===== 文章数据 =====
+let articles = [
+  {
+    id: 'ART_20260610_001',
+    title: '新客开通量化策略SOP指引',
+    body: '<p>亲爱的<span class="var-highlight">{用户昵称}</span>，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况：<span class="var-highlight">{收益情况}</span></p>',
+    disabled: false,
+    updateTime: '2026-06-10 14:30',
+    creator: '李向梅'
+  },
+  {
+    id: 'ART_20260611_001',
+    title: '618理财节活动规则说明',
+    body: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：<span class="var-highlight">{用户昵称}</span>，您的登录时间为 <span class="var-highlight">{登录时间}</span>，请及时参与活动哦！</p>',
+    disabled: false,
+    updateTime: '2026-06-11 09:15',
+    creator: '张磊'
+  },
+  {
+    id: 'ART_20260605_001',
+    title: '5月收益复盘报告',
+    body: '<p><span class="var-highlight">{用户昵称}</span>，您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>收益情况：<span class="var-highlight">{收益情况}</span></p><p>当前策略：<span class="var-highlight">{策略名称}</span></p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>',
+    disabled: false,
+    updateTime: '2026-06-05 10:00',
+    creator: '李向梅'
+  }
+];
+let nextContentSeq = 4;
+let contentEditingId = null;
+
+// 用户分层标签（按三大维度分组）
+const audienceTagGroups = [
+  {
+    label: '榜单排名分层',
+    tags: [
+      { value: 'top_user', label: '头部用户' },
+      { value: 'non_top_user', label: '非头部用户' }
+    ]
+  },
+  {
+    label: '用户生命周期分层',
+    tags: [
+      { value: 'new_user', label: '新用户' },
+      { value: 'pending_active', label: '待激活用户' },
+      { value: 'growing', label: '成长用户' },
+      { value: 'retained', label: '留存用户' }
+    ]
+  },
+  {
+    label: '用户活跃度分层',
+    tags: [
+      { value: 'active', label: '活跃用户' },
+      { value: 'warning', label: '预警用户' },
+      { value: 'low_active', label: '低活跃用户' },
+      { value: 'dormant', label: '沉睡用户' }
+    ]
+  }
+];
+
+// 扁平化用于查找
+const audienceTags = audienceTagGroups.flatMap(g => g.tags);
+
+// 渠道选项
+const channelOptions = [
+  { value: 'push', label: 'Push推送' },
+  { value: 'inapp', label: '站内信' },
+  { value: 'both', label: 'Push+站内信联动' }
+];
+
+// 触发方式
+const triggerTypes = [
+  { value: 'immediate', label: '立即发送' },
+  { value: 'scheduled', label: '定时发送' },
+  { value: 'fixed', label: '固定时间点' },
+  { value: 'relative', label: '相对时间' }
+];
+
+let editingAudience = [];
+let editingChannels = [];
+
+// ===== 渲染表格 =====
+function getChannelLabel(val) {
+  const m = { push: 'Push推送', inapp: '站内信', both: 'Push+站内信' };
+  return m[val] || val;
+}
+
+function getChannelTag(val) {
+  const m = { push: 'tag-blue', inapp: 'tag-green', both: 'tag-orange' };
+  return m[val] || '';
+}
+
+function getAudienceLabel(val) {
+  const found = audienceTags.find(t => t.value === val);
+  return found ? found.label.split('（')[0] : val;
+}
+
+function getAudienceShortLabel(val) {
+  const found = audienceTags.find(t => t.value === val);
+  if (!found) return val;
+  // 取括号前部分，若无括号则截取前6字
+  const base = found.label.split('（')[0].split('(')[0];
+  return base.length > 6 ? base.slice(0, 6) + '…' : base;
+}
+
+function getPriorityLabel(p, type) {
+  if (type !== 'auto' || !p) return '<span style="color:var(--text-muted);font-size:12px">--</span>';
+  const map = { 1: '紧急', 2: '高优', 3: '常规', 4: '低优' };
+  const colors = { 1: '#ef4444', 2: '#f59e0b', 3: 'var(--text-secondary)', 4: 'var(--text-muted)' };
+  return `<span style="font-size:12px;color:${colors[p] || colors[3]};font-weight:500">${map[p] || '常规'}</span>`;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, idx) => {
+    const typeLabel = item.type === 'auto'
+      ? `<span class="type-tag auto">自动规则</span>`
+      : `<span class="type-tag manual">手动推送</span>`;
+
+    const channelHtml = (item.channels || []).map(c =>
+      `<span class="tag ${getChannelTag(c)}">${getChannelLabel(c)}</span>`
+    ).join(' ');
+
+    const audienceHtml = (item.audience || []).map(a =>
+      `<span class="rule-tag active">${getAudienceShortLabel(a)}</span>`
+    ).join(' ');
+
+    const statusMap = {
+      draft: '<span class="status-badge draft">草稿</span>',
+      pending: '<span class="status-badge pending">待发送</span>',
+      running: '<span class="status-badge running">运行中</span>',
+      paused: '<span class="status-badge paused">已暂停</span>',
+      sent: '<span class="status-badge sent">已发送</span>'
+    };
+
+    const isAuto = item.type === 'auto';
+    let actionsHtml = '';
+    if (isAuto) {
+      if (item.status === 'running' || item.status === 'paused') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-edit-text" style="color:${item.status==='running'?'var(--warning)':'var(--success)'}" onclick="toggleAutoRule(${item.id})">${item.status==='running'?'暂停':'启用'}</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      }
+    } else {
+      if (item.status === 'draft') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-send" onclick="openSendConfirm(${item.id})">立即发送</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else if (item.status === 'pending') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-send" onclick="openSendConfirm(${item.id})">立即发送</button>
+          <button class="btn-edit-text" style="color:var(--warning)" onclick="cancelSchedule(${item.id})">取消定时</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      }
+    }
+
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td><div class="td-ellipsis" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div></td>
+        <td>${typeLabel}</td>
+        <td>${channelHtml}</td>
+        <td>${audienceHtml}</td>
+        <td><span style="font-size:12px;color:var(--text-secondary)">${item.triggerDesc || '--'}</span></td>
+        <td>${getPriorityLabel(item.priority, item.type)}</td>
+        <td>${statusMap[item.status] || ''}</td>
+        <td>${item.createTime}</td>
+        <td>${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderPagination(total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return '';
+  let html = `<span class="page-info">共 ${total} 条</span>`;
+  html += `<button ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})">‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})">›</button>`;
+  return html;
+}
+
+let currentPage = 1;
+const pageSize = 10;
+
+// ===== 页面切换 =====
+let currentMainPage = 'pushManage';
+function switchToPage(page) {
+  currentMainPage = page;
+  const bc = document.getElementById('breadcrumb');
+  const navItems = document.querySelectorAll('.nav-sub .nav-item');
+  navItems.forEach(el => el.classList.remove('active'));
+
+  if (page === 'pushManage') {
+    bc.innerHTML = '<span>首页</span><span>›</span><span class="current">推送管理</span>';
+    document.getElementById('pushManagePage').style.display = '';
+    document.getElementById('pushContentPage').style.display = 'none';
+    navItems[1]?.classList.add('active');
+  } else if (page === 'pushContent') {
+    bc.innerHTML = '<span>首页</span><span>›</span><span>营销页管理</span><span>›</span><span class="current">推送内容</span>';
+    document.getElementById('pushManagePage').style.display = 'none';
+    document.getElementById('pushContentPage').style.display = '';
+    navItems[2]?.classList.add('active');
+    refreshContentTable();
+  } else if (page === 'abTest') {
+    bc.innerHTML = '<span>首页</span><span>›</span><span>营销页管理</span><span>›</span><span class="current">A/B 测试</span>';
+    document.getElementById('pushManagePage').style.display = 'none';
+    document.getElementById('pushContentPage').style.display = 'none';
+    navItems[0]?.classList.add('active');
+  }
+}
+
+function refreshTable() {
+  const search = document.getElementById('searchInput')?.value || '';
+  const typeFilter = document.getElementById('typeFilter')?.value || '';
+  const statusFilter = document.getElementById('statusFilter')?.value || '';
+  let data = pushes;
+  if (search) {
+    const q = search.toLowerCase();
+    data = data.filter(d => d.name.toLowerCase().includes(q));
+  }
+  if (typeFilter) data = data.filter(d => d.type === typeFilter);
+  if (statusFilter) data = data.filter(d => d.status === statusFilter);
+  const total = data.length;
+  const start = (currentPage - 1) * pageSize;
+  const paged = data.slice(start, start + pageSize);
+  renderTable(paged);
+  document.getElementById('pagination').innerHTML = renderPagination(total, currentPage, pageSize);
+}
+
+function goPage(page) { currentPage = page; refreshTable(); }
+function filterData() { currentPage = 1; refreshTable(); }
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('typeFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  currentPage = 1;
+  refreshTable();
+}
+
+// ===== 抽屉 =====
+function openDrawer(mode, id) {
+  drawerMode = mode;
+  editingId = (mode === 'new') ? null : id;
+
+  const titleMap = { new: '新建推送', edit: '编辑推送', view: '推送详情' };
+  document.getElementById('editTitle').textContent = titleMap[mode];
+
+  const isView = mode === 'view';
+  document.getElementById('btnSave').style.display = isView ? 'none' : '';
+
+  let p = null;
+  if (id && mode !== 'new') {
+    p = pushes.find(e => e.id === id);
+  }
+
+  // 「保存草稿」仅在新建或编辑草稿时出现；待发送/进行中/已发送等状态下保存草稿无意义
+  const showDraftBtn = !isView && (mode === 'new' || (p && p.status === 'draft'));
+  document.getElementById('btnDraft').style.display = showDraftBtn ? '' : 'none';
+
+  editingAudience = p ? [...(p.audience || [])] : [];
+  editingChannels = p ? [...(p.channels || [])] : [];
+
+  renderDrawerForm(p, isView);
+  if (!isView) { updateSubtitleHint(); updateSaveBtnLabel(); }
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  editingId = null;
+}
+
+function renderDrawerForm(p, isView) {
+  const body = document.getElementById('drawerBody');
+  const disabled = isView ? 'disabled' : '';
+  const pushType = p ? p.type : 'manual';
+  let triggerType = p ? (p.triggerType || 'fixed') : 'fixed';
+  const isAuto = pushType === 'auto';
+
+  let html = '';
+
+  // 推送名称
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送名称</label>
+    <input type="text" id="pushName" value="${escapeHtml(p ? p.name : '')}" placeholder="如：新客24h未创建策略引导" ${disabled}>
+  </div>`;
+
+  // 目标人群（先选人群，再决定推送方式）
+  html += `<div class="form-group" id="audienceGroup">
+    <label><span class="required">*</span> 目标人群</label>
+    <div id="audienceSelector">${renderAudienceSelector(isView)}</div>
+  </div>`;
+
+  // 根据人群约束调整触发方式默认值
+  const audienceConstraints = getAudienceConstraints(editingAudience, triggerType);
+  if (!audienceConstraints.allowRelative && triggerType === 'relative') {
+    triggerType = 'fixed';
+  }
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送类型</label>
+    <select id="pushType" ${disabled} onchange="onPushTypeChange()">
+      <option value="manual" ${pushType === 'manual' ? 'selected' : ''}>手动推送</option>
+      <option value="auto" ${pushType === 'auto' ? 'selected' : ''}>自动规则</option>
+    </select>
+  </div>`;
+
+  // 触发配置（自动规则时显示，根据目标人群联动）
+  html += `<div id="triggerSection" style="${isAuto ? '' : 'display:none'}">
+    <div class="conditional-section">
+      <h5>触发规则配置</h5>
+      <div class="form-group">
+        <label><span class="required">*</span> 触发方式</label>
+        ${audienceConstraints.allowRelative
+          ? `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
+               <option value="fixed" ${triggerType !== 'relative' ? 'selected' : ''}>固定时间点</option>
+               <option value="relative" ${triggerType === 'relative' ? 'selected' : ''}>相对时间</option>
+             </select>`
+          : `<input type="hidden" id="triggerTypeSelect" value="fixed">
+             <span style="display:inline-block;padding:6px 10px;background:#f3f4f6;border-radius:6px;font-size:13px;color:#374151">固定时间点</span>`}
+      </div>
+      <div id="triggerParams" style="display:${triggerType ? '' : 'none'}">
+        ${renderTriggerParams(triggerType, p, disabled, editingAudience)}
+      </div>
+      <div class="form-group" style="margin-top:8px">
+        <label>优先级</label>
+        <select id="pushPriority" ${disabled}>
+          <option value="1" ${p && p.priority === 1 ? 'selected' : ''}>1 - 紧急</option>
+          <option value="2" ${p && p.priority === 2 ? 'selected' : ''}>2 - 高优</option>
+          <option value="3" ${(!p || !p.priority || p.priority === 3) ? 'selected' : ''}>3 - 常规</option>
+          <option value="4" ${p && p.priority === 4 ? 'selected' : ''}>4 - 低优</option>
+        </select>
+        <div class="hint">同一用户同时命中多条规则时，仅推送优先级最高的一条，其余丢弃</div>
+      </div>
+    </div>
+  </div>`;
+
+  // 内容配置
+  const channels = p ? (p.channels || []) : [];
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送渠道</label>
+    <div id="channelSelector">${renderChannelSelector(isView)}</div>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送标题 <span class="hint">（Push建议≤30字）</span></label>
+    <input type="text" id="pushTitle" value="${escapeHtml(p ? p.title : '')}" placeholder="如：【量化王】新客福利，解锁低风险量化策略👉" maxlength="50" ${disabled}>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label>副标题 <span class="hint">（非必填，站内信消息列表中标题下方的描述文本）</span></label>
+    <textarea id="pushSubtitle" rows="2" placeholder="如不填写，将自动截取所选文章正文前30字；若未选文章，则消息列表仅展示标题" ${disabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
+    <div id="subtitleHint" style="font-size:11px;margin-top:4px"></div>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label>选择文章 <span class="hint">（非必填，从「推送内容」中选择已发布的文章）</span></label>
+    <div id="articleSelector">${renderArticleSelector(p ? (p.content_id || '') : '', isView)}</div>
+    <div class="hint">选择文章后，用户点击「查看详情」将跳转到文章详情页；不选则按原有跳转链接处理</div>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label>跳转链接 <span class="hint">（点击推送后跳转的App内页面，选择文章时自动指向文章详情页）</span></label>
+    <input type="text" id="pushLink" value="${escapeHtml(p ? p.link : '')}" placeholder="如：app://strategy/create" ${disabled}>
+  </div>`;
+
+  // 推送时间（手动推送时显示）
+  const pushTime = p ? (p.pushTime || '') : '';
+  html += `<div id="timeSection" style="${isAuto ? 'display:none' : ''}">
+    <div class="form-group">
+      <label><span class="required">*</span> 推送时间</label>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer">
+          <input type="radio" name="timeMode" value="now" ${!pushTime ? 'checked' : ''} ${disabled} onchange="toggleTimeInput()"> 立即发送
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer">
+          <input type="radio" name="timeMode" value="scheduled" ${pushTime ? 'checked' : ''} ${disabled} onchange="toggleTimeInput()"> 定时发送
+        </label>
+      </div>
+      <input type="datetime-local" id="pushTimeInput" value="${pushTime}" style="${pushTime ? '' : 'display:none'}" ${disabled}>
+    </div>
+  </div>`;
+
+  // 防骚扰设置
+  html += `<div class="conditional-section" style="margin-top:8px">
+    <h5>防骚扰设置</h5>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <span style="font-size:14px;color:var(--text)">同一规则对同一用户仅触发一次</span>
+      <label class="switch">
+        <input type="checkbox" id="noRepeat" ${(p && p.noRepeat !== false) ? 'checked' : ''} ${disabled}>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>`;
+
+  body.innerHTML = html;
+  // 编辑模式下，设置全部用户复选框的 indeterminate 状态
+  if (!isView) {
+    const allCheckbox = document.getElementById('audienceAllCheckbox');
+    const allTagValues = audienceTags.map(t => t.value);
+    if (allCheckbox && editingAudience.length > 0 && editingAudience.length < allTagValues.length) {
+      allCheckbox.indeterminate = true;
+    }
+  }
+}
+
+function renderTriggerParams(triggerType, p, disabled, audience) {
+  if (!triggerType) return '';
+  let html = '';
+
+  if (triggerType === 'fixed') {
+    const cycle = (p && p.triggerCycle) || 'monthly';
+    const dayOfWeek = (p && p.triggerDayOfWeek !== undefined) ? p.triggerDayOfWeek : 1;
+    const dayOfMonth = (p && p.triggerDayOfMonth) ? p.triggerDayOfMonth : 1;
+    const triggerTime = (p && p.triggerTime) ? p.triggerTime : '08:00';
+    html += `<div class="form-row" style="align-items:flex-end">
+      <div class="form-group">
+        <label>执行周期</label>
+        <select id="fixedCycle" ${disabled} onchange="onFixedCycleChange()">
+          <option value="daily" ${cycle==='daily'?'selected':''}>每日</option>
+          <option value="weekly" ${cycle==='weekly'?'selected':''}>每周</option>
+          <option value="monthly" ${cycle==='monthly'?'selected':''}>每月</option>
+        </select>
+      </div>
+      <div class="form-group" id="fixedDayGroup" style="${cycle==='daily'?'display:none':''}">
+        <label>${cycle==='weekly'?'周几':'日期'}</label>
+        ${cycle==='weekly' ? `
+        <select id="fixedDayOfWeek" ${disabled}>
+          <option value="1" ${dayOfWeek==1?'selected':''}>周一</option>
+          <option value="2" ${dayOfWeek==2?'selected':''}>周二</option>
+          <option value="3" ${dayOfWeek==3?'selected':''}>周三</option>
+          <option value="4" ${dayOfWeek==4?'selected':''}>周四</option>
+          <option value="5" ${dayOfWeek==5?'selected':''}>周五</option>
+          <option value="6" ${dayOfWeek==6?'selected':''}>周六</option>
+          <option value="0" ${dayOfWeek==0?'selected':''}>周日</option>
+        </select>` : `
+        <input type="number" id="fixedDayOfMonth" value="${dayOfMonth}" min="1" max="28" ${disabled}>`}
+        ${cycle==='monthly' ? '<div class="hint">1-28日</div>' : ''}
+      </div>
+      <div class="form-group">
+        <label>执行时间</label>
+        <input type="time" id="fixedTime" value="${triggerTime}" ${disabled}>
+      </div>
+    </div>`;
+  } else if (triggerType === 'relative') {
+    const existingDelay = (p && p.relativeDelay) ? p.relativeDelay : ((p && p.triggerDesc) ? (parseInt(p.triggerDesc.match(/(\d+)小时/)?.[1]) || 24) : 24);
+    const existingEvent = (p && p.relativeEvent) || 'register';
+
+    // 根据当前目标人群过滤兼容的事件（不兼容的直接不显示）
+    audience = audience || [];
+    const allEvents = [
+      { value: 'register', label: '用户注册', compat: ['new_user', 'pending_active'] },
+      { value: 'strategy_create', label: '创建策略', compat: ['growing'] },
+      { value: 'real_trade', label: '首次实盘', compat: ['retained'] }
+    ];
+    const visibleEvents = audience.length === 0
+      ? allEvents
+      : allEvents.filter(ev => audience.some(t => ev.compat.includes(t)));
+    // 如果之前选中的事件被过滤掉了，取第一个可用事件
+    const safeEvent = visibleEvents.some(ev => ev.value === existingEvent)
+      ? existingEvent
+      : (visibleEvents[0]?.value || 'register');
+    const eventSelected = v => v === safeEvent ? 'selected' : '';
+
+    html += `<div class="form-row">
+      <div class="form-group">
+        <label>相对事件</label>
+        <select id="relativeEvent" ${disabled}>
+          ${visibleEvents.map(ev =>
+            `<option value="${ev.value}" ${eventSelected(ev.value)}>${ev.label}</option>`
+          ).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>延迟时间</label>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" id="relativeDelay" value="${existingDelay}" min="1" style="width:100px" ${disabled}>
+          <span>小时</span>
+        </div>
+        <div class="hint">如：24小时（1天）、48小时（2天）、168小时（7天）</div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function onPushTypeChange() {
+  const type = document.getElementById('pushType').value;
+  const triggerSection = document.getElementById('triggerSection');
+  const timeSection = document.getElementById('timeSection');
+  if (type === 'auto') {
+    triggerSection.style.display = '';
+    timeSection.style.display = 'none';
+  } else {
+    triggerSection.style.display = 'none';
+    timeSection.style.display = '';
+  }
+  updateSaveBtnLabel();
+  refreshTriggerSection();
+}
+
+// 人群变更后刷新触发配置联动
+function refreshTriggerSection() {
+  const type = document.getElementById('pushType')?.value;
+  if (type !== 'auto') return;
+  const triggerSection = document.getElementById('triggerSection');
+  if (!triggerSection || triggerSection.style.display === 'none') return;
+
+  const disabled = document.getElementById('pushType')?.disabled ? 'disabled' : '';
+  const audienceConstraints = getAudienceConstraints(editingAudience);
+
+  // 读取当前触发方式值
+  let tt = 'fixed';
+  const existing = document.getElementById('triggerTypeSelect');
+  if (existing) {
+    tt = existing.value || 'fixed';
+  }
+
+  // 如果不支持相对且当前是 relative，切回 fixed
+  const effectiveType = (!audienceConstraints.allowRelative && tt === 'relative') ? 'fixed' : tt;
+
+  // 找到触发方式的父容器 form-group，替换内容
+  const formGroup = existing?.closest('.form-group');
+  if (formGroup) {
+    const label = formGroup.querySelector('label');
+    if (audienceConstraints.allowRelative) {
+      formGroup.innerHTML = label.outerHTML + `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
+        <option value="fixed" ${effectiveType !== 'relative' ? 'selected' : ''}>固定时间点</option>
+        <option value="relative" ${effectiveType === 'relative' ? 'selected' : ''}>相对时间</option>
+      </select>`;
+    } else {
+      formGroup.innerHTML = label.outerHTML + `<input type="hidden" id="triggerTypeSelect" value="fixed">
+        <span style="display:inline-block;padding:6px 10px;background:#f3f4f6;border-radius:6px;font-size:13px;color:#374151">固定时间点</span>`;
+    }
+  }
+
+  // 更新触发参数区
+  const params = document.getElementById('triggerParams');
+  if (params) {
+    params.innerHTML = renderTriggerParams(effectiveType, null, disabled, editingAudience);
+  }
+}
+
+// 根据推送类型/发送方式更新主按钮文案
+function updateSaveBtnLabel() {
+  const btn = document.getElementById('btnSave');
+  if (!btn) return;
+  const type = document.getElementById('pushType')?.value || 'manual';
+  // 编辑已有推送时，主按钮统一为「保存」，避免显示成「定时发送/立即发送」这类动作文案
+  if (drawerMode === 'edit') { btn.textContent = '保存'; return; }
+  if (type === 'auto') { btn.textContent = '保存并启用'; return; }
+  const mode = document.querySelector('input[name="timeMode"]:checked');
+  btn.textContent = (mode && mode.value === 'scheduled') ? '定时发送' : '立即发送';
+}
+
+function onTriggerTypeChange() {
+  const tt = document.getElementById('triggerTypeSelect').value;
+  const params = document.getElementById('triggerParams');
+  if (tt) {
+    params.style.display = '';
+    params.innerHTML = renderTriggerParams(tt, null, false, editingAudience);
+  } else {
+    params.style.display = 'none';
+  }
+}
+
+function onFixedCycleChange() {
+  const cycle = document.getElementById('fixedCycle').value;
+  const dayGroup = document.getElementById('fixedDayGroup');
+  if (cycle === 'daily') {
+    dayGroup.style.display = 'none';
+  } else {
+    dayGroup.style.display = '';
+    const label = dayGroup.querySelector('label');
+    if (cycle === 'weekly') {
+      label.textContent = '周几';
+      let sel = '<select id="fixedDayOfWeek">';
+      const days = ['周一','周二','周三','周四','周五','周六','周日'];
+      days.forEach((d, i) => { sel += `<option value="${i===6?0:i+1}">${d}</option>`; });
+      sel += '</select>';
+      dayGroup.innerHTML = `<label>周几</label>${sel}`;
+    } else {
+      label.textContent = '日期';
+      dayGroup.innerHTML = '<label>日期</label><input type="number" id="fixedDayOfMonth" value="1" min="1" max="28"><div class="hint">1-28日</div>';
+    }
+  }
+}
+
+function toggleTimeInput() {
+  const mode = document.querySelector('input[name="timeMode"]:checked');
+  const input = document.getElementById('pushTimeInput');
+  if (mode && mode.value === 'scheduled') {
+    input.style.display = '';
+  } else {
+    input.style.display = 'none';
+  }
+  updateSaveBtnLabel();
+}
+
+// ===== 渠道选择器 =====
+function renderChannelSelector(isView) {
+  const chips = channelOptions.map(o => {
+    const sel = editingChannels.includes(o.value);
+    if (isView && !sel) return '';
+    const click = isView ? '' : `onclick="toggleChannel('${o.value}')"`;
+    return `<span class="tag-chip ${sel ? 'selected' : ''}" ${click}>${o.label}</span>`;
+  }).join('');
+  return `<div class="tag-selector">${chips || '<span style="color:var(--text-muted);font-size:12px">' + (isView ? '—' : '请选择推送渠道') + '</span>'}</div>`;
+}
+
+function toggleChannel(value) {
+  const i = editingChannels.indexOf(value);
+  if (i >= 0) editingChannels.splice(i, 1);
+  else editingChannels.push(value);
+  document.getElementById('channelSelector').innerHTML = renderChannelSelector(false);
+}
+
+// ===== 人群选择器（分组展示）=====
+function renderAudienceSelector(isView) {
+  const allTagValues = audienceTags.map(t => t.value);
+
+  if (isView) {
+    // 查看模式：仅显示已选标签
+    if (editingAudience.length === allTagValues.length) {
+      return '<div class="tag-selector"><span class="tag-chip selected">全部用户</span></div>';
+    }
+    const selected = editingAudience.map(v => audienceTags.find(t => t.value === v)).filter(Boolean);
+    if (selected.length === 0) return '<div class="tag-selector"><span style="color:var(--text-muted);font-size:12px">—</span></div>';
+    return `<div class="tag-selector">${selected.map(t =>
+      `<span class="tag-chip selected">${t.label}</span>`
+    ).join('')}</div>`;
+  }
+
+  // 编辑模式：复选框列表
+  const allSelected = editingAudience.length === allTagValues.length;
+  const selected = editingAudience.map(v => audienceTags.find(t => t.value === v)).filter(Boolean);
+
+  // 已选标签 chips
+  const chipsHTML = allSelected
+    ? '<span class="audience-dropdown-chip">全部用户<span class="remove" onclick="event.stopPropagation();clearAllAudience()">&times;</span></span>'
+    : (selected.length > 0
+      ? selected.map(t => `<span class="audience-dropdown-chip">${t.label}<span class="remove" onclick="event.stopPropagation();toggleAudience('${t.value}')">&times;</span></span>`).join('')
+      : '<span class="placeholder">请选择目标人群</span>');
+
+  // 下拉面板
+  let panelHTML = `<div class="audience-dropdown-option" onclick="event.stopPropagation();toggleAllAudience()" style="border-bottom:1px solid var(--border);margin-bottom:4px;font-weight:500">
+    <input type="checkbox" id="audienceAllCheckbox" ${allSelected ? 'checked' : ''} onclick="event.preventDefault()">
+    <span>全部用户</span>
+  </div>`;
+  audienceTagGroups.forEach(group => {
+    panelHTML += `<div class="audience-dropdown-group-label">${group.label}</div>`;
+    group.tags.forEach(t => {
+      const sel = editingAudience.includes(t.value);
+      panelHTML += `<div class="audience-dropdown-option" onclick="event.stopPropagation();toggleAudience('${t.value}')">
+        <input type="checkbox" ${sel ? 'checked' : ''} onclick="event.preventDefault()">
+        <span>${t.label}</span>
+      </div>`;
+    });
+  });
+
+  return `<div class="audience-dropdown" id="audienceDropdown">
+    <div class="audience-dropdown-trigger" onclick="event.stopPropagation();toggleAudienceDropdown()">
+      <div class="audience-dropdown-chips">${chipsHTML}</div>
+      <span class="audience-dropdown-arrow">&#9660;</span>
+    </div>
+    <div class="audience-dropdown-panel">${panelHTML}</div>
+  </div>`;
+}
+
+function toggleAudienceDropdown() {
+  const dd = document.getElementById('audienceDropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+
+function toggleAllAudience() {
+  const allTagValues = audienceTags.map(t => t.value);
+  if (editingAudience.length === allTagValues.length) {
+    editingAudience = [];
+  } else {
+    editingAudience = [...allTagValues];
+  }
+  rerenderAudienceDropdown();
+}
+
+function toggleAudience(value) {
+  const i = editingAudience.indexOf(value);
+  if (i >= 0) editingAudience.splice(i, 1);
+  else editingAudience.push(value);
+  rerenderAudienceDropdown();
+}
+
+function clearAllAudience() {
+  editingAudience = [];
+  rerenderAudienceDropdown();
+}
+
+function rerenderAudienceDropdown() {
+  const wasOpen = document.getElementById('audienceDropdown')?.classList.contains('open');
+  document.getElementById('audienceSelector').innerHTML = renderAudienceSelector(false);
+  if (wasOpen) {
+    document.getElementById('audienceDropdown')?.classList.add('open');
+  }
+  // 设置全部用户复选框的 indeterminate 状态（无论下拉是否打开都要设）
+  const allCheckbox = document.getElementById('audienceAllCheckbox');
+  const allTagValues = audienceTags.map(t => t.value);
+  if (allCheckbox && editingAudience.length > 0 && editingAudience.length < allTagValues.length) {
+    allCheckbox.indeterminate = true;
+  }
+  refreshTriggerSection();
+}
+
+// 点击下拉外部区域关闭
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('audienceDropdown');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+// ===== 人群-触发联动约束 =====
+const lifecycleTags = ['new_user', 'pending_active', 'growing', 'retained'];
+
+function getAudienceConstraints(audience) {
+  if (!audience || audience.length === 0) {
+    return { allowRelative: true, disabledEvents: [] };
+  }
+  const hasNonLifecycle = audience.some(t => !lifecycleTags.includes(t));
+  return { allowRelative: !hasNonLifecycle };
+}
+
+// ===== 变量插入 =====
+const VAR_LIMIT = 110; // iOS 锁屏 4 行推荐上限
+
+function insertVariable(v) {
+  const ta = document.getElementById('pushBody');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const text = ta.value;
+  ta.value = text.slice(0, start) + v + text.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + v.length;
+  ta.focus();
+  updateCharCounter();
+}
+
+function updateCharCounter() {
+  const ta = document.getElementById('pushBody');
+  const counter = document.getElementById('charCounter');
+  if (!ta || !counter) return;
+  const len = ta.value.length;
+  counter.textContent = len + ' / ' + VAR_LIMIT + ' 推荐';
+  counter.className = 'char-counter' + (len > VAR_LIMIT ? ' over' : len > VAR_LIMIT * 0.8 ? ' warn' : '');
+}
+
+// ===== 保存 =====
+function savePush(action) {
+  const name = document.getElementById('pushName').value.trim();
+  const pushType = document.getElementById('pushType').value;
+  const title = document.getElementById('pushTitle').value.trim();
+  const subtitle = document.getElementById('pushSubtitle').value.trim();
+  const contentId = document.getElementById('articleSelect')?.value || '';
+  const link = document.getElementById('pushLink').value.trim();
+  const noRepeat = document.getElementById('noRepeat').checked;
+
+  if (!name) { showToast('请输入推送名称'); return; }
+  if (!title) { showToast('请输入推送标题'); return; }
+  if (editingChannels.length === 0) { showToast('请至少选择一个推送渠道'); return; }
+  if (editingAudience.length === 0) { showToast('请至少选择一个目标人群'); return; }
+
+  let triggerType = '';
+  let triggerDesc = '';
+  let pushTime = '';
+  let priority = 3;
+  let triggerCycle = '';
+  let triggerDayOfWeek = null;
+  let triggerDayOfMonth = null;
+  let triggerTimeVal = '';
+  let relativeEventVal = '';
+  let relativeDelayVal = 0;
+
+  if (pushType === 'auto') {
+    triggerType = document.getElementById('triggerTypeSelect').value;
+    if (!triggerType) { showToast('请选择触发方式'); return; }
+    priority = parseInt(document.getElementById('pushPriority').value) || 3;
+
+    if (triggerType === 'fixed') {
+      const cycle = document.getElementById('fixedCycle').value;
+      const time = document.getElementById('fixedTime').value;
+      triggerCycle = cycle;
+      triggerTimeVal = time;
+      if (cycle === 'daily') {
+        triggerDesc = `每日 ${time}`;
+      } else if (cycle === 'weekly') {
+        const dow = parseInt(document.getElementById('fixedDayOfWeek').value);
+        triggerDayOfWeek = dow;
+        const dowMap = { 1:'周一',2:'周二',3:'周三',4:'周四',5:'周五',6:'周六',0:'周日' };
+        triggerDesc = `每${dowMap[dow] || '周一'} ${time}`;
+      } else {
+        const day = document.getElementById('fixedDayOfMonth').value;
+        triggerDayOfMonth = parseInt(day) || 1;
+        triggerDesc = `每月${day}日 ${time}`;
+      }
+    } else if (triggerType === 'relative') {
+      const event = document.getElementById('relativeEvent').value;
+      const delay = parseInt(document.getElementById('relativeDelay').value) || 0;
+      if (delay < 1) { showToast('延迟时间必须大于0'); return; }
+      relativeEventVal = event;
+      relativeDelayVal = delay;
+      const eventMap = { register: '注册后', strategy_create: '创建策略后', real_trade: '首次实盘后' };
+      triggerDesc = (eventMap[event] || '') + delay + '小时';
+    }
+  } else {
+    const timeMode = document.querySelector('input[name="timeMode"]:checked');
+    if (timeMode && timeMode.value === 'scheduled') {
+      pushTime = document.getElementById('pushTimeInput').value;
+      if (!pushTime) { showToast('请选择定时发送时间'); return; }
+    }
+  }
+
+  // 手动推送：定时发送 => 待发送；立即发送 => 已发送
+  const manualScheduled = pushType === 'manual' && !!pushTime;
+  const manualStatus = manualScheduled ? 'pending' : 'sent';
+
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+
+  if (editingId) {
+    const p = pushes.find(e => e.id === editingId);
+    if (p) {
+      p.name = name;
+      p.type = pushType;
+      p.channels = [...editingChannels];
+      p.audience = [...editingAudience];
+      p.triggerType = triggerType;
+      p.triggerDesc = triggerDesc;
+      p.triggerCycle = triggerCycle;
+      p.triggerDayOfWeek = triggerDayOfWeek;
+      p.triggerDayOfMonth = triggerDayOfMonth;
+      p.triggerTime = triggerTimeVal;
+      p.relativeEvent = relativeEventVal;
+      p.relativeDelay = relativeDelayVal;
+      p.priority = priority;
+      p.title = title;
+      p.subtitle = subtitle;
+      p.content_id = contentId;
+      p.link = link;
+      p.pushTime = pushTime;
+      p.noRepeat = noRepeat;
+      if (action === 'save') {
+        p.status = pushType === 'auto' ? 'running' : manualStatus;
+      }
+    }
+  } else {
+    pushes.unshift({
+      id: nextId++,
+      name,
+      type: pushType,
+      channels: [...editingChannels],
+      audience: [...editingAudience],
+      triggerType,
+      triggerDesc,
+      triggerCycle,
+      triggerDayOfWeek,
+      triggerDayOfMonth,
+      triggerTime: triggerTimeVal,
+      relativeEvent: relativeEventVal,
+      relativeDelay: relativeDelayVal,
+      priority,
+      status: action === 'save' ? (pushType === 'auto' ? 'running' : manualStatus) : 'draft',
+      title,
+      subtitle,
+      content_id: contentId,
+      link,
+      pushTime,
+      noRepeat,
+      createTime: now,
+      creator: '当前用户'
+    });
+  }
+
+  if (action === 'save' && pushType === 'manual') {
+    showToast(manualScheduled ? '已设置定时发送' : '推送已发送', 'success');
+  } else {
+    showToast('保存成功', 'success');
+  }
+  closeDrawer();
+  refreshTable();
+}
+
+// ===== 发送确认 =====
+let sendTargetId = null;
+
+function openSendConfirm(id) {
+  sendTargetId = id;
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+
+  const channelStr = (p.channels || []).map(c => getChannelLabel(c)).join('、');
+  const audienceStr = (p.audience || []).map(a => getAudienceLabel(a)).join('、');
+
+  document.getElementById('sendModalMsg').innerHTML = `
+    即将发送推送「<b>${escapeHtml(p.name)}</b>」<br><br>
+    渠道：${channelStr}<br>
+    目标人群：${audienceStr}<br>
+    标题：${escapeHtml(p.title)}<br>
+    副标题：${escapeHtml(p.subtitle || '(无)')}
+  `;
+
+  document.getElementById('sendModalWarning').style.display = 'none';
+  document.getElementById('sendModal').style.display = 'flex';
+}
+
+function closeSendModal() {
+  sendTargetId = null;
+  document.getElementById('sendModal').style.display = 'none';
+}
+
+function confirmSend() {
+  if (sendTargetId !== null) {
+    const p = pushes.find(e => e.id === sendTargetId);
+    if (p) {
+      p.status = 'sent';
+      const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+      p.createTime = now;
+    }
+    sendTargetId = null;
+    document.getElementById('sendModal').style.display = 'none';
+    refreshTable();
+    showToast('推送已发送', 'success');
+  }
+}
+
+// ===== 自动规则开关 =====
+function toggleAutoRule(id) {
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+  if (p.status === 'running') {
+    p.status = 'paused';
+    showToast('规则已暂停');
+  } else if (p.status === 'paused') {
+    p.status = 'running';
+    showToast('规则已启用');
+  }
+  refreshTable();
+}
+
+// ===== 取消定时（待发送 → 草稿）=====
+function cancelSchedule(id) {
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+  if (confirm('确定取消该推送的定时发送吗？取消后将转为草稿。')) {
+    p.status = 'draft';
+    p.pushTime = '';
+    refreshTable();
+    showToast('已取消定时，转为草稿');
+  }
+}
+
+// ===== 删除确认弹窗（与语料包后台一致）=====
+let pendingDeleteAction = null;
+
+function openDeleteModal(title, msg, onConfirm) {
+  document.getElementById('deleteModalTitle').textContent = title;
+  document.getElementById('deleteModalMsg').innerHTML = msg;
+  pendingDeleteAction = onConfirm;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  pendingDeleteAction = null;
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDeleteModal() {
+  const action = pendingDeleteAction;
+  closeDeleteModal();
+  if (action) action();
+}
+
+// ===== 删除 =====
+function deletePush(id) {
+  const p = pushes.find(e => e.id === id);
+  const name = p ? p.name : '';
+  openDeleteModal('删除推送', `确定删除推送${name ? '「' + escapeHtml(name) + '」' : ''}吗？删除后不可恢复。`, () => {
+    pushes = pushes.filter(e => e.id !== id);
+    refreshTable();
+    showToast('已删除');
+  });
+}
+
+// ===== 文章列表渲染 =====
+let contentCurrentPage = 1;
+const contentPageSize = 10;
+
+function refreshContentTable() {
+  const search = document.getElementById('contentSearchInput')?.value || '';
+  const statusFilter = document.getElementById('contentStatusFilter')?.value || '';
+  let data = articles;
+  if (search) {
+    const q = search.toLowerCase();
+    data = data.filter(d => d.title.toLowerCase().includes(q));
+  }
+  if (statusFilter === 'enabled') data = data.filter(d => !d.disabled);
+  if (statusFilter === 'disabled') data = data.filter(d => d.disabled);
+  const total = data.length;
+  const start = (contentCurrentPage - 1) * contentPageSize;
+  const paged = data.slice(start, start + contentPageSize);
+  renderContentTable(paged);
+  document.getElementById('contentPagination').innerHTML = renderContentPagination(total, contentCurrentPage, contentPageSize);
+}
+
+function renderContentTable(data) {
+  const tbody = document.getElementById('contentTableBody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无文章</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, idx) => {
+    const refCount = pushes.filter(p => p.content_id === item.id).length;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>
+          <span style="font-family:monospace;font-size:12px;color:var(--accent)">${escapeHtml(item.id)}</span>
+          <span class="copy-id-btn" onclick="copyArticleId('${escapeHtml(item.id)}')" title="复制ID">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </span>
+        </td>
+        <td><div class="td-ellipsis" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
+        <td>
+          <label class="toggle-switch">
+            <input type="checkbox" ${item.disabled ? '' : 'checked'} onchange="toggleContentDisabled('${item.id}', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:6px">${item.disabled ? '禁用' : '启用'}</span>
+        </td>
+        <td>${refCount}</td>
+        <td>${item.updateTime}</td>
+        <td>
+          <button class="btn-edit-text" onclick="openContentDrawer('view', '${item.id}')">查看</button>
+          <button class="btn-edit-text" onclick="openContentDrawer('edit', '${item.id}')">编辑</button>
+          <button class="btn-danger-text" onclick="deleteContent('${item.id}')">删除</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderContentPagination(total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return '';
+  let html = `<span class="page-info">共 ${total} 条</span>`;
+  html += `<button ${page === 1 ? 'disabled' : ''} onclick="goContentPage(${page - 1})">‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i === page ? 'active' : ''}" onclick="goContentPage(${i})">${i}</button>`;
+  }
+  html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goContentPage(${page + 1})">›</button>`;
+  return html;
+}
+
+function goContentPage(page) { contentCurrentPage = page; refreshContentTable(); }
+function filterContentData() { contentCurrentPage = 1; refreshContentTable(); }
+function resetContentFilters() {
+  document.getElementById('contentSearchInput').value = '';
+  document.getElementById('contentStatusFilter').value = '';
+  contentCurrentPage = 1;
+  refreshContentTable();
+}
+
+function copyArticleId(id) {
+  navigator.clipboard.writeText(id).then(() => {
+    showToast('已复制 ' + id);
+  }).catch(() => {
+    // 降级方案
+    const ta = document.createElement('textarea');
+    ta.value = id;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制 ' + id);
+  });
+}
+
+function toggleContentDisabled(id, enabled) {
+  const a = articles.find(e => e.id === id);
+  if (!a) return;
+  a.disabled = !enabled;
+  a.updateTime = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+  showToast(enabled ? '文章已启用' : '文章已禁用', 'success');
+}
+
+// ===== 文章编辑器 =====
+function openContentDrawer(mode, id) {
+  contentEditingId = (mode === 'edit') ? id : null;
+  const titleMap = { new: '新建文章', edit: '编辑文章', view: '文章详情' };
+  document.getElementById('contentDrawerTitle').textContent = titleMap[mode];
+
+  let a = null;
+  if (id) a = articles.find(e => e.id === id);
+
+  const isView = mode === 'view';
+  renderContentForm(a, isView);
+  document.getElementById('btnContentSave').style.display = isView ? 'none' : '';
+  document.getElementById('btnContentCancel').textContent = isView ? '关闭' : '取消';
+  document.getElementById('contentDrawerOverlay').classList.add('open');
+  document.getElementById('contentDrawer').classList.add('open');
+}
+
+function deleteContent(id) {
+  const a = articles.find(e => e.id === id);
+  if (!a) return;
+  const refCount = pushes.filter(p => p.content_id === id).length;
+  let msg = `确定删除文章「${escapeHtml(a.title)}」吗？删除后不可恢复。`;
+  if (refCount > 0) {
+    msg = `该文章已被 ${refCount} 条推送关联，删除后这些关联推送将自动转为「草稿」，且「选择文章」重置为「-- 不选择文章 --」。<br>确定删除「${escapeHtml(a.title)}」吗？删除后不可恢复。`;
+  }
+  openDeleteModal('删除文章', msg, () => {
+    // 关联推送：清空所选文章并转为草稿
+    pushes.forEach(p => {
+      if (p.content_id === id) {
+        p.content_id = '';
+        p.status = 'draft';
+      }
+    });
+    articles = articles.filter(e => e.id !== id);
+    refreshContentTable();
+    refreshTable();
+    showToast(refCount > 0 ? `已删除，${refCount} 条关联推送已转为草稿` : '已删除');
+  });
+}
+
+function closeContentDrawer() {
+  document.getElementById('contentDrawerOverlay').classList.remove('open');
+  document.getElementById('contentDrawer').classList.remove('open');
+  contentEditingId = null;
+}
+
+function renderContentForm(a, isView = false) {
+  const body = document.getElementById('contentDrawerBody');
+  const initBody = a ? a.body : '';
+  const isDisabled = a ? a.disabled : false;
+  body.innerHTML = `
+    <div class="form-group">
+      <label><span class="required">*</span> 文章标题 <span class="hint">（内部辨识用，不展示给用户）</span></label>
+      <input type="text" id="contentTitle" value="${escapeHtml(a ? a.title : '')}" placeholder="如：新客开通量化策略SOP指引" maxlength="50" ${isView ? 'disabled' : ''}>
+    </div>
+    <div class="form-group">
+      <label>文章正文 <span class="hint">（可视化编辑，使用下方按钮插入变量或设置格式）</span></label>
+      <div class="editor-toolbar" ${isView ? 'style="display:none"' : ''}>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{用户昵称}')"><span class="var-badge">x</span>{用户昵称}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{策略名称}')"><span class="var-badge">x</span>{策略名称}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{收益情况}')"><span class="var-badge">x</span>{收益情况}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{登录时间}')"><span class="var-badge">x</span>{登录时间}</span>
+        <span style="color:var(--border);margin:0 4px">|</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtParagraph()" style="background:#f0f4ff;color:var(--accent)"><b>¶</b> 段落</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtBold()" style="background:#f0f4ff;color:var(--accent)"><b>B</b> 加粗</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtLineBreak()" style="background:#f0f4ff;color:var(--accent)">↩ 换行</span>
+        <span style="color:var(--border);margin:0 4px">|</span>
+        <span class="var-tag" onmousedown="saveEditorSelection()" onclick="triggerImageUpload()" style="background:#ecfdf5;color:#047857"><b>＋</b> 图片</span>
+        <span class="var-tag" onmousedown="saveEditorSelection()" onclick="triggerAttachUpload()" style="background:#ecfdf5;color:#047857"><b>＋</b> 附件(PDF)</span>
+      </div>
+      <input type="file" id="contentImageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+      <input type="file" id="contentAttachInput" accept="application/pdf" style="display:none" onchange="handleAttachUpload(this)">
+      <div id="contentBody" class="rich-editor" contenteditable="${isView ? 'false' : 'true'}" ${isView ? 'style="border-top:1px solid var(--border);border-radius:var(--radius)"' : ''} data-placeholder="在此编辑文章内容，可使用上方按钮插入变量、格式、图片与附件。"></div>
+    </div>
+    <div class="form-group">
+      <label>启用状态</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <label class="toggle-switch ${isView ? 'is-readonly' : ''}">
+          <input type="checkbox" id="contentEnabled" ${isDisabled ? '' : 'checked'} ${isView ? 'disabled' : ''}>
+          <span class="toggle-slider"></span>
+        </label>
+        <span style="font-size:13px;color:var(--text-muted)" id="contentEnabledLabel">${isDisabled ? '禁用' : '启用'}</span>
+      </div>
+    </div>
+    ${isView ? '' : `<div class="info-tip" style="margin-top:8px">
+      提示：变量占位符（黄色高亮）在推送时会替换为每用户的真实数据。使用「段落」按钮包裹文本，使用「加粗」标记关键词，「换行」用于段内换行。
+    </div>`}
+  `;
+  // 开关切换文字同步
+  document.getElementById('contentEnabled').addEventListener('change', function() {
+    document.getElementById('contentEnabledLabel').textContent = this.checked ? '启用' : '禁用';
+  });
+  // 载入正文到可视化编辑器
+  const editor = document.getElementById('contentBody');
+  editor.innerHTML = prepareEditorHtml(initBody);
+}
+
+// 将存储的 HTML 载入编辑器：把变量占位符渲染成不可编辑的高亮标签
+function prepareEditorHtml(html) {
+  if (!html) return '';
+  // 已包裹的变量标签设为原子（不可编辑）
+  html = html.replace(/<span class="var-highlight">/g, '<span class="var-highlight" contenteditable="false">');
+  // 附件卡片设为原子（不可编辑）
+  html = html.replace(/<a class="attach-card"/g, '<a class="attach-card" contenteditable="false"');
+  // 未包裹的裸占位符 {xxx} 也高亮（避免影响标签内属性，仅处理标签外文本）
+  html = html.replace(/(>|^)([^<]*)/g, (m, lead, text) => {
+    return lead + text.replace(/\{[^}]+\}/g, '<span class="var-highlight" contenteditable="false">$&</span>');
+  });
+  return html;
+}
+
+// 读取编辑器内容并还原为存储用 HTML
+function getEditorHtml() {
+  const editor = document.getElementById('contentBody');
+  if (!editor) return '';
+  let html = editor.innerHTML;
+  html = html.replace(/\s*contenteditable="false"/g, '');
+  html = html.replace(/&nbsp;/g, ' ');
+  html = html.trim();
+  if (html === '<br>' || html === '<p></p>' || html === '<p><br></p>') html = '';
+  return html;
+}
+
+function insertContentVar(v) {
+  const editor = document.getElementById('contentBody');
+  if (!editor) return;
+  editor.focus();
+  const chip = `<span class="var-highlight" contenteditable="false">${v}</span>&nbsp;`;
+  document.execCommand('insertHTML', false, chip);
+}
+
+function fmtBold() {
+  document.getElementById('contentBody').focus();
+  document.execCommand('bold');
+}
+
+function fmtParagraph() {
+  document.getElementById('contentBody').focus();
+  document.execCommand('formatBlock', false, 'p');
+}
+
+function fmtLineBreak() {
+  document.getElementById('contentBody').focus();
+  document.execCommand('insertHTML', false, '<br>');
+}
+
+// ===== 正文图片 / 附件插入 =====
+let savedEditorRange = null;
+
+// 在打开文件选择框前保存光标位置（文件框会让编辑器失焦）
+function saveEditorSelection() {
+  const sel = window.getSelection();
+  const editor = document.getElementById('contentBody');
+  if (sel && sel.rangeCount > 0 && editor) {
+    const range = sel.getRangeAt(0);
+    if (editor.contains(range.commonAncestorContainer)) {
+      savedEditorRange = range.cloneRange();
+      return;
+    }
+  }
+  savedEditorRange = null;
+}
+
+// 在保存的光标处（或正文末尾）插入 HTML
+function insertHtmlAtEditor(htmlStr) {
+  const editor = document.getElementById('contentBody');
+  if (!editor) return;
+  editor.focus();
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  if (savedEditorRange) {
+    sel.addRange(savedEditorRange);
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    sel.addRange(range);
+  }
+  document.execCommand('insertHTML', false, htmlStr);
+  savedEditorRange = null;
+}
+
+function triggerImageUpload() {
+  document.getElementById('contentImageInput').click();
+}
+
+function handleImageUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); input.value = ''; return; }
+  if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过 5MB'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    // 原型阶段用本地 DataURL 预览；真实开发时改为上传接口返回的 URL
+    insertHtmlAtEditor(`<img src="${e.target.result}" alt="${escapeHtml(file.name)}"><p><br></p>`);
+    showToast('图片已插入', 'success');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function triggerAttachUpload() {
+  document.getElementById('contentAttachInput').click();
+}
+
+function handleAttachUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') { showToast('请选择 PDF 文件'); input.value = ''; return; }
+  if (file.size > 20 * 1024 * 1024) { showToast('附件大小不能超过 20MB'); input.value = ''; return; }
+  // 原型阶段用本地 blob 链接预览；真实开发时改为上传接口返回的 URL
+  const url = URL.createObjectURL(file);
+  const card = `<a class="attach-card" href="${url}" target="_blank" contenteditable="false">` +
+    `<span class="attach-icon">PDF</span>` +
+    `<span class="attach-info"><span class="attach-name">${escapeHtml(file.name)}</span><span class="attach-size">${formatFileSize(file.size)}</span></span>` +
+    `</a><p><br></p>`;
+  insertHtmlAtEditor(card);
+  showToast('附件已插入', 'success');
+  input.value = '';
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+function generateArticleId() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const datePrefix = `${y}${m}${dd}`;
+  // 找当天已有文章的最大序号
+  const todayArticles = articles.filter(a => a.id.startsWith(`ART_${datePrefix}_`));
+  let maxSeq = 0;
+  todayArticles.forEach(a => {
+    const seq = parseInt(a.id.split('_').pop());
+    if (seq > maxSeq) maxSeq = seq;
+  });
+  const seq = String(maxSeq + 1).padStart(3, '0');
+  return `ART_${datePrefix}_${seq}`;
+}
+
+function saveContent() {
+  const title = document.getElementById('contentTitle').value.trim();
+  const body = getEditorHtml();
+  const enabled = document.getElementById('contentEnabled')?.checked ?? true;
+  if (!title) { showToast('请输入文章标题'); return; }
+  if (!body) { showToast('请输入文章正文'); return; }
+
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+
+  if (contentEditingId) {
+    const a = articles.find(e => e.id === contentEditingId);
+    if (a) {
+      a.title = title;
+      a.body = body;
+      a.disabled = !enabled;
+      a.updateTime = now;
+    }
+  } else {
+    articles.unshift({
+      id: generateArticleId(),
+      title,
+      body,
+      disabled: !enabled,
+      updateTime: now,
+      creator: '当前用户'
+    });
+  }
+
+  showToast('文章已保存', 'success');
+  closeContentDrawer();
+  if (currentMainPage === 'pushContent') refreshContentTable();
+}
+
+// ===== 推送表单中的文章选择器 =====
+function renderArticleSelector(selectedId, isView) {
+  const publishedArticles = articles.filter(a => !a.disabled);
+  if (isView) {
+    if (!selectedId) return '<span style="color:var(--text-muted);font-size:12px">未选择</span>';
+    const a = articles.find(e => e.id === selectedId);
+    return `<span style="font-size:13px;color:var(--text)">${a ? escapeHtml(a.title) : '(已删除)'}</span>`;
+  }
+  let html = `<select id="articleSelect" style="width:100%" onchange="onArticleSelectChange()">
+    <option value="">-- 不选择文章 --</option>`;
+  publishedArticles.forEach(a => {
+    html += `<option value="${a.id}" ${a.id === selectedId ? 'selected' : ''}>${escapeHtml(a.title)}</option>`;
+  });
+  html += `</select>`;
+  if (publishedArticles.length === 0) {
+    html += '<div class="hint" style="margin-top:4px;color:var(--warning)">暂无已发布的文章，请先在「推送内容」中创建文章</div>';
+  }
+  return html;
+}
+
+function onArticleSelectChange() {
+  updateSubtitleHint();
+}
+
+function updateSubtitleHint() {
+  const hint = document.getElementById('subtitleHint');
+  if (!hint) return;
+  const articleId = document.getElementById('articleSelect')?.value || '';
+  const subtitleVal = document.getElementById('pushSubtitle')?.value.trim();
+  if (!subtitleVal && articleId) {
+    const a = articles.find(e => e.id === articleId);
+    if (a) {
+      const plainText = a.body.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      const preview = plainText.length > 30 ? plainText.slice(0, 30) + '...' : plainText;
+      hint.innerHTML = `<span style="color:var(--text-muted)">未填副标题，将自动截取文章正文：</span><span style="color:var(--accent)">「${escapeHtml(preview)}」</span>`;
+    }
+  } else if (!subtitleVal && !articleId) {
+    hint.innerHTML = '<span style="color:var(--warning)">未填副标题且未选文章，消息列表将仅展示标题</span>';
+  } else {
+    hint.innerHTML = '';
+  }
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ===== 初始化 =====
+refreshTable();
+</script>
+
+</body>
+</html>
