@@ -1962,7 +1962,7 @@ function renderGroupCard(g, index, isView) {
         </div>
         <div class="form-group">
           <label><span class="required">*</span> 权重（%）</label>
-          <input type="number" class="group-weight" value="${g.weight}" placeholder="如 50" min="1" max="100" ${disabled} onchange="updateWeightSummary()">
+          <input type="number" class="group-weight" value="${g.weight}" placeholder="如 50" min="1" max="100" step="1" ${disabled} oninput="validateWeight(this)" onchange="updateWeightSummary()">
         </div>
       </div>
       <div class="form-group">
@@ -1998,6 +1998,40 @@ function renderGroupCard(g, index, isView) {
       </div>
     </div>
   `;
+}
+
+// 验证权重输入，确保为正整数
+function validateWeight(input) {
+  let value = input.value;
+  
+  // 移除非数字字符
+  value = value.replace(/[^0-9]/g, '');
+  
+  // 如果输入为空，设置为0
+  if (value === '') {
+    value = '0';
+  }
+  
+  // 转换为数字并限制范围
+  let numValue = parseInt(value, 10);
+  if (isNaN(numValue)) {
+    numValue = 0;
+  }
+  
+  // 限制在1-100之间
+  if (numValue < 1) {
+    numValue = 1;
+  }
+  if (numValue > 100) {
+    numValue = 100;
+  }
+  
+  // 如果值发生变化，更新input
+  if (parseInt(input.value, 10) !== numValue) {
+    input.value = numValue;
+  }
+  
+  updateWeightSummary();
 }
 
 function addGroup() {
