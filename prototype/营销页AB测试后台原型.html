@@ -1215,9 +1215,8 @@ tbody tr:hover {
   color: var(--danger);
 }
 
-/* Hidden JSON textarea */
+/* JSON 配置编辑区域 */
 .group-content-json {
-  display: none;
   width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1236,9 +1235,15 @@ tbody tr:hover {
   margin-top: 8px;
 }
 
+.group-content-json:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
 .group-content-json:disabled {
   background: #f0f1f3;
   color: var(--text-secondary);
+  cursor: not-allowed;
 }
 
 /* Channel mini tags in table */
@@ -1985,8 +1990,11 @@ function renderGroupCard(g, index, isView) {
             ${countHtml}
           </div>
         ` : imagesHtml || '<div style="color:var(--text-muted);font-size:12px;padding:12px;text-align:center">暂无内容图片</div>'}
-        <!-- 隐藏的JSON存储 -->
-        <textarea class="group-content-json" rows="4" ${disabled}>${escapeHtml(JSON.stringify(content, null, 2))}</textarea>
+      </div>
+      <!-- JSON配置编辑区域 -->
+      <div class="form-group">
+        <label>JSON 配置（高级编辑） <span class="hint">（修改此区域需谨慎，会覆盖上述配置）</span></label>
+        <textarea class="group-content-json" rows="8" ${disabled}>${escapeHtml(JSON.stringify(content, null, 2))}</textarea>
       </div>
     </div>
   `;
