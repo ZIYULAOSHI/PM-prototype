@@ -936,8 +936,288 @@ tbody tr:hover {
   box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
 }
 
-/* Group content JSON textarea */
+/* Page Title input */
+.page-title-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition);
+  box-sizing: border-box;
+}
+
+.page-title-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.page-title-input:disabled {
+  background: #f4f5f8;
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+/* Background Image Section */
+.bg-image-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #f8f9fb;
+}
+
+.bg-image-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.bg-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bg-image-thumb {
+  width: 100px;
+  height: 60px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  background: #fff;
+}
+
+.bg-image-info {
+  flex: 1;
+}
+
+.bg-image-name {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.bg-image-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.bg-image-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.bg-image-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  transition: all var(--transition);
+}
+
+.bg-image-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.bg-image-btn.delete:hover {
+  border-color: var(--danger);
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.bg-image-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: #fafbfd;
+}
+
+.bg-image-upload-area:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.bg-image-upload-area .upload-icon {
+  font-size: 24px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.bg-image-upload-area .upload-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.bg-image-upload-area .upload-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Images Upload Area */
+.images-upload-container {
+  margin-top: 8px;
+}
+
+.images-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: #fafbfd;
+  margin-bottom: 12px;
+}
+
+.images-upload-area:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.images-upload-area.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.file-input {
+  display: none;
+}
+
+/* Images List */
+.images-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.image-item {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+  transition: all var(--transition);
+  cursor: grab;
+}
+
+.image-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.image-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.image-preview {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+/* 移除底部文字区域 */
+.image-info {
+  display: none;
+}
+
+/* 固定悬浮的关闭图标 */
+.image-close-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(229, 72, 77, 0.9);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition);
+  z-index: 10;
+}
+
+.image-item:hover .image-close-btn {
+  opacity: 1;
+}
+
+.image-close-btn:hover {
+  background: rgba(229, 72, 77, 1);
+}
+
+/* 拖拽排序样式 */
+.drag-overlay {
+  border: 2px dashed var(--accent);
+  background: rgba(59, 109, 240, 0.05);
+}
+
+.drop-placeholder {
+  border: 2px dashed var(--border);
+  background: rgba(0, 0, 0, 0.02);
+  min-height: 120px;
+}
+
+.images-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 0;
+}
+
+.images-count.warning {
+  color: var(--warning);
+}
+
+.images-count.error {
+  color: var(--danger);
+}
+
+/* Hidden JSON textarea */
 .group-content-json {
+  display: none;
   width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -945,7 +1225,7 @@ tbody tr:hover {
   font-size: 12px;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   color: var(--text);
-  background: #fff;
+  background: #f9fafb;
   outline: none;
   resize: vertical;
   line-height: 1.6;
@@ -953,17 +1233,12 @@ tbody tr:hover {
   white-space: pre;
   overflow-wrap: normal;
   overflow-x: auto;
-}
-
-.group-content-json:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+  margin-top: 8px;
 }
 
 .group-content-json:disabled {
-  background: #f5f6f8;
+  background: #f0f1f3;
   color: var(--text-secondary);
-  cursor: not-allowed;
 }
 
 /* Channel mini tags in table */
@@ -1213,11 +1488,21 @@ tbody tr:hover {
 let experiments = [
   {
     id: 1,
-    name: '新客落地页算法对比-第1轮',
+    name: '新客落地页图片配置测试',
     status: true,
     channels: ['baidu'],
     groups: [
-      { groupName: 'A', weight: 100, content: { pageTitle: '新客福利', algorithm: '研报精选', backtestStart: '2021-04-26', backtestEnd: '2026-04-24' } }
+      { 
+        groupName: 'A', 
+        weight: 100, 
+        content: { 
+          pageTitle: '新客福利',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: '收益展示图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: '策略流程图', order: 1 }
+          ]
+        } 
+      }
     ],
     url: 'https://m.quantking.cn/landing/new-user',
     createTime: '2026-05-20 10:30',
@@ -1229,9 +1514,39 @@ let experiments = [
     status: true,
     channels: ['xiaohongshu', 'douyin'],
     groups: [
-      { groupName: 'A', weight: 40, content: { pageTitle: '限时体验', algorithm: '趋势跟踪', backtestStart: '2023-06-01', backtestEnd: '2026-05-30' } },
-      { groupName: 'B', weight: 30, content: { pageTitle: '限时体验', algorithm: '均值回归', backtestStart: '2023-06-01', backtestEnd: '2026-05-30' } },
-      { groupName: 'C', weight: 30, content: { pageTitle: '限时体验', algorithm: '动量突破', backtestStart: '2024-01-01', backtestEnd: '2026-05-30' } }
+      { 
+        groupName: 'A', 
+        weight: 40, 
+        content: { 
+          pageTitle: '限时体验',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: '活动主图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: '优惠券展示', order: 1 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'B', 
+        weight: 30, 
+        content: { 
+          pageTitle: '限时体验',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: 'B组主图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: 'B组特色', order: 1 },
+            { url: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&h=300&fit=crop', name: '用户评价', order: 2 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'C', 
+        weight: 30, 
+        content: { 
+          pageTitle: '限时体验',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: 'C组主图', order: 0 }
+          ]
+        } 
+      }
     ],
     url: 'https://m.quantking.cn/landing/may-promo',
     createTime: '2026-05-18 09:15',
@@ -1243,10 +1558,50 @@ let experiments = [
     status: false,
     channels: ['gongzhonghao'],
     groups: [
-      { groupName: 'A', weight: 30, content: { pageTitle: '回归有礼', algorithm: '行业轮动', backtestStart: '2022-03-15', backtestEnd: '2026-03-15' } },
-      { groupName: 'B', weight: 30, content: { pageTitle: '回归有礼', algorithm: '研报精选', backtestStart: '2021-04-26', backtestEnd: '2026-03-15' } },
-      { groupName: 'C', weight: 20, content: { pageTitle: '回归有礼', algorithm: '均值回归', backtestStart: '2022-06-01', backtestEnd: '2026-03-15' } },
-      { groupName: 'D', weight: 20, content: { pageTitle: '回归有礼', algorithm: '龙头战法', backtestStart: '2023-01-10', backtestEnd: '2026-03-15' } }
+      { 
+        groupName: 'A', 
+        weight: 30, 
+        content: { 
+          pageTitle: '回归有礼',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: '召回主图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: '回归奖励', order: 1 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'B', 
+        weight: 30, 
+        content: { 
+          pageTitle: '回归有礼',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: 'B组主图', order: 0 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'C', 
+        weight: 20, 
+        content: { 
+          pageTitle: '回归有礼',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: 'C组主图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: 'C组特色', order: 1 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'D', 
+        weight: 20, 
+        content: { 
+          pageTitle: '回归有礼',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: 'D组主图', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: 'D组特色1', order: 1 },
+            { url: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&h=300&fit=crop', name: 'D组特色2', order: 2 }
+          ]
+        } 
+      }
     ],
     url: 'https://m.quantking.cn/landing/new-user',
     createTime: '2026-04-10 14:00',
@@ -1258,8 +1613,29 @@ let experiments = [
     status: true,
     channels: ['weibo', 'baidu'],
     groups: [
-      { groupName: 'A', weight: 50, content: { pageTitle: '618量化狂欢', algorithm: 'AI选股', backtestStart: '2024-06-01', backtestEnd: '2026-06-18' } },
-      { groupName: 'B', weight: 50, content: { pageTitle: '618量化狂欢', algorithm: '龙头战法', backtestStart: '2024-06-01', backtestEnd: '2026-06-18' } }
+      { 
+        groupName: 'A', 
+        weight: 50, 
+        content: { 
+          pageTitle: '618量化狂欢',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: '618主图A', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: '优惠活动', order: 1 },
+            { url: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&h=300&fit=crop', name: '用户案例', order: 2 }
+          ]
+        } 
+      },
+      { 
+        groupName: 'B', 
+        weight: 50, 
+        content: { 
+          pageTitle: '618量化狂欢',
+          images: [
+            { url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop', name: '618主图B', order: 0 },
+            { url: 'https://images.unsplash.com/photo-1611974789640-64b500f9b4e2?w=400&h=300&fit=crop', name: '促销信息', order: 1 }
+          ]
+        } 
+      }
     ],
     url: 'https://m.quantking.cn/landing/618',
     createTime: '2026-05-30 16:20',
@@ -1434,7 +1810,7 @@ function renderDrawerForm(exp, isView) {
   const name = exp ? exp.name : '';
   const url = exp ? (exp.url || '') : '';
   const status = exp ? exp.status : false;
-  const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, content: { pageTitle: '', algorithm: '' } }];
+  const groups = exp ? exp.groups : [{ groupName: 'A', weight: 100, content: { pageTitle: '', images: [] } }];
 
   // 初始化渠道编辑状态
   editingChannels = exp ? [...(exp.channels || [])] : [];
@@ -1508,6 +1884,66 @@ function renderDrawerForm(exp, isView) {
 
 function renderGroupCard(g, index, isView) {
   const disabled = isView ? 'disabled' : '';
+  const content = g.content || {};
+  const pageTitle = content.pageTitle || '';
+  const backgroundImage = content.backgroundImage || '';
+  const images = content.images || [];
+  
+  // 生成背景图HTML
+  let bgImageHtml = '';
+  if (backgroundImage) {
+    const bgImageName = content.backgroundImageName || '背景图';
+    bgImageHtml = `
+      <div class="bg-image-preview">
+        <img src="${escapeHtml(backgroundImage)}" alt="背景图" class="bg-image-thumb" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiNmMGYxZjUiLz48dGV4dCB4PSI1MCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzZiNzI4MCI+Ymc8L3RleHQ+PC9zdmc+J">
+        <div class="bg-image-info">
+          <div class="bg-image-name">${escapeHtml(bgImageName)}</div>
+          <div class="bg-image-hint">背景图（不可排序）</div>
+        </div>
+        ${!isView ? `
+          <div class="bg-image-actions">
+            <button class="bg-image-btn" onclick="replaceBackgroundImage(${index})">更换</button>
+            <button class="bg-image-btn delete" onclick="removeBackgroundImage(${index})">删除</button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } else {
+    bgImageHtml = `
+      <div class="bg-image-upload-area" onclick="document.getElementById('bgFileInput-${index}').click()">
+        <div class="upload-icon">🎨</div>
+        <div class="upload-text">上传背景图</div>
+        <div class="upload-hint">建议尺寸：1920×1080，支持 JPG、PNG</div>
+        <input type="file" id="bgFileInput-${index}" class="file-input" accept="image/*" onchange="handleBackgroundFile(event, ${index})">
+      </div>
+    `;
+  }
+  
+  // 生成图片预览HTML
+  let imagesHtml = '';
+  if (images.length > 0) {
+    imagesHtml = '<div class="images-list" id="imagesList-' + index + '">';
+    images.forEach((img, imgIndex) => {
+      // 修复图片URL中的特殊字符问题
+      const imgUrl = escapeHtml(img.url).replace(/&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<');
+      imagesHtml += `
+        <div class="image-item" data-index="${imgIndex}" draggable="true"
+             ondragstart="handleDragStart(event, ${index}, ${imgIndex})"
+             ondragover="handleDragOver(event, ${index}, ${imgIndex})"
+             ondrop="handleDrop(event, ${index}, ${imgIndex})"
+             ondragend="handleDragEnd(event, ${index}, ${imgIndex})">
+          <img src="${imgUrl}" alt="图片" class="image-preview" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2YwZjFmNSIvPjx0ZXh0IHg9IjYwIiB5PSI2MCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNmI3MjgwIj5pbWFnZTwvdGV4dD48L3N2Zz4='">
+          ${!isView ? `
+            <button class="image-close-btn" onclick="confirmRemoveImage(${index}, ${imgIndex})">×</button>
+          ` : ''}
+        </div>
+      `;
+    });
+    imagesHtml += '</div>';
+  }
+  
+  const countHtml = `<div class="images-count ${images.length > 10 ? 'error' : images.length >= 8 ? 'warning' : ''}">已上传 ${images.length} / 10 张图片</div>`;
+  
   return `
     <div class="group-card" data-index="${index}">
       <div class="group-card-header">
@@ -1525,8 +1961,32 @@ function renderGroupCard(g, index, isView) {
         </div>
       </div>
       <div class="form-group">
-        <label><span class="required">*</span> 页面内容配置（JSON）</label>
-        <textarea class="group-content-json" rows="8" placeholder='{\n  "pageTitle": "新客福利",\n  "algorithm": "研报精选"\n}' ${disabled}>${escapeHtml(JSON.stringify(g.content || {}, null, 2))}</textarea>
+        <label><span class="required">*</span> 页面标题</label>
+        <input type="text" class="page-title-input" value="${escapeHtml(pageTitle)}" placeholder="如：新客福利、限时体验" ${disabled} onchange="updatePageTitle(${index}, this.value)">
+      </div>
+      <div class="bg-image-section">
+        <h4>背景图配置 <span class="hint">（可选，不上传则为默认背景）</span></h4>
+        ${bgImageHtml}
+      </div>
+      <div class="form-group">
+        <label><span class="required">*</span> 页面图片配置 <span class="hint">（最多10张图片）</span></label>
+        ${!isView ? `
+          <div class="images-upload-container">
+            <div class="images-upload-area" onclick="document.getElementById('fileInput-${index}').click()" 
+                 ondragover="handleDragOver(event, ${index})" 
+                 ondragleave="handleDragLeave(event, ${index})"
+                 ondrop="handleDrop(event, ${index})">
+              <div class="upload-icon">📁</div>
+              <div class="upload-text">点击或拖拽上传内容图片</div>
+              <div class="upload-hint">支持 JPG、PNG、GIF，单张图片不超过 5MB</div>
+              <input type="file" id="fileInput-${index}" class="file-input" multiple accept="image/*" onchange="handleFiles(event, ${index})">
+            </div>
+            ${imagesHtml}
+            ${countHtml}
+          </div>
+        ` : imagesHtml || '<div style="color:var(--text-muted);font-size:12px;padding:12px;text-align:center">暂无内容图片</div>'}
+        <!-- 隐藏的JSON存储 -->
+        <textarea class="group-content-json" rows="4" ${disabled}>${escapeHtml(JSON.stringify(content, null, 2))}</textarea>
       </div>
     </div>
   `;
@@ -1537,7 +1997,7 @@ function addGroup() {
   const cards = container.querySelectorAll('.group-card');
   const nextLetter = String.fromCharCode(65 + cards.length); // A=65
   const newCard = document.createElement('div');
-  newCard.innerHTML = renderGroupCard({ groupName: nextLetter, weight: 0, content: { pageTitle: '', algorithm: '' } }, cards.length, false);
+  newCard.innerHTML = renderGroupCard({ groupName: nextLetter, weight: 0, content: { pageTitle: '', images: [] } }, cards.length, false);
   container.appendChild(newCard.firstElementChild);
   updateWeightSummary();
   updateSingleGroupWeight();
@@ -1628,6 +2088,465 @@ function toggleChannel(value) {
 }
 
 
+// ===== 图片处理函数 =====
+function updatePageTitle(groupIndex, title) {
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  try {
+    const content = JSON.parse(jsonTextarea.value || '{}');
+    content.pageTitle = title;
+    jsonTextarea.value = JSON.stringify(content, null, 2);
+  } catch (e) {
+    console.error('更新页面标题失败:', e);
+  }
+}
+
+function handleDragOver(e, groupIndex) {
+  e.preventDefault();
+  e.stopPropagation();
+  const uploadArea = e.target.closest('.images-upload-area');
+  if (uploadArea) {
+    uploadArea.classList.add('drag-over');
+  }
+}
+
+function handleDragLeave(e, groupIndex) {
+  e.preventDefault();
+  e.stopPropagation();
+  const uploadArea = e.target.closest('.images-upload-area');
+  if (uploadArea) {
+    uploadArea.classList.remove('drag-over');
+  }
+}
+
+function handleDrop(e, groupIndex) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const uploadArea = e.target.closest('.images-upload-area');
+  if (uploadArea) {
+    uploadArea.classList.remove('drag-over');
+  }
+  
+  const files = e.dataTransfer.files;
+  processFiles(files, groupIndex);
+}
+
+function handleFiles(e, groupIndex) {
+  const files = e.target.files;
+  processFiles(files, groupIndex);
+}
+
+function processFiles(files, groupIndex) {
+  console.log('processFiles called', files.length, 'files for group', groupIndex);
+  
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) {
+    console.error('Card not found for group', groupIndex);
+    return;
+  }
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  let content = {};
+  try {
+    content = JSON.parse(jsonTextarea.value || '{}');
+  } catch (e) {
+    console.error('JSON parse error:', e);
+    content = { pageTitle: '', images: [] };
+  }
+  
+  if (!content.images) content.images = [];
+  
+  // 检查图片数量限制
+  const existingCount = content.images.length;
+  if (existingCount + files.length > 10) {
+    showToast(`最多只能上传10张图片，当前已有${existingCount}张`);
+    return;
+  }
+  
+  if (files.length === 0) {
+    showToast('请选择图片文件');
+    return;
+  }
+  
+  // 处理每个文件
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    console.log('Processing file:', file.name, file.type, file.size);
+    
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+      showToast(`文件"${file.name}"不是图片类型，已跳过`);
+      continue;
+    }
+    
+    // 检查文件大小（5MB限制）
+    if (file.size > 5 * 1024 * 1024) {
+      showToast(`文件"${file.name}"超过5MB限制，已跳过`);
+      continue;
+    }
+    
+    // 创建文件预览（在实际应用中，这里应该是上传到服务器并返回URL）
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imageDataUrl = e.target.result;
+      console.log('File loaded successfully');
+      
+      content.images.push({
+        url: imageDataUrl, // 实际应用中这里应该是服务器返回的URL
+        name: file.name.replace(/\.[^/.]+$/, ""), // 去除扩展名
+        order: content.images.length
+      });
+      
+      // 更新JSON
+      jsonTextarea.value = JSON.stringify(content, null, 2);
+      
+      // 重新渲染这个分组卡片
+      const groups = getCurrentGroupsFromDrawer();
+      if (groups && groups[groupIndex]) {
+        const container = document.getElementById('groupsContainer');
+        const newCard = document.createElement('div');
+        newCard.innerHTML = renderGroupCard(groups[groupIndex], groupIndex, false);
+        
+        // 替换原有卡片
+        const oldCard = container.querySelectorAll('.group-card')[groupIndex];
+        if (oldCard) {
+          oldCard.parentNode.replaceChild(newCard.firstElementChild, oldCard);
+        }
+        
+        showToast(`已上传 ${i + 1}/${files.length} 张图片`);
+      }
+    };
+    
+    reader.onerror = function(e) {
+      console.error('FileReader error:', e);
+      showToast(`文件"${file.name}"读取失败`);
+    };
+    
+    reader.readAsDataURL(file);
+  }
+  
+  // 重置文件输入
+  const fileInput = document.getElementById(`fileInput-${groupIndex}`);
+  if (fileInput) {
+    fileInput.value = '';
+  }
+}
+
+// 拖拽排序相关变量
+let dragSourceIndex = null;
+let dragSourceGroupIndex = null;
+let dragOverElement = null;
+
+// 拖拽开始
+function handleDragStart(e, groupIndex, imageIndex) {
+  dragSourceIndex = imageIndex;
+  dragSourceGroupIndex = groupIndex;
+  e.dataTransfer.setData('text/plain', `${groupIndex},${imageIndex}`);
+  e.dataTransfer.effectAllowed = 'move';
+  
+  // 添加拖动样式
+  setTimeout(() => {
+    e.target.classList.add('dragging');
+  }, 0);
+}
+
+// 拖拽经过
+function handleDragOver(e, groupIndex, imageIndex) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  const target = e.target.closest('.image-item');
+  if (target && target !== dragOverElement) {
+    if (dragOverElement) {
+      dragOverElement.classList.remove('drag-overlay');
+    }
+    dragOverElement = target;
+    dragOverElement.classList.add('drag-overlay');
+  }
+}
+
+// 拖拽放置
+function handleDrop(e, groupIndex, imageIndex) {
+  e.preventDefault();
+  
+  if (dragSourceGroupIndex !== groupIndex) {
+    // 只允许同组内拖拽
+    if (dragOverElement) {
+      dragOverElement.classList.remove('drag-overlay');
+      dragOverElement = null;
+    }
+    return;
+  }
+  
+  const targetIndex = parseInt(e.target.closest('.image-item').dataset.index);
+  
+  if (dragSourceIndex !== null && dragSourceIndex !== targetIndex) {
+    moveImageByDrag(groupIndex, dragSourceIndex, targetIndex);
+  }
+  
+  if (dragOverElement) {
+    dragOverElement.classList.remove('drag-overlay');
+    dragOverElement = null;
+  }
+}
+
+// 拖拽结束
+function handleDragEnd(e, groupIndex, imageIndex) {
+  e.target.classList.remove('dragging');
+  
+  if (dragOverElement) {
+    dragOverElement.classList.remove('drag-overlay');
+    dragOverElement = null;
+  }
+  
+  dragSourceIndex = null;
+  dragSourceGroupIndex = null;
+}
+
+// 通过拖拽移动图片
+function moveImageByDrag(groupIndex, fromIndex, toIndex) {
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  try {
+    const content = JSON.parse(jsonTextarea.value || '{}');
+    if (!content.images || !content.images[fromIndex]) return;
+    
+    // 移动元素
+    const [movedItem] = content.images.splice(fromIndex, 1);
+    content.images.splice(toIndex, 0, movedItem);
+    
+    // 重新排序
+    content.images.forEach((img, idx) => {
+      img.order = idx;
+    });
+    
+    jsonTextarea.value = JSON.stringify(content, null, 2);
+    
+    // 重新渲染这个分组卡片
+    const groups = getCurrentGroupsFromDrawer();
+    if (groups && groups[groupIndex]) {
+      const container = document.getElementById('groupsContainer');
+      const newCard = document.createElement('div');
+      newCard.innerHTML = renderGroupCard(groups[groupIndex], groupIndex, false);
+      
+      // 替换原有卡片
+      const oldCard = container.querySelectorAll('.group-card')[groupIndex];
+      if (oldCard) {
+        oldCard.parentNode.replaceChild(newCard.firstElementChild, oldCard);
+      }
+    }
+  } catch (e) {
+    console.error('拖拽排序失败:', e);
+  }
+}
+
+// 确认删除图片
+function confirmRemoveImage(groupIndex, imageIndex) {
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  try {
+    const content = JSON.parse(jsonTextarea.value || '{}');
+    if (!content.images || !content.images[imageIndex]) return;
+    
+    const imgName = content.images[imageIndex].name || '图片';
+    
+    // 创建确认对话框
+    if (confirm(`确定要删除图片 "${imgName}" 吗？`)) {
+      removeImage(groupIndex, imageIndex);
+    }
+  } catch (e) {
+    console.error('获取图片信息失败:', e);
+  }
+}
+
+function removeImage(groupIndex, imageIndex) {
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  try {
+    const content = JSON.parse(jsonTextarea.value || '{}');
+    if (content.images && content.images[imageIndex]) {
+      content.images.splice(imageIndex, 1);
+      
+      // 重新排序
+      content.images.forEach((img, idx) => {
+        img.order = idx;
+      });
+      
+      jsonTextarea.value = JSON.stringify(content, null, 2);
+      
+      // 重新渲染这个分组卡片
+      const groups = getCurrentGroupsFromDrawer();
+      if (groups && groups[groupIndex]) {
+        const container = document.getElementById('groupsContainer');
+        const newCard = document.createElement('div');
+        newCard.innerHTML = renderGroupCard(groups[groupIndex], groupIndex, false);
+        
+        // 替换原有卡片
+        const oldCard = container.querySelectorAll('.group-card')[groupIndex];
+        if (oldCard) {
+          oldCard.parentNode.replaceChild(newCard.firstElementChild, oldCard);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('删除图片失败:', e);
+  }
+}
+
+
+
+// ===== 背景图处理函数 =====
+function handleBackgroundFile(e, groupIndex) {
+  const files = e.target.files;
+  if (files.length === 0) return;
+  
+  // 只取第一张图片
+  const file = files[0];
+  
+  // 检查文件类型
+  if (!file.type.startsWith('image/')) {
+    showToast(`文件"${file.name}"不是图片类型`);
+    return;
+  }
+  
+  // 检查文件大小（10MB限制，背景图可以稍大）
+  if (file.size > 10 * 1024 * 1024) {
+    showToast(`背景图"${file.name}"超过10MB限制`);
+    return;
+  }
+  
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  let content = {};
+  try {
+    content = JSON.parse(jsonTextarea.value || '{}');
+  } catch (e) {
+    content = { pageTitle: '', images: [] };
+  }
+  
+  // 创建文件预览
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imageDataUrl = e.target.result;
+    
+    // 更新背景图
+    content.backgroundImage = imageDataUrl;
+    content.backgroundImageName = file.name.replace(/\.[^/.]+$/, ""); // 去除扩展名
+    
+    // 更新JSON
+    jsonTextarea.value = JSON.stringify(content, null, 2);
+    
+    // 重新渲染这个分组卡片
+    const groups = getCurrentGroupsFromDrawer();
+    if (groups && groups[groupIndex]) {
+      const container = document.getElementById('groupsContainer');
+      const newCard = document.createElement('div');
+      newCard.innerHTML = renderGroupCard(groups[groupIndex], groupIndex, false);
+      
+      // 替换原有卡片
+      const oldCard = container.querySelectorAll('.group-card')[groupIndex];
+      if (oldCard) {
+        oldCard.parentNode.replaceChild(newCard.firstElementChild, oldCard);
+      }
+    }
+    
+    showToast('背景图上传成功');
+  };
+  
+  reader.readAsDataURL(file);
+  
+  // 重置文件输入
+  e.target.value = '';
+}
+
+function replaceBackgroundImage(groupIndex) {
+  // 创建临时的文件输入元素
+  const tempFileInput = document.createElement('input');
+  tempFileInput.type = 'file';
+  tempFileInput.accept = 'image/*';
+  tempFileInput.style.display = 'none';
+  
+  tempFileInput.onchange = function(e) {
+    handleBackgroundFile(e, groupIndex);
+    // 清理临时元素
+    document.body.removeChild(tempFileInput);
+  };
+  
+  // 添加到DOM并触发点击
+  document.body.appendChild(tempFileInput);
+  tempFileInput.click();
+}
+
+function removeBackgroundImage(groupIndex) {
+  const card = document.querySelectorAll('.group-card')[groupIndex];
+  if (!card) return;
+  
+  const jsonTextarea = card.querySelector('.group-content-json');
+  try {
+    const content = JSON.parse(jsonTextarea.value || '{}');
+    
+    if (confirm('确定要删除背景图吗？删除后将使用默认背景。')) {
+      delete content.backgroundImage;
+      delete content.backgroundImageName;
+      
+      // 更新JSON
+      jsonTextarea.value = JSON.stringify(content, null, 2);
+      
+      // 重新渲染这个分组卡片
+      const groups = getCurrentGroupsFromDrawer();
+      if (groups && groups[groupIndex]) {
+        const container = document.getElementById('groupsContainer');
+        const newCard = document.createElement('div');
+        newCard.innerHTML = renderGroupCard(groups[groupIndex], groupIndex, false);
+        
+        // 替换原有卡片
+        const oldCard = container.querySelectorAll('.group-card')[groupIndex];
+        if (oldCard) {
+          oldCard.parentNode.replaceChild(newCard.firstElementChild, oldCard);
+        }
+      }
+      
+      showToast('背景图已删除');
+    }
+  } catch (e) {
+    console.error('删除背景图失败:', e);
+  }
+}
+
+function getCurrentGroupsFromDrawer() {
+  const container = document.getElementById('groupsContainer');
+  if (!container) return null;
+  
+  const cards = container.querySelectorAll('.group-card');
+  const groups = [];
+  
+  cards.forEach(card => {
+    const gName = card.querySelector('.group-name').value.trim();
+    const gWeight = parseInt(card.querySelector('.group-weight').value) || 0;
+    const contentRaw = card.querySelector('.group-content-json').value.trim();
+    
+    try {
+      const content = JSON.parse(contentRaw || '{}');
+      groups.push({ groupName: gName, weight: gWeight, content });
+    } catch (e) {
+      groups.push({ groupName: gName, weight: gWeight, content: {} });
+    }
+  });
+  
+  return groups;
+}
+
 // ===== 保存 =====
 function saveExperiment() {
   const name = document.getElementById('expName').value.trim();
@@ -1643,7 +2562,7 @@ function saveExperiment() {
   const groups = [];
   let weightTotal = 0;
   let valid = true;
-  let jsonError = '';
+  let errorMsg = '';
 
   cards.forEach((card, i) => {
     const gName = card.querySelector('.group-name').value.trim();
@@ -1655,13 +2574,25 @@ function saveExperiment() {
 
     let content = {};
     if (!contentRaw) {
-      if (!jsonError) jsonError = `${label}的页面内容配置不能为空`;
+      if (!errorMsg) errorMsg = `${label}的页面内容配置不能为空`;
     } else {
       try {
         content = JSON.parse(contentRaw);
       } catch (e) {
-        if (!jsonError) jsonError = `${label}的页面内容 JSON 格式不正确`;
+        if (!errorMsg) errorMsg = `${label}的页面内容 JSON 格式不正确`;
       }
+    }
+    
+    // 验证必要的字段
+    if (!content.pageTitle || content.pageTitle.trim() === '') {
+      if (!errorMsg) errorMsg = `${label}的页面标题不能为空`;
+    }
+    
+    // 验证图片数量
+    if (!content.images || content.images.length === 0) {
+      if (!errorMsg) errorMsg = `${label}至少需要上传1张图片`;
+    } else if (content.images.length > 10) {
+      if (!errorMsg) errorMsg = `${label}最多只能上传10张图片`;
     }
 
     weightTotal += gWeight;
@@ -1669,7 +2600,7 @@ function saveExperiment() {
   });
 
   if (!valid) { showToast('请完整填写所有组别的标识与权重'); return; }
-  if (jsonError) { showToast(jsonError); return; }
+  if (errorMsg) { showToast(errorMsg); return; }
   if (weightTotal !== 100) { showToast('权重之和必须等于100%'); return; }
 
   const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
