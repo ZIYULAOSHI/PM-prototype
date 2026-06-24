@@ -832,6 +832,138 @@ tbody tr:last-child td { border-bottom: none; }
   cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.6;
 }
 .audience-dropdown-chip .remove:hover { opacity: 1; }
+
+/* ===== 目标人群条件构造器 ===== */
+.aud-builder { border:1px solid var(--border); border-radius:10px; padding:12px; background:#fafbfc; }
+.aud-builder-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.aud-builder-hint { font-size:12px; color:var(--text-muted); }
+.aud-preset-select { height:30px; border:1px solid var(--border); border-radius:6px; font-size:12px; padding:0 8px; background:#fff; color:var(--text-primary); cursor:pointer; }
+.aud-group { border:1px dashed var(--border); border-radius:8px; padding:10px 10px 10px 12px; background:#fff; }
+.aud-group.nested { background:#f6f8fc; border-color:#c7d2fe; margin:6px 0; }
+.aud-group-bar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.aud-logic-seg { display:inline-flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.aud-logic-seg button { border:none; background:#fff; font-size:12px; padding:4px 10px; cursor:pointer; color:var(--text-secondary); }
+.aud-logic-seg button.active { background:var(--accent); color:#fff; }
+.aud-logic-label { font-size:12px; color:var(--text-muted); }
+.aud-cond { display:flex; align-items:center; gap:6px; margin:6px 0; flex-wrap:wrap; }
+.aud-cond select, .aud-cond input { height:32px; border:1px solid var(--border); border-radius:6px; font-size:13px; padding:0 8px; background:#fff; color:var(--text-primary); }
+.aud-field { min-width:160px; }
+.aud-op { min-width:96px; }
+.aud-val { display:inline-flex; align-items:center; gap:4px; flex-wrap:nowrap; }
+.aud-val input { width:118px; }
+.aud-unit { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+.aud-enum-chips { display:inline-flex; flex-wrap:wrap; gap:4px; }
+.aud-enum-chip { font-size:12px; padding:4px 10px; border-radius:13px; border:1px solid var(--border); background:#fff; cursor:pointer; color:var(--text-secondary); }
+.aud-enum-chip.on { background:var(--accent-light); border-color:var(--accent); color:var(--accent); font-weight:500; }
+.aud-del { width:26px; height:26px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; font-size:16px; border-radius:5px; flex-shrink:0; }
+.aud-del:hover { background:#fee2e2; color:#ef4444; }
+.aud-del-btn { height:32px; padding:0 12px; border:1px solid #fecaca; background:#fff; color:#ef4444; cursor:pointer; font-size:12px; border-radius:6px; flex-shrink:0; margin-left:auto; }
+.aud-del-btn:hover { background:#fee2e2; border-color:#ef4444; }
+.aud-joiner { font-size:12px; color:var(--accent); font-weight:600; padding:2px 0 2px 4px; }
+.aud-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.aud-add-btn { font-size:12px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:6px; padding:5px 12px; cursor:pointer; }
+.aud-add-btn:hover { background:#dbe4ff; }
+.aud-group-del { margin-left:auto; font-size:12px; color:var(--text-muted); background:transparent; border:none; cursor:pointer; }
+.aud-group-del:hover { color:#ef4444; }
+.aud-empty { font-size:12px; color:var(--text-muted); padding:12px; text-align:center; background:#fff; border-radius:6px; border:1px dashed var(--border); }
+.aud-estimate { display:flex; align-items:center; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.aud-est-btn { font-size:12px; border:1px solid var(--accent); color:var(--accent); background:#fff; border-radius:6px; padding:5px 14px; cursor:pointer; }
+.aud-est-btn:hover { background:var(--accent-light); }
+.aud-est-result { font-size:12px; color:var(--text-secondary); }
+.aud-est-result b { color:var(--accent); font-size:14px; }
+.aud-section { margin-bottom:12px; }
+.aud-section-title { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.aud-section-title .hint { font-size:11px; font-weight:400; color:var(--text-muted); }
+.aud-quick { display:flex; flex-direction:column; gap:10px; background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+.aud-quick-group-label { font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:6px; }
+.aud-quick-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.aud-quick-chip { font-size:12px; padding:5px 12px; border-radius:14px; border:1px solid var(--border); background:#fff; cursor:pointer; color:var(--text-secondary); transition:all .15s; }
+.aud-quick-chip:hover { border-color:var(--accent); }
+.aud-quick-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:500; }
+.aud-preview { margin-top:12px; padding:12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px; }
+.aud-preview-title { font-size:12px; font-weight:600; color:#4338ca; margin-bottom:8px; }
+.aud-preview-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:12px; }
+.aud-preview-k { flex-shrink:0; width:60px; color:var(--text-muted); padding-top:3px; }
+.aud-preview-v { flex:1; color:var(--text-primary); display:flex; flex-wrap:wrap; gap:5px; align-items:center; line-height:1.7; }
+.aud-preview-v .muted { color:var(--text-muted); }
+.aud-pv-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:11px; background:#fff; border:1px solid #c7d2fe; color:#4338ca; font-size:11px; }
+.aud-pv-chip .x { cursor:pointer; opacity:.55; font-size:13px; }
+.aud-pv-chip .x:hover { opacity:1; }
+.aud-combine { display:flex; align-items:center; gap:8px; margin:8px 0; }
+.aud-combine-label { font-size:11px; color:var(--text-muted); }
+.aud-final { margin-top:8px; padding-top:8px; border-top:1px dashed #c7d2fe; font-size:12px; color:#3730a3; line-height:1.7; }
+.aud-final b { color:#4338ca; }
+/* 收起/展开 */
+.aud-collapse-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; background:#f1f5f9; border:1px solid var(--border); border-radius:8px; cursor:pointer; margin-bottom:12px; }
+.aud-builder.collapsed .aud-collapse-bar { margin-bottom:0; }
+.aud-collapse-bar:hover { background:#e8eef5; }
+.aud-collapse-title { font-size:12px; font-weight:600; color:var(--text-primary); flex-shrink:0; }
+.aud-collapse-summary { font-size:12px; color:#3730a3; flex:1; line-height:1.6; }
+.aud-collapse-summary b { color:#4338ca; }
+.aud-collapse-toggle { font-size:12px; color:var(--accent); flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
+.aud-arrow { font-size:9px; }
+/* 预设人群定义说明（问号悬浮） */
+.aud-help { position:relative; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; background:var(--text-muted); color:#fff; font-size:10px; cursor:help; font-weight:600; }
+.aud-help-pop { display:none; position:absolute; top:22px; left:0; z-index:200; width:330px; max-height:340px; overflow-y:auto; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:10px 12px; font-weight:400; text-align:left; cursor:default; }
+.aud-help-pop::before { content:''; position:absolute; top:-10px; left:0; right:0; height:10px; }
+.aud-help:hover .aud-help-pop { display:block; }
+.aud-help-title { font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px; }
+.aud-help-group { margin-bottom:8px; }
+.aud-help-g-label { font-size:11px; font-weight:600; color:var(--accent); margin-bottom:3px; }
+.aud-help-item { font-size:11px; color:var(--text-secondary); line-height:1.65; }
+.aud-help-item b { color:var(--text-primary); font-weight:600; }
+/* AI 自然语言圈人 */
+.aud-ai { background:linear-gradient(135deg,#eef2ff,#f5f3ff); border:1px solid #c7d2fe; border-radius:8px; padding:10px 12px; margin-bottom:10px; }
+.aud-ai-head { font-size:12px; color:#4338ca; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.aud-ai-badge { background:#6366f1; color:#fff; font-size:10px; padding:1px 7px; border-radius:4px; letter-spacing:.5px; }
+.aud-ai-input { width:100%; min-height:46px; border:1px solid #c7d2fe; border-radius:6px; padding:8px 10px; font-size:13px; resize:vertical; font-family:inherit; box-sizing:border-box; color:var(--text-primary); }
+.aud-ai-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-light); }
+.aud-ai-actions { margin-top:8px; }
+.aud-ai-btn { font-size:12px; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 14px; cursor:pointer; font-weight:500; }
+.aud-ai-btn:hover { opacity:.9; }
+.aud-ai-examples { font-size:11px; color:var(--text-muted); margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.aud-ai-eg { background:#fff; border:1px dashed #c7d2fe; border-radius:11px; padding:2px 9px; cursor:pointer; color:#4338ca; }
+.aud-ai-eg:hover { background:#eef2ff; }
+/* 预览区内可编辑的条件胶囊 */
+.aud-preview-row-block { align-items:flex-start; }
+.aud-pv-edit { flex:1; min-width:0; }
+.aud-pv-conds { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.aud-cond-pill { display:inline-flex; align-items:center; padding:3px 10px; border-radius:13px; background:#fff; border:1px solid #c7d2fe; color:#4338ca; font-size:12px; cursor:pointer; transition:all .15s; }
+.aud-cond-pill:hover { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-light); }
+.aud-cond-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.aud-cond-pill.incomplete { border-style:dashed; color:var(--text-muted); }
+.aud-logic-link { font-size:12px; font-weight:700; cursor:pointer; padding:1px 6px; border-radius:5px; user-select:none; border:1px solid transparent; }
+.aud-logic-link.is-and { color:var(--accent); background:var(--accent-light); }
+.aud-logic-link.is-or { color:#b45309; background:#fef3c7; }
+.aud-logic-link:hover { border-color:currentColor; }
+.aud-paren { font-size:20px; font-weight:700; color:#b45309; line-height:1; padding:0 1px; }
+.aud-add-pill { font-size:12px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:13px; padding:3px 11px; cursor:pointer; }
+.aud-add-pill:hover { background:#dbe4ff; }
+.aud-cond-editor { width:100%; margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; box-sizing:border-box; }
+/* 自定义条件入口（快捷人群模块底部） */
+.aud-custom-add { width:72px; height:28px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:8px; cursor:pointer; font-size:17px; line-height:1; }
+.aud-custom-add:hover { background:#dbe4ff; }
+.aud-quick-head { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:2px; flex-wrap:wrap; }
+.aud-quick-head .hint { font-size:11px; font-weight:400; color:var(--text-muted); }
+.aud-quick-foot { border-top:1px dashed var(--border); margin-top:6px; padding-top:10px; display:flex; flex-direction:column; gap:10px; }
+.aud-estimate-inline { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.aud-quick-chip.custom { position:relative; background:#fff7ed; border:1px solid #fdba74; color:#b45309; max-width:100%; }
+.aud-quick-chip.custom:hover { border-color:#f59e0b; }
+.aud-chip-close { position:absolute; top:-7px; right:-7px; width:16px; height:16px; border-radius:50%; background:#ef4444; color:#fff; font-size:12px; line-height:16px; text-align:center; display:none; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.aud-quick-chip.custom:hover .aud-chip-close { display:block; }
+.aud-chip-close:hover { background:#dc2626; }
+.aud-custom-empty { font-size:12px; color:var(--text-muted); align-self:center; }
+/* 自定义条件弹窗 */
+.aud-popup-mask { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1600; display:flex; align-items:center; justify-content:center; }
+.aud-popup { width:560px; max-width:92vw; max-height:84vh; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.25); padding:18px 20px; box-sizing:border-box; }
+.aud-popup-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.aud-popup-title { font-size:15px; font-weight:600; color:var(--text-primary); }
+.aud-popup-close { cursor:pointer; color:var(--text-muted); font-size:22px; background:none; border:none; line-height:1; }
+.aud-popup-close:hover { color:var(--text-primary); }
+.aud-popup-foot { display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding-top:12px; border-top:1px solid var(--border); }
+.aud-popup-done { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:8px 22px; font-size:13px; cursor:pointer; }
+.aud-popup-done:hover { opacity:.9; }
+.aud-popup-done:disabled { background:#cbd5e1; cursor:not-allowed; opacity:1; }
 .switch-label {
   font-size: 13px;
   color: var(--text);
@@ -1666,9 +1798,10 @@ let pushes = [
     channels: ['push'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '注册后24小时',
-    relativeEvent: 'register',
-    relativeDelay: 24,
+    triggerDesc: '注册后 0~24小时',
+    relativeField: 'reg_time',
+    relativeFrom: 0,
+    relativeTo: 24,
     priority: 8,
     status: 'running',
     title: '【量化王】新客福利，解锁低风险量化策略',
@@ -1688,9 +1821,10 @@ let pushes = [
     channels: ['inapp'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '创建策略后48小时',
-    relativeEvent: 'strategy_create',
-    relativeDelay: 48,
+    triggerDesc: '最近创建策略后 0~48小时',
+    relativeField: 'last_strategy_time',
+    relativeFrom: 0,
+    relativeTo: 48,
     priority: 40,
     status: 'running',
     title: '新客福利规则与教程',
@@ -1710,9 +1844,10 @@ let pushes = [
     channels: ['push', 'inapp'],
     audience: ['growing'],
     triggerType: 'relative',
-    triggerDesc: '首次实盘后72小时',
-    relativeEvent: 'real_trade',
-    relativeDelay: 72,
+    triggerDesc: '首次实盘后 0~72小时',
+    relativeField: 'first_real_trade_time',
+    relativeFrom: 0,
+    relativeTo: 72,
     priority: 1.5,
     status: 'running',
     title: '【量化王】恭喜您完成首次实盘',
@@ -1732,9 +1867,10 @@ let pushes = [
     channels: ['push'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '注册后72小时',
-    relativeEvent: 'register',
-    relativeDelay: 72,
+    triggerDesc: '注册后 0~72小时',
+    relativeField: 'reg_time',
+    relativeFrom: 0,
+    relativeTo: 72,
     priority: 20,
     status: 'paused',
     title: '【量化王】3天未实盘引导',
@@ -1754,9 +1890,10 @@ let pushes = [
     channels: ['inapp'],
     audience: ['new_user'],
     triggerType: 'relative',
-    triggerDesc: '注册后120小时',
-    relativeEvent: 'register',
-    relativeDelay: 120,
+    triggerDesc: '注册后 0~120小时',
+    relativeField: 'reg_time',
+    relativeFrom: 0,
+    relativeTo: 120,
     priority: 70,
     status: 'draft',
     title: '【量化王】新手成长引导',
@@ -1839,6 +1976,86 @@ const audienceTagGroups = [
 // 扁平化用于查找
 const audienceTags = audienceTagGroups.flatMap(g => g.tags);
 
+// ===== 目标人群「可配置字段」元数据注册表 =====
+// 说明：运营圈人时可用的字段全部在此声明。新增一个可筛选维度 = 加一条记录，无需改造交互/发版。
+// 每个字段：field 字段标识 / label 展示名 / type 数据类型(number数值 enum枚举 bool布尔 datetime时间) / unit 单位 / options 枚举可选值
+const audienceFieldRegistry = [
+  { group: '用户属性', fields: [
+    { field: 'user_age',   label: '年龄',     type: 'number', unit: '岁' },
+    { field: 'gender',     label: '性别',     type: 'enum',   options: ['男', '女', '未知'] },
+    { field: 'city',       label: '城市',     type: 'enum',   options: ['北京', '上海', '广州', '深圳', '杭州', '其他'] },
+    { field: 'reg_days',   label: '注册天数', type: 'number', unit: '天' },
+    { field: 'reg_time',   label: '注册时间', type: 'datetime' }
+  ]},
+  { group: '账号状态', fields: [
+    { field: 'account_status',  label: '账号状态',     type: 'enum', options: ['正常', '已拉黑', '已注销'] },
+    { field: 'is_vip',          label: '是否VIP会员',  type: 'bool' },
+    { field: 'is_unsubscribed', label: '是否已退订推送', type: 'bool' },
+    { field: 'last_login_time', label: '最近登录时间', type: 'datetime' }
+  ]},
+  { group: '策略行为', fields: [
+    { field: 'strategy_pub_cnt',     label: '累计发布策略数',   type: 'number', unit: '个' },
+    { field: 'strategy_run_cnt',     label: '实盘运行策略数',   type: 'number', unit: '个' },
+    { field: 'strategy_profit_rank', label: '策略收益排名百分位', type: 'number', unit: '%' },
+    { field: 'last_strategy_time',   label: '最近创建策略时间', type: 'datetime' },
+    { field: 'first_real_trade_time', label: '首次实盘时间',     type: 'datetime' }
+  ]},
+  { group: '社区 / 群聊行为', fields: [
+    { field: 'chat_msg_cnt_7d', label: '近7日群聊发言数', type: 'number', unit: '条' },
+    { field: 'post_cnt_30d',    label: '近30日广场发帖数', type: 'number', unit: '条' },
+    { field: 'is_group_member', label: '是否群聊成员',     type: 'bool' }
+  ]}
+];
+
+// 各数据类型支持的算子
+const audienceOperators = {
+  number:   [ { op:'gte',label:'≥' }, { op:'gt',label:'>' }, { op:'eq',label:'=' }, { op:'lt',label:'<' }, { op:'lte',label:'≤' }, { op:'between',label:'介于' } ],
+  enum:     [ { op:'in',label:'属于' }, { op:'not_in',label:'不属于' } ],
+  bool:     [ { op:'eq',label:'为' } ],
+  datetime: [ { op:'between_hours',label:'距今(小时)区间' }, { op:'within_days',label:'距今N天内' }, { op:'before_days',label:'距今超过N天' }, { op:'before',label:'早于' }, { op:'after',label:'晚于' } ]
+};
+
+// 快捷人群模板（本质是预存的一棵条件树，可在后台维护，不写死在代码逻辑里）
+const audiencePresets = [
+  { key: 'all',      label: '全部用户',   rule: { logic:'AND', conditions: [] } },
+  { key: 'top_user', label: '头部用户（收益前30%）', rule: { logic:'AND', conditions: [
+      { field:'strategy_profit_rank', op:'lte', value:30 },
+      { field:'last_strategy_time',   op:'before_days', value:30 } ] } },
+  { key: 'new_user', label: '新用户（注册≤15天未建策略）', rule: { logic:'AND', conditions: [
+      { field:'reg_days',        op:'lte', value:15 },
+      { field:'strategy_pub_cnt', op:'eq',  value:0 } ] } },
+  { key: 'dormant',  label: '沉睡用户（30天未登录）', rule: { logic:'AND', conditions: [
+      { field:'last_login_time', op:'before_days', value:30 } ] } },
+  { key: 'active_creator', label: '活跃策略作者（示例：发过策略+群聊活跃）', rule: { logic:'AND', conditions: [
+      { field:'strategy_pub_cnt', op:'gt',  value:0 },
+      { field:'account_status',   op:'not_in', value:['已拉黑'] },
+      { field:'chat_msg_cnt_7d',  op:'gte', value:1 } ] } }
+];
+
+function findAudienceFieldDef(field) {
+  for (const g of audienceFieldRegistry) {
+    const f = g.fields.find(x => x.field === field);
+    if (f) return f;
+  }
+  return null;
+}
+
+// 相对时间「触发节点」展示名：字段 label 末尾「时间」→「后」（如 注册时间 → 注册后）
+function formatTriggerNodeLabel(label) {
+  return (label || '').replace(/时间$/, '后');
+}
+
+// 取出字段注册表中所有「时间类」字段，供「相对时间」触发选择（与自定义人群同源）
+function getDatetimeFields() {
+  const out = [];
+  for (const g of audienceFieldRegistry) {
+    for (const f of g.fields) {
+      if (f.type === 'datetime') out.push(f);
+    }
+  }
+  return out;
+}
+
 // 渠道选项
 const channelOptions = [
   { value: 'push', label: 'Push推送' },
@@ -1871,6 +2088,17 @@ const triggerTypes = [
 
 let editingAudience = [];
 let editingChannels = [];
+// 新建面板使用的「条件构造器」规则树（编辑/查看暂仍用标签选择器）
+let editingAudienceRule = { logic: 'AND', conditions: [], ops: [] };
+let editingAudienceEstimate = '';
+// 快捷人群（预设标签多选）与「快捷人群 ↔ 自定义条件」之间的关系
+let editingAudienceCombine = 'AND';
+// 目标人群编辑区收起/展开（默认收起）
+let audienceBuilderCollapsed = true;
+// 非高级模式下，预览区中被展开编辑的条件索引（null 表示未展开）
+let audiencePreviewExpanded = null;
+// 自定义条件弹窗开关
+let audienceCustomPopupOpen = false;
 
 // ===== 渲染表格 =====
 function getChannelLabel(val) {
@@ -1924,7 +2152,17 @@ function renderTable(data) {
 
     const totalAudienceTags = audienceTags.length;
     let audienceHtml;
-    if ((item.audience || []).length === totalAudienceTags) {
+    if (item.audienceSummary !== undefined && item.audienceSummary !== '') {
+      // 条件构造器创建：快捷人群标签 + 自定义条件
+      const summary = item.audienceSummary || '全部用户';
+      const tags = item.audience || [];
+      let chips = [];
+      if (tags.length === totalAudienceTags && tags.length > 0) chips.push('全部用户');
+      else chips = tags.map(a => getAudienceShortLabel(a));
+      if (item.audienceRule) chips.push('自定义条件');
+      if (chips.length === 0) chips.push('全部用户');
+      audienceHtml = chips.map(c => `<span class="rule-tag active" title="${escapeHtml(summary)}">${c}</span>`).join(' ');
+    } else if ((item.audience || []).length === totalAudienceTags) {
       audienceHtml = '<span class="rule-tag active">全部用户</span>';
     } else {
       audienceHtml = (item.audience || []).map(a =>
@@ -2141,6 +2379,21 @@ function openDrawer(mode, id) {
 
   editingAudience = p ? [...(p.audience || [])] : [];
   editingChannels = p ? [...(p.channels || [])] : [];
+  // 新建/编辑面板都使用条件构造器；编辑时从已存的扁平规则恢复自定义条件
+  if (p && p.audienceFlat && Array.isArray(p.audienceFlat.conditions)) {
+    editingAudienceRule = JSON.parse(JSON.stringify({
+      logic: 'AND',
+      conditions: p.audienceFlat.conditions,
+      ops: p.audienceFlat.ops || []
+    }));
+  } else {
+    editingAudienceRule = { logic: 'AND', conditions: [], ops: [] };
+  }
+  editingAudienceEstimate = '';
+  editingAudienceCombine = (p && p.audienceCombine) ? p.audienceCombine : 'AND';
+  audienceBuilderCollapsed = true;
+  audiencePreviewExpanded = null;
+  audienceCustomPopupOpen = false;
 
   // 保存原始的 link 值，用于取消选择文章时恢复
   window._lastLinkVal = p ? (p.link || 'msg_detail') : 'msg_detail';
@@ -2182,9 +2435,21 @@ function renderDrawerForm(p, isView) {
   </div>`;
 
   // 目标人群（先选人群，再决定推送方式）
+  // 新建、编辑(非待发送)：可视化条件构造器（自由配置）；查看/待发送：只读
+  const useAudienceBuilder = (drawerMode === 'new' || (drawerMode === 'edit' && !isPendingEdit));
+  let audienceInner;
+  if (useAudienceBuilder) {
+    audienceInner = renderAudienceBuilder();
+  } else if (p && p.audienceSummary !== undefined && p.audienceSummary !== '') {
+    // 由条件构造器创建的推送，查看/编辑暂以只读摘要展示（待复用条件构造器后支持编辑）
+    audienceInner = `<div class="preview-box"><div class="preview-label">目标人群</div>
+      <div style="font-size:13px;color:var(--text-primary);line-height:1.6">${escapeHtml(p.audienceSummary || '全部用户')}</div></div>`;
+  } else {
+    audienceInner = renderAudienceSelector(isView, isPendingEdit);
+  }
   html += `<div class="form-group" id="audienceGroup">
     <label><span class="required">*</span> 目标人群</label>
-    <div id="audienceSelector">${renderAudienceSelector(isView, isPendingEdit)}</div>
+    <div id="audienceSelector">${audienceInner}</div>
   </div>`;
 
   // 根据人群约束调整触发方式默认值
@@ -2355,39 +2620,27 @@ function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) 
       </div>
     </div>`;
   } else if (triggerType === 'relative') {
-    const existingDelay = (p && p.relativeDelay) ? p.relativeDelay : ((p && p.triggerDesc) ? (parseInt(p.triggerDesc.match(/(\d+)小时/)?.[1]) || 24) : 24);
-    const existingEvent = (p && p.relativeEvent) || 'register';
+    // 相对时间：从字段注册表的「时间类(datetime)字段」中选择 + 距今 N~M 小时区间
+    // 字段全部来自与自定义人群相同的字段注册表，新增字段=研发在注册表加一行，无需发版
+    const timeFields = getDatetimeFields();
+    const existingField = (p && p.relativeField) || (timeFields[0] ? timeFields[0].field : 'reg_time');
+    const safeField = timeFields.some(f => f.field === existingField) ? existingField : (timeFields[0]?.field || 'reg_time');
+    const existingFrom = (p && p.relativeFrom !== undefined && p.relativeFrom !== null && p.relativeFrom !== '') ? p.relativeFrom : 0;
+    const existingTo = (p && p.relativeTo !== undefined && p.relativeTo !== null && p.relativeTo !== '') ? p.relativeTo : 24;
 
-    // 根据当前目标人群过滤兼容的事件（不兼容的直接不显示）
-    audience = audience || [];
-    const allEvents = [
-      { value: 'register', label: '用户注册', compat: ['new_user', 'pending_active'] },
-      { value: 'strategy_create', label: '创建策略', compat: ['growing'] },
-      { value: 'real_trade', label: '首次实盘', compat: ['retained'] }
-    ];
-    const visibleEvents = audience.length === 0
-      ? allEvents
-      : allEvents.filter(ev => audience.some(t => ev.compat.includes(t)));
-    // 如果之前选中的事件被过滤掉了，取第一个可用事件
-    const safeEvent = visibleEvents.some(ev => ev.value === existingEvent)
-      ? existingEvent
-      : (visibleEvents[0]?.value || 'register');
-    const eventSelected = v => v === safeEvent ? 'selected' : '';
-
-    // 待发送状态：全部置灰
     html += `<div class="form-row">
       <div class="form-group">
-        <label>相对事件</label>
-        <select id="relativeEvent" ${disabled || pendingDisabled}>
-          ${visibleEvents.map(ev =>
-            `<option value="${ev.value}" ${eventSelected(ev.value)}>${ev.label}</option>`
-          ).join('')}
+        <label>触发节点</label>
+        <select id="relativeField" ${disabled || pendingDisabled}>
+          ${timeFields.map(f => `<option value="${f.field}" ${f.field === safeField ? 'selected' : ''}>${formatTriggerNodeLabel(f.label)}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
-        <label>延迟时间</label>
+        <label>区间</label>
         <div style="display:flex;align-items:center;gap:6px">
-          <input type="number" id="relativeDelay" value="${existingDelay}" min="0" max="999" step="1" style="width:100px" ${disabled || pendingDisabled} onblur="onRelativeDelayBlur()">
+          <input type="number" id="relativeFrom" value="${existingFrom}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeFrom')">
+          <span>~</span>
+          <input type="number" id="relativeTo" value="${existingTo}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeTo')">
           <span>小时</span>
         </div>
       </div>
@@ -2656,15 +2909,510 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ===== 人群-触发联动约束 =====
-const lifecycleTags = ['new_user', 'pending_active', 'growing', 'retained'];
+// ===== 目标人群条件构造器（新建面板）=====
+function newEmptyCondition() {
+  return { field: '', op: '', value: '', value2: '' };
+}
 
-function getAudienceConstraints(audience) {
-  if (!audience || audience.length === 0) {
-    return { allowRelative: true, disabledEvents: [] };
+function isRuleGroup(node) {
+  return node && typeof node === 'object' && Array.isArray(node.conditions);
+}
+
+// 通过路径字符串("0-1")定位条件树节点的父分组与索引
+function pathToArr(s) { return s === '' ? [] : s.split('-').map(Number); }
+
+function getGroupByPath(arr) {
+  let g = editingAudienceRule;
+  for (const idx of arr) { g = g.conditions[idx]; }
+  return g;
+}
+function getNodeByPath(arr) {
+  if (arr.length === 0) return editingAudienceRule;
+  const parent = getGroupByPath(arr.slice(0, -1));
+  return parent.conditions[arr[arr.length - 1]];
+}
+
+// 非高级模式：扁平条件 + 逐连接符(ops)。按「或」优先级把连续的「或」聚成括号组，再用「且」连接
+function buildRuleFromFlat(conds, ops) {
+  ops = ops || [];
+  if (!conds || conds.length === 0) return { logic: 'AND', conditions: [] };
+  const segments = [];
+  let cur = [conds[0]];
+  for (let i = 1; i < conds.length; i++) {
+    if (ops[i - 1] === 'OR') cur.push(conds[i]);
+    else { segments.push(cur); cur = [conds[i]]; }
   }
-  const hasNonLifecycle = audience.some(t => !lifecycleTags.includes(t));
-  return { allowRelative: !hasNonLifecycle };
+  segments.push(cur);
+  const topConds = segments.map(seg => seg.length === 1 ? seg[0] : { logic: 'OR', conditions: seg });
+  return { logic: 'AND', conditions: topConds };
+}
+
+// 取「生效规则树」：按 ops 把扁平条件归一化为嵌套树（连续「或」聚为 OR 组）
+function getEffectiveRule() {
+  return buildRuleFromFlat(editingAudienceRule.conditions, editingAudienceRule.ops);
+}
+
+function renderAudienceBuilder() {
+  // 收起状态：仅展示最终人群
+  if (audienceBuilderCollapsed) {
+    return `<div class="aud-builder collapsed">
+      <div class="aud-collapse-bar" onclick="toggleAudienceCollapse()">
+        <span class="aud-collapse-summary">最终人群 = <b>${buildAudienceSummary()}</b></span>
+        <span class="aud-collapse-toggle">展开编辑 <span class="aud-arrow">▼</span></span>
+      </div>
+    </div>`;
+  }
+
+  const quickHTML = audienceTagGroups.map(g => `
+    <div class="aud-quick-group">
+      <div class="aud-quick-group-label">${g.label}</div>
+      <div class="aud-quick-chips">
+        ${g.tags.map(t => `<span class="aud-quick-chip ${editingAudience.includes(t.value) ? 'on' : ''}" title="${escapeHtml(t.label)}" onclick="toggleQuickTag('${t.value}')">${t.label.split('（')[0]}</span>`).join('')}
+      </div>
+    </div>`).join('');
+
+  // 自定义条件：作为「快捷人群」模块底部的一组，以标签形式呈现，点 + 弹出 AI/条件编辑
+  const eff = getEffectiveRule();
+  const hasCustom = countConditions(eff) > 0;
+  const hasTags = editingAudience.length > 0;
+  const customChip = hasCustom
+    ? `<span class="aud-quick-chip custom on" title="点击编辑自定义条件" onclick="openCustomPopup()">${escapeHtml(summarizeRule(eff))}<span class="aud-chip-close" title="删除自定义条件" onclick="event.stopPropagation();confirmDeleteCustom()">×</span></span>`
+    : '';
+  const customGroup = `
+    <div class="aud-quick-group">
+      <div class="aud-quick-group-label">自定义</div>
+      <div class="aud-quick-chips">
+        ${customChip}
+        <button type="button" class="aud-custom-add" onclick="openCustomPopup()" title="添加 / 编辑自定义条件">+</button>
+      </div>
+    </div>`;
+
+  // 两者关系（快捷人群 ↔ 自定义条件），仅在两者都存在时出现
+  const combineRow = (hasTags && hasCustom) ? `
+    <div class="aud-combine">
+      <span class="aud-combine-label">快捷人群与自定义条件的关系</span>
+      <div class="aud-logic-seg">
+        <button type="button" class="${editingAudienceCombine === 'AND' ? 'active' : ''}" onclick="setAudienceCombine('AND')">且（都满足）</button>
+        <button type="button" class="${editingAudienceCombine === 'OR' ? 'active' : ''}" onclick="setAudienceCombine('OR')">或（满足其一）</button>
+      </div>
+    </div>` : '';
+
+  // 模块底部：两者关系 + 预估人数
+  const footer = `
+    <div class="aud-quick-foot">
+      ${combineRow}
+      <div class="aud-estimate-inline">
+        <button type="button" class="aud-est-btn" onclick="estimateAudience()">预估人数</button>
+        <span class="aud-est-result" id="audEstResult">${editingAudienceEstimate || ''}</span>
+      </div>
+    </div>`;
+
+  return `<div class="aud-builder">
+    <div class="aud-collapse-bar" onclick="toggleAudienceCollapse()">
+      <span class="aud-collapse-title">人群配置</span>
+      <span class="aud-collapse-toggle">收起 <span class="aud-arrow">▲</span></span>
+    </div>
+    <div class="aud-section">
+      <div class="aud-quick">
+        <div class="aud-quick-head">快捷人群 ${renderAudienceHelp()} <span class="hint">点击选择，可多选；不选择任何标签默认为全部用户</span></div>
+        ${quickHTML}${customGroup}${footer}
+      </div>
+    </div>
+    ${audienceCustomPopupOpen ? renderAudienceCustomPopup() : ''}
+  </div>`;
+}
+
+// 自定义条件弹窗：AI 解析 + 条件编辑（标签胶囊/高级树）
+function renderAudienceCustomPopup() {
+  const eff = getEffectiveRule();
+  const cnt = countConditions(eff);
+  // 存在未填完的条件时，「完成」置灰不可点击
+  const hasIncomplete = (editingAudienceRule.conditions || []).some(c => !isConditionComplete(c));
+  return `<div class="aud-popup-mask" onclick="if(event.target===this)closeCustomPopup()">
+    <div class="aud-popup">
+      <div class="aud-popup-head">
+        <span class="aud-popup-title">自定义人群条件</span>
+        <button type="button" class="aud-popup-close" onclick="closeCustomPopup()">&times;</button>
+      </div>
+      <div class="aud-section-title">条件
+        <span class="hint">点「且/或」切换关系，连续「或」自动加括号</span>
+      </div>
+      ${renderPreviewCustomEditable()}
+      <div class="aud-popup-foot">
+        <span class="aud-est-result">${cnt > 0 ? '已设置 ' + cnt + ' 个条件' : '未设置条件'}</span>
+        <button type="button" class="aud-popup-done" ${hasIncomplete ? 'disabled' : ''} title="${hasIncomplete ? '请先完善或删除未填完的条件' : ''}" onclick="closeCustomPopup()">完成</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openCustomPopup() {
+  audienceCustomPopupOpen = true;
+  // 尚无条件时，预置一条空条件并展开，便于直接编辑
+  if (editingAudienceRule.conditions.length === 0) {
+    editingAudienceRule.conditions.push(newEmptyCondition());
+    editingAudienceRule.ops = [];
+    audiencePreviewExpanded = 0;
+  }
+  rerenderAudienceBuilder();
+}
+
+function closeCustomPopup() {
+  // 清理未填完的空条件，避免残留
+  if (Array.isArray(editingAudienceRule.conditions)) {
+    const keep = [];
+    const ops = editingAudienceRule.ops || [];
+    const newOps = [];
+    editingAudienceRule.conditions.forEach((c, i) => {
+      if (isConditionComplete(c)) {
+        if (keep.length > 0) newOps.push(ops[i - 1] || 'AND');
+        keep.push(c);
+      }
+    });
+    editingAudienceRule.conditions = keep;
+    editingAudienceRule.ops = newOps;
+  }
+  audienceCustomPopupOpen = false;
+  audiencePreviewExpanded = null;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+// 快捷人群「?」说明：悬浮展示各预设标签的人群定义
+function renderAudienceHelp() {
+  const groupsHTML = audienceTagGroups.map(g => `
+    <div class="aud-help-group">
+      <div class="aud-help-g-label">${g.label}</div>
+      ${g.tags.map(t => {
+        const name = t.label.split('（')[0];
+        const def = (t.label.split('（')[1] || '').replace('）', '');
+        return `<div class="aud-help-item"><b>${name}</b>：${def || '—'}</div>`;
+      }).join('')}
+    </div>`).join('');
+  return `<span class="aud-help" onclick="event.stopPropagation()">?<span class="aud-help-pop">
+    <div class="aud-help-title">预设人群定义</div>${groupsHTML}</span></span>`;
+}
+
+function toggleAudienceCollapse() {
+  audienceBuilderCollapsed = !audienceBuilderCollapsed;
+  rerenderAudienceBuilder();
+}
+
+// 已选人群预览：把「快捷人群」+「自定义条件」合并展示，便于一眼看清最终圈选范围
+// 非高级模式：预览区里的自定义条件以「胶囊」展示，点胶囊展开编辑；
+// 每个连接符可单独点按切换「且/或」；连续的「或」两侧加明显括号，表示括号内任一满足即可
+function renderPreviewCustomEditable() {
+  const conds = editingAudienceRule.conditions;
+  const ops = editingAudienceRule.ops || [];
+  const parts = [];
+  conds.forEach((c, i) => {
+    // 连接符（位于第 i 个胶囊之前，对应 ops[i-1]）
+    if (i > 0) {
+      const op = ops[i - 1] === 'OR' ? 'OR' : 'AND';
+      const cls = op === 'OR' ? 'aud-logic-link is-or' : 'aud-logic-link is-and';
+      parts.push(`<span class="${cls}" onclick="toggleConnector(${i - 1})" title="点击切换 且/或">${op === 'OR' ? '或' : '且'}</span>`);
+    }
+    // 左括号：当前是某段「或」连续区间的起点
+    if (ops[i] === 'OR' && (i === 0 || ops[i - 1] !== 'OR')) {
+      parts.push('<span class="aud-paren">（</span>');
+    }
+    {
+      const complete = isConditionComplete(c);
+      const label = complete ? summarizeCondition(c) : '新条件…';
+      const active = audiencePreviewExpanded === i ? 'active' : '';
+      parts.push(`<span class="aud-cond-pill ${active} ${complete ? '' : 'incomplete'}" onclick="togglePreviewCond(${i})">${escapeHtml(label)}</span>`);
+    }
+    // 右括号：当前是某段「或」连续区间的终点
+    if (ops[i - 1] === 'OR' && (i === conds.length - 1 || ops[i] !== 'OR')) {
+      parts.push('<span class="aud-paren">）</span>');
+    }
+  });
+  parts.push(`<button type="button" class="aud-add-pill" onclick="addPreviewCondition()">+ 添加条件</button>`);
+
+  let editor = '';
+  const cur = audiencePreviewExpanded;
+  if (cur !== null && conds[cur] && !isRuleGroup(conds[cur])) {
+    editor = `<div class="aud-cond-editor">${renderConditionRow(conds[cur], String(cur))}</div>`;
+  }
+  return `<div class="aud-pv-conds">${parts.join('')}</div>${editor}`;
+}
+
+function togglePreviewCond(i) {
+  audiencePreviewExpanded = (audiencePreviewExpanded === i) ? null : i;
+  rerenderAudienceBuilder();
+}
+
+function addPreviewCondition() {
+  if (editingAudienceRule.conditions.length > 0) {
+    if (!Array.isArray(editingAudienceRule.ops)) editingAudienceRule.ops = [];
+    editingAudienceRule.ops.push('AND');
+  }
+  editingAudienceRule.conditions.push(newEmptyCondition());
+  audiencePreviewExpanded = editingAudienceRule.conditions.length - 1;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+// 切换第 i 个连接符（ops[i]）的且/或
+function toggleConnector(i) {
+  if (!Array.isArray(editingAudienceRule.ops)) editingAudienceRule.ops = [];
+  editingAudienceRule.ops[i] = editingAudienceRule.ops[i] === 'OR' ? 'AND' : 'OR';
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+
+// 合成最终人群的可读描述
+function buildAudienceSummary() {
+  const allTags = audienceTags.map(t => t.value);
+  const eff = getEffectiveRule();
+  const hasCustom = countConditions(eff) > 0;
+
+  let tagPart = '';
+  if (editingAudience.length > 0 && editingAudience.length === allTags.length) {
+    tagPart = '全部用户';
+  } else if (editingAudience.length > 0) {
+    const names = editingAudience.map(getAudienceLabel);
+    tagPart = names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+  }
+
+  let customPart = '';
+  if (hasCustom) {
+    const s = summarizeRule(eff);
+    customPart = countConditions(eff) > 1 ? '（' + s + '）' : s;
+  }
+
+  if (!tagPart && !customPart) return '全部用户';
+  if (tagPart && customPart) return tagPart + (editingAudienceCombine === 'AND' ? ' 且 ' : ' 或 ') + customPart;
+  return tagPart || customPart;
+}
+
+function toggleQuickTag(v) {
+  const i = editingAudience.indexOf(v);
+  if (i >= 0) editingAudience.splice(i, 1); else editingAudience.push(v);
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+function setAudienceCombine(v) {
+  editingAudienceCombine = v;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+function renderConditionRow(c, ps) {
+  const fieldOptions = audienceFieldRegistry.map(g =>
+    `<optgroup label="${g.group}">${g.fields.map(f =>
+      `<option value="${f.field}" ${c.field === f.field ? 'selected' : ''}>${f.label}</option>`).join('')}</optgroup>`
+  ).join('');
+
+  const def = findAudienceFieldDef(c.field);
+  let opSelect = '<select class="aud-op" disabled><option>—</option></select>';
+  let valControl = '';
+  if (def) {
+    const ops = audienceOperators[def.type] || [];
+    opSelect = `<select class="aud-op" onchange="onCondOpChange('${ps}', this.value)">
+      ${ops.map(o => `<option value="${o.op}" ${c.op === o.op ? 'selected' : ''}>${o.label}</option>`).join('')}
+    </select>`;
+    valControl = renderValueControl(c, def, ps);
+  }
+
+  return `<div class="aud-cond">
+    <select class="aud-field" onchange="onCondFieldChange('${ps}', this.value)">
+      <option value="">选择字段…</option>
+      ${fieldOptions}
+    </select>
+    ${opSelect}
+    <span class="aud-val">${valControl}</span>
+    <button type="button" class="aud-del-btn" onclick="removeCondition('${ps}')">删除条件</button>
+  </div>`;
+}
+
+function renderValueControl(c, def, ps) {
+  if (def.type === 'number') {
+    const unit = def.unit === '%' ? `<span class="aud-unit">%</span>` : '';
+    if (c.op === 'between') {
+      return `<input type="number" value="${c.value ?? ''}" placeholder="最小" oninput="setCondValue('${ps}', this.value)" style="width:80px">
+        <span class="aud-unit">~</span>
+        <input type="number" value="${c.value2 ?? ''}" placeholder="最大" oninput="setCondValue2('${ps}', this.value)" style="width:80px">${unit}`;
+    }
+    return `<input type="number" value="${c.value ?? ''}" placeholder="数值" oninput="setCondValue('${ps}', this.value)">${unit}`;
+  }
+  if (def.type === 'enum') {
+    const sel = Array.isArray(c.value) ? c.value : [];
+    return `<span class="aud-enum-chips">${def.options.map(o =>
+      `<span class="aud-enum-chip ${sel.includes(o) ? 'on' : ''}" onclick="toggleEnumValue('${ps}', '${o}')">${o}</span>`).join('')}</span>`;
+  }
+  if (def.type === 'bool') {
+    return `<select onchange="setCondValue('${ps}', this.value)">
+      <option value="">请选择</option>
+      <option value="true" ${c.value === 'true' || c.value === true ? 'selected' : ''}>是</option>
+      <option value="false" ${c.value === 'false' || c.value === false ? 'selected' : ''}>否</option>
+    </select>`;
+  }
+  if (def.type === 'datetime') {
+    if (c.op === 'between_hours') {
+      return `<span class="aud-unit">距今</span>
+        <input type="number" value="${c.value ?? ''}" placeholder="N" min="0" max="999" oninput="setCondValue('${ps}', this.value)" style="width:70px">
+        <span class="aud-unit">~</span>
+        <input type="number" value="${c.value2 ?? ''}" placeholder="M" min="0" max="999" oninput="setCondValue2('${ps}', this.value)" style="width:70px">
+        <span class="aud-unit">小时</span>`;
+    }
+    if (c.op === 'within_days' || c.op === 'before_days') {
+      return `<input type="number" value="${c.value ?? ''}" placeholder="天数" oninput="setCondValue('${ps}', this.value)"><span class="aud-unit">天</span>`;
+    }
+    return `<input type="date" value="${c.value ?? ''}" onchange="setCondValue('${ps}', this.value)">`;
+  }
+  return '';
+}
+
+function rerenderAudienceBuilder() {
+  const host = document.getElementById('audienceSelector');
+  if (host) host.innerHTML = renderAudienceBuilder();
+}
+
+// 删除整组自定义条件（二次确认）
+function confirmDeleteCustom() {
+  openDeleteModal('删除自定义条件', '确定删除该自定义标签及其全部条件吗？此操作不影响已选择的预设标签。', () => {
+    editingAudienceRule = { logic: 'AND', conditions: [], ops: [] };
+    audiencePreviewExpanded = null;
+    editingAudienceEstimate = '';
+    rerenderAudienceBuilder();
+    showToast('已删除自定义条件');
+  });
+}
+
+// —— 交互：增删改 ——
+function removeCondition(ps) {
+  const arr = pathToArr(ps);
+  const idx = arr[arr.length - 1];
+  const parent = getGroupByPath(arr.slice(0, -1));
+  parent.conditions.splice(idx, 1);
+  // 根级扁平条件：同步移除对应连接符，保持 ops 长度 = 条件数 - 1
+  if (parent === editingAudienceRule && Array.isArray(editingAudienceRule.ops)) {
+    editingAudienceRule.ops.splice(idx > 0 ? idx - 1 : 0, 1);
+  }
+  audiencePreviewExpanded = null;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+function onCondFieldChange(ps, field) {
+  const c = getNodeByPath(pathToArr(ps));
+  c.field = field;
+  const def = findAudienceFieldDef(field);
+  c.op = def ? (audienceOperators[def.type][0]?.op || '') : '';
+  c.value = def && def.type === 'enum' ? [] : '';
+  c.value2 = '';
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+function onCondOpChange(ps, op) {
+  const c = getNodeByPath(pathToArr(ps));
+  c.op = op;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+function setCondValue(ps, v)  { getNodeByPath(pathToArr(ps)).value = v;  editingAudienceEstimate = ''; syncDoneBtn(); }
+function setCondValue2(ps, v) { getNodeByPath(pathToArr(ps)).value2 = v; editingAudienceEstimate = ''; syncDoneBtn(); }
+// 输入值变化时，仅同步「完成」按钮的可点击态（不整体重渲染，避免输入框失焦）
+function syncDoneBtn() {
+  const btn = document.querySelector('.aud-popup-done');
+  if (!btn) return;
+  btn.disabled = (editingAudienceRule.conditions || []).some(c => !isConditionComplete(c));
+  btn.title = btn.disabled ? '请先完善或删除未填完的条件' : '';
+}
+function toggleEnumValue(ps, opt) {
+  const c = getNodeByPath(pathToArr(ps));
+  if (!Array.isArray(c.value)) c.value = [];
+  const i = c.value.indexOf(opt);
+  if (i >= 0) c.value.splice(i, 1); else c.value.push(opt);
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+function applyAudiencePreset(key) {
+  if (!key) return;
+  const preset = audiencePresets.find(p => p.key === key);
+  if (!preset) return;
+  editingAudienceRule = JSON.parse(JSON.stringify(preset.rule));
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+// —— 校验 / 摘要 / 预估 ——
+function isConditionComplete(c) {
+  const def = findAudienceFieldDef(c.field);
+  if (!def || !c.op) return false;
+  if (def.type === 'enum') return Array.isArray(c.value) && c.value.length > 0;
+  if (def.type === 'bool') return c.value === 'true' || c.value === 'false' || c.value === true || c.value === false;
+  if (def.type === 'number' && c.op === 'between') return c.value !== '' && c.value !== null && c.value2 !== '' && c.value2 !== null;
+  if (def.type === 'datetime' && c.op === 'between_hours') return c.value !== '' && c.value !== null && c.value2 !== '' && c.value2 !== null;
+  return c.value !== '' && c.value !== null && c.value !== undefined;
+}
+
+// 返回 {ok, msg}；空条件视为「全部用户」，合法
+function validateAudienceRule(group) {
+  for (const node of group.conditions) {
+    if (isRuleGroup(node)) {
+      const r = validateAudienceRule(node);
+      if (!r.ok) return r;
+    } else if (!isConditionComplete(node)) {
+      return { ok: false, msg: '请完善目标人群条件（字段/算子/值均需填写），或删除空条件' };
+    }
+  }
+  return { ok: true };
+}
+
+function summarizeRule(group) {
+  if (!group || group.conditions.length === 0) return '全部用户';
+  const parts = group.conditions.map(node => {
+    if (isRuleGroup(node)) return '（' + summarizeRule(node) + '）';
+    return summarizeCondition(node);
+  }).filter(Boolean);
+  return parts.join(group.logic === 'AND' ? ' 且 ' : ' 或 ');
+}
+
+function summarizeCondition(c) {
+  const def = findAudienceFieldDef(c.field);
+  if (!def) return '';
+  const opLabel = (audienceOperators[def.type].find(o => o.op === c.op) || {}).label || c.op;
+  if (def.type === 'enum') return `${def.label}${opLabel}[${(c.value || []).join('、')}]`;
+  if (def.type === 'bool') return `${def.label}${opLabel}${(c.value === 'true' || c.value === true) ? '是' : '否'}`;
+  if (def.type === 'datetime') {
+    if (c.op === 'between_hours') return `${def.label}距今${c.value}~${c.value2}小时`;
+    if (c.op === 'within_days') return `${def.label}距今${c.value}天内`;
+    if (c.op === 'before_days') return `${def.label}距今超过${c.value}天`;
+    return `${def.label}${opLabel}${c.value}`;
+  }
+  if (def.type === 'number' && c.op === 'between') return `${def.label}介于${c.value}~${c.value2}${def.unit || ''}`;
+  return `${def.label}${opLabel}${c.value}${def.unit || ''}`;
+}
+
+function countConditions(group) {
+  let n = 0;
+  for (const node of group.conditions) {
+    if (isRuleGroup(node)) n += countConditions(node);
+    else if (isConditionComplete(node)) n += 1;
+  }
+  return n;
+}
+
+// 模拟人数预估：仅用于原型演示，真实计算由人群服务执行
+function estimateAudience() {
+  const v = validateAudienceRule(getEffectiveRule());
+  if (!v.ok) { showToast(v.msg); return; }
+  const n = countConditions(getEffectiveRule()) + editingAudience.length;
+  const base = 1268000;
+  const est = n === 0 ? base : Math.max(800, Math.round(base / Math.pow(2.4, n) * (0.8 + Math.random() * 0.4)));
+  editingAudienceEstimate = `预计覆盖约 <b>${est.toLocaleString()}</b> 人 <span style="color:var(--text-muted)">（模拟数据，实际以人群服务计算为准）</span>`;
+  const el = document.getElementById('audEstResult');
+  if (el) el.innerHTML = editingAudienceEstimate;
+}
+
+// ===== 人群-触发联动约束 =====
+// 相对时间触发已改为「时间字段 + 距今区间」，与目标人群解耦，恒允许选择
+function getAudienceConstraints() {
+  return { allowRelative: true, disabledEvents: [] };
 }
 
 // ===== 变量插入 =====
@@ -2692,29 +3440,60 @@ function updateCharCounter() {
 }
 
 // ===== 优先级冲突检测 =====
+// 将自定义条件规则归一化为可比较的字符串：子条件排序后拼接，故与录入顺序无关
+function canonicalizeRule(node) {
+  if (!node) return '';
+  if (isRuleGroup(node)) {
+    const children = node.conditions.map(canonicalizeRule).filter(Boolean).sort();
+    if (children.length === 0) return '';
+    if (children.length === 1) return children[0];
+    return (node.logic || 'AND') + '(' + children.join(',') + ')';
+  }
+  if (!isConditionComplete(node)) return '';
+  let val = node.value;
+  if (Array.isArray(val)) val = val.slice().sort().join('|');
+  let s = node.field + ':' + node.op + ':' + val;
+  if (node.op === 'between') s += '~' + (node.value2 ?? '');
+  return s;
+}
+
 // audience: 当前推送目标人群标签数组
 // priority: 当前推送优先级数值
 // excludeId: 排除自身的推送ID（编辑时用）
+// audienceRule: 当前推送自定义条件规则（条件树），可为空
 // 返回：true 表示无冲突，false 表示有冲突（已阻止后续操作）
-function checkPriorityConflict(audience, priority, excludeId) {
+function checkPriorityConflict(audience, priority, excludeId, audienceRule) {
   const conflictItems = [];
+  const curRuleKey = audienceRule ? canonicalizeRule(audienceRule) : '';
   pushes.forEach(p => {
     if (excludeId && p.id === excludeId) return;
     if (p.status !== 'running' && p.status !== 'pending') return;
-    if (!p.audience || p.audience.length === 0) return;
     if (Number(p.priority) !== Number(priority)) return;
-    const intersected = p.audience.filter(tag => audience.includes(tag));
-    if (intersected.length === 0) return;
-    const intersectedNames = intersected.map(tag => {
-      const found = audienceTags.find(t => t.value === tag);
-      return found ? found.label.split('（')[0] : tag;
-    }).join('、');
-    conflictItems.push({ name: p.name, priority: p.priority, intersect: intersectedNames });
+
+    const reasons = [];
+    // 1) 快捷人群标签存在交集
+    if (p.audience && p.audience.length && audience && audience.length) {
+      const intersected = p.audience.filter(tag => audience.includes(tag));
+      if (intersected.length > 0) {
+        const intersectedNames = intersected.map(tag => {
+          const found = audienceTags.find(t => t.value === tag);
+          return found ? found.label.split('（')[0] : tag;
+        }).join('、');
+        reasons.push('相同人群标签：' + intersectedNames);
+      }
+    }
+    // 2) 自定义条件完全相同
+    if (curRuleKey && p.audienceRule && canonicalizeRule(p.audienceRule) === curRuleKey) {
+      reasons.push('自定义条件完全相同');
+    }
+
+    if (reasons.length === 0) return;
+    conflictItems.push({ name: p.name, priority: p.priority, reason: reasons.join('；') });
   });
   if (conflictItems.length > 0) {
-    const names = conflictItems.slice(0, 3).map((item, i) => `${i + 1}. ${item.name}（优先级 ${item.priority}，冲突人群：${item.intersect}）`).join('<br>');
+    const names = conflictItems.slice(0, 3).map((item, i) => `${i + 1}. ${item.name}（优先级 ${item.priority}，冲突原因：${item.reason}）`).join('<br>');
     const moreHint = conflictItems.length > 3 ? `<br>等共 ${conflictItems.length} 条` : '';
-    showModal(`优先级冲突检测<br><br>以下推送与当前推送存在相同的目标人群且优先级同为 <b>${priority}</b>，可能导致推送行为不可预测：<br><br>${names}${moreHint}<br><br>请调整优先级数值或修改目标人群后再保存。`, null);
+    showModal(`优先级冲突检测<br><br>以下推送与当前推送存在相同的目标人群（含快捷标签或自定义条件）且优先级同为 <b>${priority}</b>，可能导致推送行为不可预测：<br><br>${names}${moreHint}<br><br>请调整优先级数值或修改目标人群后再保存。`, null);
     return false;
   }
   return true;
@@ -2738,7 +3517,17 @@ function savePush(action) {
   if (!name) { showToast('请输入推送名称'); return; }
   if (!title) { showToast('请输入推送标题'); return; }
   if (editingChannels.length === 0) { showToast('请至少选择一个推送渠道'); return; }
-  if (editingAudience.length === 0) { showToast('请至少选择一个目标人群'); return; }
+  // 新建、编辑(非待发送)：校验条件构造器规则；查看/待发送：沿用原标签必填校验
+  const existingPushForSave = editingId ? pushes.find(e => e.id === editingId) : null;
+  const isPendingEditSave = !!(existingPushForSave && existingPushForSave.status === 'pending');
+  const useAudienceBuilder = (drawerMode === 'new' || (drawerMode === 'edit' && !isPendingEditSave));
+  const hasExistingRule = !!(existingPushForSave && (existingPushForSave.audienceRule || (existingPushForSave.audienceSummary !== undefined && existingPushForSave.audienceSummary !== '')));
+  if (useAudienceBuilder) {
+    const audienceValidation = validateAudienceRule(getEffectiveRule());
+    if (!audienceValidation.ok) { showToast(audienceValidation.msg); return; }
+  } else if (!hasExistingRule) {
+    if (editingAudience.length === 0) { showToast('请至少选择一个目标人群'); return; }
+  }
   if (link === 'h5' && !linkUrl) { showToast('请输入链接地址'); return; }
   
   // 如果选择了文章，校验文章有效性
@@ -2758,8 +3547,9 @@ function savePush(action) {
   let triggerDayOfWeek = null;
   let triggerDayOfMonth = null;
   let triggerTimeVal = '';
-  let relativeEventVal = '';
-  let relativeDelayVal = 0;
+  let relativeFieldVal = '';
+  let relativeFromVal = 0;
+  let relativeToVal = 0;
 
   const priorityVal = document.getElementById('pushPriority').value;
   if (priorityVal === '' || priorityVal === null || priorityVal === undefined) {
@@ -2771,7 +3561,10 @@ function savePush(action) {
   priority = Math.round(priority * 10) / 10;
 
   // 优先级冲突检测（复用于保存和启用暂停状态）
-  if (!checkPriorityConflict(editingAudience, priority, editingId)) {
+  const currentRuleForConflict = useAudienceBuilder
+    ? (countConditions(getEffectiveRule()) > 0 ? getEffectiveRule() : null)
+    : (existingPushForSave ? existingPushForSave.audienceRule : null);
+  if (!checkPriorityConflict(editingAudience, priority, editingId, currentRuleForConflict)) {
     return;
   }
 
@@ -2802,13 +3595,17 @@ function savePush(action) {
         triggerDesc = `每月${day}日 ${time}`;
       }
     } else if (triggerType === 'relative') {
-      const event = document.getElementById('relativeEvent').value;
-      const delay = parseInt(document.getElementById('relativeDelay').value);
-      if (isNaN(delay) || delay < 0 || delay > 999) { showToast('请输入0-999范围内的整数'); return; }
-      relativeEventVal = event;
-      relativeDelayVal = delay;
-      const eventMap = { register: '注册后', strategy_create: '创建策略后', real_trade: '首次实盘后' };
-      triggerDesc = (eventMap[event] || '') + delay + '小时';
+      const field = document.getElementById('relativeField').value;
+      const from = parseInt(document.getElementById('relativeFrom').value);
+      const to = parseInt(document.getElementById('relativeTo').value);
+      if (!field) { showToast('请选择触发节点'); return; }
+      if (isNaN(from) || from < 0 || from > 999 || isNaN(to) || to < 0 || to > 999) { showToast('区间需为0-999的整数'); return; }
+      if (from >= to) { showToast('区间的起始小时需小于结束小时'); return; }
+      relativeFieldVal = field;
+      relativeFromVal = from;
+      relativeToVal = to;
+      const fieldDef = findAudienceFieldDef(field);
+      triggerDesc = `${fieldDef ? formatTriggerNodeLabel(fieldDef.label) : field} ${from}~${to}小时`;
     }
   } else {
     pushTime = ''; // 手动推送只能立即发送
@@ -2827,14 +3624,21 @@ function savePush(action) {
       p.type = pushType;
       p.channels = [...editingChannels];
       p.audience = [...editingAudience];
+      if (useAudienceBuilder) {
+        p.audienceRule = countConditions(getEffectiveRule()) > 0 ? JSON.parse(JSON.stringify(getEffectiveRule())) : null;
+        p.audienceFlat = countConditions(getEffectiveRule()) > 0 ? JSON.parse(JSON.stringify(editingAudienceRule)) : null;
+        p.audienceCombine = editingAudienceCombine;
+        p.audienceSummary = buildAudienceSummary();
+      }
       p.triggerType = triggerType;
       p.triggerDesc = triggerDesc;
       p.triggerCycle = triggerCycle;
       p.triggerDayOfWeek = triggerDayOfWeek;
       p.triggerDayOfMonth = triggerDayOfMonth;
       p.triggerTime = triggerTimeVal;
-      p.relativeEvent = relativeEventVal;
-      p.relativeDelay = relativeDelayVal;
+      p.relativeField = relativeFieldVal;
+      p.relativeFrom = relativeFromVal;
+      p.relativeTo = relativeToVal;
       p.priority = priority;
       p.title = title;
       p.subtitle = subtitle;
@@ -2857,14 +3661,19 @@ function savePush(action) {
       type: pushType,
       channels: [...editingChannels],
       audience: [...editingAudience],
+      audienceRule: (useAudienceBuilder && countConditions(getEffectiveRule()) > 0) ? JSON.parse(JSON.stringify(getEffectiveRule())) : null,
+      audienceFlat: (useAudienceBuilder && countConditions(getEffectiveRule()) > 0) ? JSON.parse(JSON.stringify(editingAudienceRule)) : null,
+      audienceCombine: useAudienceBuilder ? editingAudienceCombine : 'AND',
+      audienceSummary: useAudienceBuilder ? buildAudienceSummary() : '',
       triggerType,
       triggerDesc,
       triggerCycle,
       triggerDayOfWeek,
       triggerDayOfMonth,
       triggerTime: triggerTimeVal,
-      relativeEvent: relativeEventVal,
-      relativeDelay: relativeDelayVal,
+      relativeField: relativeFieldVal,
+      relativeFrom: relativeFromVal,
+      relativeTo: relativeToVal,
       priority,
       status: action === 'save' 
         ? (pushType === 'auto' 
@@ -2903,7 +3712,9 @@ function openSendConfirm(id) {
   const channelStr = (p.channels || []).map(c => getChannelLabel(c)).join('、');
   const totalAudienceTags = audienceTags.length;
   let audienceStr;
-  if ((p.audience || []).length === totalAudienceTags) {
+  if (p.audienceSummary !== undefined && p.audienceSummary !== '') {
+    audienceStr = p.audienceSummary || '全部用户';
+  } else if ((p.audience || []).length === totalAudienceTags) {
     audienceStr = '全部用户';
   } else {
     audienceStr = (p.audience || []).map(a => getAudienceLabel(a)).join('、');
@@ -2958,7 +3769,7 @@ function toggleAutoRule(id) {
       }
     }
     // 优先级冲突检测
-    if (!checkPriorityConflict(p.audience || [], p.priority, p.id)) {
+    if (!checkPriorityConflict(p.audience || [], p.priority, p.id, p.audienceRule || null)) {
       return;
     }
     p.status = 'running';
@@ -3515,8 +4326,9 @@ function onMonthDayBlur() {
   input.classList.remove('input-error');
 }
 
-function onRelativeDelayBlur() {
-  const input = document.getElementById('relativeDelay');
+// 小时输入校验（0-999 整数），用于「相对时间」的距今区间
+function clampHourInput(id) {
+  const input = document.getElementById(id);
   if (!input) return;
   const val = input.value.trim();
   if (val === '') {
