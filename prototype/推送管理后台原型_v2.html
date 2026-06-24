@@ -319,12 +319,15 @@ body {
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 thead th {
@@ -336,6 +339,17 @@ thead th {
   text-align: left;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+thead th.col-actions {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: #f8f9fb;
+  box-shadow: -4px 0 8px -4px rgba(0,0,0,0.08);
 }
 
 tbody td {
@@ -344,10 +358,21 @@ tbody td {
   border-bottom: 1px solid #f0f1f5;
   color: var(--text);
   vertical-align: middle;
+  background: var(--surface);
 }
 
+tbody td.col-actions {
+  position: sticky;
+  right: 0;
+  background: var(--surface);
+  z-index: 1;
+  box-shadow: -4px 0 8px -4px rgba(0,0,0,0.08);
+}
+
+tbody tr:hover td { background: #fafbfd; }
+tbody tr:hover td.col-actions { background: #fafbfd; }
+
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: #fafbfd; }
 
 .td-ellipsis {
   max-width: 160px;
@@ -635,6 +660,11 @@ tbody tr:hover { background: #fafbfd; }
 .form-group textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
 }
 
 .form-group textarea {
@@ -1150,8 +1180,8 @@ tbody tr:hover { background: #fafbfd; }
         <input type="text" placeholder="搜索推送名称" id="searchInput">
         <select id="typeFilter">
           <option value="">全部类型</option>
-          <option value="manual">手动推送</option>
-          <option value="auto">自动规则</option>
+          <option value="manual">手动</option>
+          <option value="auto">自动</option>
         </select>
         <select id="statusFilter">
           <option value="">全部状态</option>
@@ -1161,9 +1191,28 @@ tbody tr:hover { background: #fafbfd; }
           <option value="paused">已暂停</option>
           <option value="sent">已发送</option>
         </select>
+        <select id="audienceFilter">
+          <option value="">全部人群</option>
+          <option value="top_user">头部用户</option>
+          <option value="non_top_user">非头部用户</option>
+          <option value="new_user">新用户</option>
+          <option value="pending_active">待激活用户</option>
+          <option value="growing">成长用户</option>
+          <option value="retained">留存用户</option>
+          <option value="active">活跃用户</option>
+          <option value="warning">预警用户</option>
+          <option value="low_active">低活跃用户</option>
+          <option value="dormant">沉睡用户</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;color:var(--text-muted)">优先级</span>
+          <input type="number" id="priorityMin" min="0" max="100" step="0.1" placeholder="最小" style="width:70px">
+          <span style="color:var(--text-muted)">~</span>
+          <input type="number" id="priorityMax" min="0" max="100" step="0.1" placeholder="最大" style="width:70px">
+        </div>
         <button class="btn btn-default" onclick="resetFilters()">重置</button>
         <button class="btn btn-default" onclick="filterData()">查询</button>
-        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">+ 新建推送</button>
+        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">+ 新建</button>
       </div>
 
       <div class="table-container">
@@ -1176,10 +1225,12 @@ tbody tr:hover { background: #fafbfd; }
               <th style="width:100px">推送渠道</th>
               <th style="width:140px">目标人群</th>
               <th style="width:110px">触发方式</th>
+              <th style="width:160px">选择文章</th>
+              <th style="width:140px">跳转链接</th>
               <th style="width:60px">优先级</th>
               <th style="width:80px">状态</th>
               <th style="width:120px">创建时间</th>
-              <th style="width:140px">操作</th>
+              <th class="col-actions" style="width:200px">操作</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -1192,7 +1243,7 @@ tbody tr:hover { background: #fafbfd; }
     <div id="pushContentPage" style="display:none">
       <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
         <h2>推送内容</h2>
-        <button class="btn btn-primary" onclick="openContentDrawer('new')">+ 新建文章</button>
+        <button class="btn btn-primary" onclick="openContentDrawer('new')">+ 新建</button>
       </div>
       <div class="filter-bar">
         <input type="text" placeholder="搜索文章标题" id="contentSearchInput">
@@ -1211,10 +1262,10 @@ tbody tr:hover { background: #fafbfd; }
               <th style="width:50px">序号</th>
               <th style="width:160px">文章ID</th>
               <th style="width:200px">文章标题</th>
-              <th style="width:80px">启用状态</th>
+              <th style="width:80px">状态</th>
               <th style="width:100px">关联推送数</th>
-              <th style="width:140px">更新时间</th>
-              <th style="width:140px">操作</th>
+              <th style="width:155px">更新时间</th>
+              <th class="col-actions" style="width:200px">操作</th>
             </tr>
           </thead>
           <tbody id="contentTableBody"></tbody>
@@ -1229,7 +1280,7 @@ tbody tr:hover { background: #fafbfd; }
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="editDrawer">
   <div class="drawer-header">
-    <h3 id="editTitle">新建推送</h3>
+    <h3 id="editTitle">新建</h3>
   </div>
   <div class="drawer-body" id="drawerBody"></div>
   <div class="drawer-footer">
@@ -1279,165 +1330,450 @@ tbody tr:hover { background: #fafbfd; }
 
 <!-- Toast Container -->
 <div id="toastContainer"></div>
+<div id="modalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center"><div id="modalBox" style="background:#fff;border-radius:8px;padding:24px;max-width:480px;max-height:min(80vh);box-shadow:0 12px 48px rgba(0,0,0,0.15);margin:20px"><div id="modalContent" style="font-size:14px;line-height:1.7;color:#333"></div><div style="margin-top:20px;text-align:right"><button id="modalCancel" style="padding:8px 20px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:13px;cursor:pointer">知道了</button></div></div></div>
 
 <script>
 // ===== 推送数据 =====
 let pushes = [
+  // ========= 手动推送（6条） =========
   {
     id: 1,
-    name: '新客24h未创建策略引导',
-    type: 'auto',
+    name: '新用户注册欢迎',
+    type: 'manual',
     channels: ['push'],
-    audience: ['new_user', 'pending_active'],
-    triggerType: 'relative',
-    triggerDesc: '注册后24小时',
-    priority: 2,
-    status: 'running',
-    title: '【量化王】新客福利，解锁低风险量化策略👉',
-    subtitle: '',
+    audience: ['new_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 5.5,
+    status: 'sent',
+    title: '【量化王】欢迎加入量化王，开启量化投资之旅',
+    subtitle: '新手专享福利：100万模拟资金已到账，立即体验',
     content_id: '',
-    body: '尊敬的量化王用户，您已完成注册但尚未创建策略。立即创建您的第一个量化策略，享受低风险高回报的投资体验！',
-    link: 'app://strategy/create',
+    body: '恭喜您成功注册量化王，100万模拟资金已自动到账，立即开启您的量化投资之旅！',
+    link: 'home',
     pushTime: '',
-    noRepeat: true,
-    createTime: '2026-06-01 10:30',
+    noRepeat: null,
+    createTime: '2026-06-01 10:00',
     creator: '李向梅'
   },
   {
     id: 2,
-    name: '注册T+2福利教程',
-    type: 'auto',
+    name: '首次登录引导',
+    type: 'manual',
     channels: ['inapp'],
-    audience: ['new_user'],
-    triggerType: 'relative',
-    triggerDesc: '注册后48小时',
-    priority: 3,
-    status: 'running',
-    title: '新客福利规则与教程',
-    subtitle: '欢迎来到量化王！我们为您准备了专属福利和操作教程，助您快速上手量化投资。',
+    audience: ['new_user', 'pending_active'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 50,
+    status: 'sent',
+    title: '新客开通量化策略SOP',
+    subtitle: '3步快速开通您的第一个量化策略',
     content_id: 'ART_20260610_001',
-    body: '欢迎来到量化王！我们为您准备了专属福利和操作教程，助您快速上手量化投资。',
-    link: 'app://tutorial/newbie',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
     pushTime: '',
-    noRepeat: true,
-    createTime: '2026-06-01 14:00',
+    noRepeat: null,
+    createTime: '2026-06-02 09:00',
     creator: '李向梅'
   },
   {
     id: 3,
-    name: '7天未登录用户召回',
-    type: 'auto',
+    name: '模拟交易盈利提醒',
+    type: 'manual',
     channels: ['push', 'inapp'],
-    audience: ['warning', 'growing'],
-    triggerType: 'fixed',
-    triggerDesc: '每日 8:00',
-    triggerCycle: 'daily',
-    triggerDayOfWeek: null,
-    triggerDayOfMonth: null,
-    triggerTime: '08:00',
-    priority: 2,
-    status: 'running',
-    title: '【量化王】您的策略收益更新了，快来看看',
-    subtitle: '您已有一段时间未登录，您关注的策略有了新的行情变化，点击查看最新收益。',
+    audience: ['top_user', 'non_top_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 2.5,
+    status: 'draft',
+    title: '【量化王】系统维护通知',
+    subtitle: '系统将于今晚22:00-24:00进行例行维护，期间可能影响使用',
     content_id: '',
-    body: '您已有一段时间未登录，您关注的策略有了新的行情变化，点击查看最新收益。',
-    link: 'app://dashboard',
+    body: '系统将于今晚22:00-24:00进行例行维护，期间可能影响部分功能，请提前做好相关操作安排。',
+    link: 'profile',
     pushTime: '',
-    noRepeat: true,
-    createTime: '2026-06-02 09:15',
+    noRepeat: null,
+    createTime: '2026-06-03 14:30',
     creator: '王静'
   },
   {
     id: 4,
-    name: '6月新功能推广活动',
+    name: '策略到期提醒',
     type: 'manual',
     channels: ['push'],
     audience: ['growing', 'retained'],
     triggerType: '',
     triggerDesc: '--',
-    priority: 0,
+    priority: 85,
     status: 'sent',
-    title: '【量化王】AI选股策略全新上线，限时免费体验',
+    title: '【量化王】您的5月收益复盘报告',
     subtitle: '',
-    content_id: '',
-    body: '重磅更新！全新AI选股策略已上线，基于深度学习算法，6月限时免费体验，立即查看！',
-    link: 'app://strategy/ai-stock',
-    pushTime: '2026-06-05 10:00',
-    noRepeat: false,
+    content_id: 'ART_20260605_001',
+    body: '您5月的量化策略收益报告已生成',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
     createTime: '2026-06-04 16:00',
     creator: '张磊'
   },
   {
     id: 5,
-    name: '每月收益复盘（6月）',
-    type: 'auto',
+    name: 'VIP会员权益推荐',
+    type: 'manual',
     channels: ['inapp'],
-    audience: ['growing', 'retained'],
-    triggerType: 'fixed',
-    triggerDesc: '每月1日 8:00',
-    triggerCycle: 'monthly',
-    triggerDayOfWeek: null,
-    triggerDayOfMonth: 1,
-    triggerTime: '08:00',
-    priority: 3,
+    audience: ['growing'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 60,
     status: 'draft',
-    title: '【量化王】5月收益复盘报告',
-    subtitle: '您5月的量化策略收益报告已生成，点击查看详细复盘分析和优化建议。',
-    content_id: 'ART_20260605_001',
-    body: '您5月的量化策略收益报告已生成，点击查看详细复盘分析和优化建议。',
-    link: 'app://report/monthly',
+    title: '【量化王】新版本功能预告',
+    subtitle: '全新AI选股策略即将上线',
+    content_id: '',
+    body: 'AI选股策略即将上线，敬请期待',
+    link: 'strategy',
     pushTime: '',
-    noRepeat: false,
-    createTime: '2026-06-08 11:00',
-    creator: '李向梅'
+    noRepeat: null,
+    createTime: '2026-06-05 11:00',
+    creator: '张磊'
   },
   {
     id: 6,
-    name: '15天未登录用户进阶召回',
+    name: '市场行情异动推送',
+    type: 'manual',
+    channels: ['push', 'inapp'],
+    audience: ['top_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 10,
+    status: 'sent',
+    title: '【量化王】VIP专属活动',
+    subtitle: 'VIP会员专享618福利',
+    content_id: 'ART_20260611_001',
+    body: 'VIP会员专享618理财节活动规则',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-06 09:30',
+    creator: '李向梅'
+  },
+  // ========= 自动规则-定时发送（4条） =========
+  {
+    id: 7,
+    name: '新手任务完成奖励',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-15 10:00',
+    priority: 12,
+    status: 'pending',
+    title: '【量化王】618理财节即将开启',
+    subtitle: '618理财节限时来袭，多重专属福利等你解锁',
+    content_id: '',
+    body: '618理财节限时来袭，多重专属福利等你解锁',
+    link: 'plaza_hot',
+    pushTime: '2026-06-15 10:00',
+    noRepeat: null,
+    createTime: '2026-06-10 09:00',
+    creator: '张磊'
+  },
+  {
+    id: 8,
+    name: '活动专属福利通知',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-19 08:00',
+    priority: 25.5,
+    status: 'running',
+    title: '【量化王】本周市场行情分析',
+    subtitle: '本周围绕市场走势、热门策略表现、策略表现分析',
+    content_id: 'ART_20260611_001',
+    body: '618理财节活动规则说明',
+    link: 'msg_detail',
+    pushTime: '2026-06-19 08:00',
+    noRepeat: null,
+    createTime: '2026-06-07 10:00',
+    creator: '李向梅'
+  },
+  {
+    id: 9,
+    name: '持仓策略调整建议',
     type: 'auto',
     channels: ['push'],
-    audience: ['growing', 'warning'],
+    audience: ['top_user', 'growing'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-20 09:00',
+    priority: 35,
+    status: 'pending',
+    title: '【量化王】端午节专属活动',
+    subtitle: '端午安康，专属福利活动即将开启',
+    content_id: '',
+    body: '端午节安康，专属福利活动即将开启',
+    link: 'plaza_strategy',
+    pushTime: '2026-06-20 09:00',
+    noRepeat: null,
+    createTime: '2026-06-08 14:00',
+    creator: '王静'
+  },
+  {
+    id: 10,
+    name: '周度收益复盘报告',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-30 20:00',
+    priority: 50.5,
+    status: 'running',
+    title: '【量化王】6月策略榜单',
+    subtitle: '6月量化策略大师榜，看看你排第几',
+    content_id: '',
+    body: '6月量化策略大师榜已更新，点击查看',
+    link: 'master_board',
+    pushTime: '2026-06-30 20:00',
+    noRepeat: null,
+    createTime: '2026-06-09 16:00',
+    creator: '张磊'
+  },
+  // ========= 自动规则-重复时间（5条） =========
+  {
+    id: 11,
+    name: '量化策略推荐',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['growing', 'retained'],
     triggerType: 'fixed',
-    triggerDesc: '每日 8:00',
+    triggerDesc: '每日 08:00',
     triggerCycle: 'daily',
     triggerDayOfWeek: null,
     triggerDayOfMonth: null,
     triggerTime: '08:00',
-    priority: 2,
-    status: 'paused',
-    title: '【量化王】进阶量化策略推荐，助你提升收益',
+    priority: 65,
+    status: 'running',
+    title: '【量化王】每日签到提醒',
+    subtitle: '每日签到，获取专属奖励',
+    content_id: '',
+    body: '快来签到获取今日专属奖励',
+    link: 'home',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-01 08:00',
+    creator: '李向梅'
+  },
+  {
+    id: 12,
+    name: '社区互动提醒',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['top_user'],
+    triggerType: 'fixed',
+    triggerDesc: '每周一 09:00',
+    triggerCycle: 'weekly',
+    triggerDayOfWeek: 1,
+    triggerDayOfMonth: null,
+    triggerTime: '09:00',
+    priority: 18,
+    status: 'running',
+    title: '【量化王】本周精选策略推荐',
+    subtitle: '基于您的投资偏好，本周精选策略推荐',
+    content_id: 'ART_20260610_001',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-02 10:00',
+    creator: '李向梅'
+  },
+  {
+    id: 13,
+    name: '用户升级通知',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['warning'],
+    triggerType: 'fixed',
+    triggerDesc: '每月1日 10:00',
+    triggerCycle: 'monthly',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: 1,
+    triggerTime: '10:00',
+    priority: 90.5,
+    status: 'running',
+    title: '【量化王】本月运营动态',
     subtitle: '',
     content_id: '',
-    body: '发现你感兴趣的超额收益策略，基于市场最新行情为你推荐以下进阶策略。',
-    link: 'app://strategy/advanced',
+    body: '本月运营动态和新功能上线通知',
+    link: 'user_manual',
     pushTime: '',
-    noRepeat: true,
-    createTime: '2026-06-03 15:30',
+    noRepeat: null,
+    createTime: '2026-06-03 11:00',
+    creator: '王静'
+  },
+  {
+    id: 14,
+    name: '新客注册奖励',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['warning', 'growing'],
+    triggerType: 'fixed',
+    triggerDesc: '每日 08:00',
+    triggerCycle: 'daily',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 25,
+    status: 'paused',
+    title: '【量化王】您的策略收益更新了',
+    subtitle: '您关注的策略有新的行情变化',
+    content_id: '',
+    body: '您已有一段时间未登录，您关注的策略有新的行情变化',
+    link: 'home',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-04 09:15',
+    creator: '王静'
+  },
+  {
+    id: 15,
+    name: '生日专属祝福',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['retained', 'growing'],
+    triggerType: 'fixed',
+    triggerDesc: '每周一 08:00',
+    triggerCycle: 'weekly',
+    triggerDayOfWeek: 1,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 55,
+    status: 'draft',
+    title: '【量化王】您的本周收益报告',
+    subtitle: '',
+    content_id: 'ART_20260605_001',
+    body: '5月收益复盘报告',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-05 12:00',
+    creator: '张磊'
+  },
+  // ========= 自动规则-相对时间（5条） =========
+  {
+    id: 16,
+    name: '注册3天未登录回访',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '注册后24小时',
+    relativeEvent: 'register',
+    relativeDelay: 24,
+    priority: 8,
+    status: 'running',
+    title: '【量化王】新客福利，解锁低风险量化策略',
+    subtitle: '',
+    content_id: '',
+    body: '您已完成注册但尚未创建策略，立即创建您的第一个量化策略',
+    link: 'strategy',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-06 10:30',
+    creator: '李向梅'
+  },
+  {
+    id: 17,
+    name: '创建策略后未实盘跟进',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '创建策略后48小时',
+    relativeEvent: 'strategy_create',
+    relativeDelay: 48,
+    priority: 40,
+    status: 'running',
+    title: '新客福利规则与教程',
+    subtitle: '我们为您准备了专属福利和操作教程',
+    content_id: 'ART_20260610_001',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-07 14:00',
+    creator: '李向梅'
+  },
+  {
+    id: 18,
+    name: '首次实盘交易跟进',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['growing'],
+    triggerType: 'relative',
+    triggerDesc: '首次实盘后72小时',
+    relativeEvent: 'real_trade',
+    relativeDelay: 72,
+    priority: 1.5,
+    status: 'running',
+    title: '【量化王】恭喜您完成首次实盘',
+    subtitle: '完成首次实盘后，您的专属福利已发放',
+    content_id: 'ART_20260611_001',
+    body: '618理财节活动规则说明',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-08 16:00',
     creator: '张磊'
   },
   {
-    id: 7,
+    id: 19,
     name: '618理财节预热推送',
-    type: 'manual',
-    channels: ['push', 'inapp'],
-    audience: ['growing', 'retained'],
-    triggerType: '',
-    triggerDesc: '--',
-    priority: 0,
-    status: 'pending',
-    title: '【量化王】618理财节即将开启，专属福利抢先看',
-    subtitle: '618理财节限时来袭！多重专属福利等你解锁，6月15日 10:00 准时开启，敬请期待。',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '注册后72小时',
+    relativeEvent: 'register',
+    relativeDelay: 72,
+    priority: 20,
+    status: 'paused',
+    title: '【量化王】3天未实盘引导',
+    subtitle: '',
     content_id: '',
-    body: '618理财节限时来袭！多重专属福利等你解锁，6月15日 10:00 准时开启，敬请期待。',
-    link: 'app://activity/618',
-    pushTime: '2026-06-15 10:00',
-    noRepeat: false,
-    createTime: '2026-06-10 09:00',
-    creator: '张磊'
+    body: '您注册已3天未实盘，立即查看低风险新手策略推荐',
+    link: 'strategy',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-09 10:00',
+    creator: '王静'
+  },
+  {
+    id: 20,
+    name: '周年庆专属活动',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['new_user'],
+    triggerType: 'relative',
+    triggerDesc: '注册后120小时',
+    relativeEvent: 'register',
+    relativeDelay: 120,
+    priority: 70,
+    status: 'draft',
+    title: '【量化王】新手成长引导',
+    subtitle: '新手5日引导，助您快速上手',
+    content_id: '',
+    body: '新手5日引导推送，助您快速上手量化投资',
+    link: 'user_manual',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-10 14:00',
+    creator: '李向梅'
   }
 ];
 
-let nextId = 8;
+let nextId = 21;
+// 随机打乱数据顺序
+pushes.sort(() => Math.random() - 0.5);
 let editingId = null;
 let drawerMode = 'new';
 
@@ -1446,7 +1782,7 @@ let articles = [
   {
     id: 'ART_20260610_001',
     title: '新客开通量化策略SOP指引',
-    body: '<p>亲爱的<span class="var-highlight">{用户昵称}</span>，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况：<span class="var-highlight">{收益情况}</span></p>',
+    body: '<p>亲爱的<span class="var-highlight">{用户昵称}</span>，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况：<span class="var-highlight">{最近一次创建的策略收益情况}</span></p>',
     disabled: false,
     updateTime: '2026-06-10 14:30',
     creator: '李向梅'
@@ -1454,7 +1790,7 @@ let articles = [
   {
     id: 'ART_20260611_001',
     title: '618理财节活动规则说明',
-    body: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：<span class="var-highlight">{用户昵称}</span>，您的登录时间为 <span class="var-highlight">{登录时间}</span>，请及时参与活动哦！</p>',
+    body: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：<span class="var-highlight">{用户昵称}</span>，您的最近一次登录时间为 <span class="var-highlight">{最近一次登录时间}</span>，距上次登录时间间隔（天） <span class="var-highlight">{距上次登录时间间隔（天）}</span>，请及时参与活动哦！</p>',
     disabled: false,
     updateTime: '2026-06-11 09:15',
     creator: '张磊'
@@ -1462,7 +1798,7 @@ let articles = [
   {
     id: 'ART_20260605_001',
     title: '5月收益复盘报告',
-    body: '<p><span class="var-highlight">{用户昵称}</span>，您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>收益情况：<span class="var-highlight">{收益情况}</span></p><p>当前策略：<span class="var-highlight">{策略名称}</span></p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>',
+    body: '<p><span class="var-highlight">{用户昵称}</span>，您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>收益情况：<span class="var-highlight">{最近一次创建的策略收益情况}</span></p><p>当前策略：<span class="var-highlight">{最近一次创建的策略名称}</span></p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>',
     disabled: false,
     updateTime: '2026-06-05 10:00',
     creator: '李向梅'
@@ -1476,26 +1812,26 @@ const audienceTagGroups = [
   {
     label: '榜单排名分层',
     tags: [
-      { value: 'top_user', label: '头部用户' },
-      { value: 'non_top_user', label: '非头部用户' }
+      { value: 'top_user', label: '头部用户（策略收益前30%，策略创建≥1月）' },
+      { value: 'non_top_user', label: '非头部用户（其余用户）' }
     ]
   },
   {
     label: '用户生命周期分层',
     tags: [
-      { value: 'new_user', label: '新用户' },
-      { value: 'pending_active', label: '待激活用户' },
-      { value: 'growing', label: '成长用户' },
-      { value: 'retained', label: '留存用户' }
+      { value: 'new_user', label: '新用户（首次登录≤15天，未创建策略）' },
+      { value: 'pending_active', label: '待激活用户（首次登录>15天，未创建策略）' },
+      { value: 'growing', label: '成长用户（已创建策略，未实盘运行）' },
+      { value: 'retained', label: '留存用户（已实盘运行）' }
     ]
   },
   {
     label: '用户活跃度分层',
     tags: [
-      { value: 'active', label: '活跃用户' },
-      { value: 'warning', label: '预警用户' },
-      { value: 'low_active', label: '低活跃用户' },
-      { value: 'dormant', label: '沉睡用户' }
+      { value: 'active', label: '活跃用户（距上次登录<7天）' },
+      { value: 'warning', label: '预警用户（7天≤距上次登录<15天）' },
+      { value: 'low_active', label: '低活跃用户（15天≤距上次登录<30天）' },
+      { value: 'dormant', label: '沉睡用户（距上次登录≥30天）' }
     ]
   }
 ];
@@ -1506,15 +1842,30 @@ const audienceTags = audienceTagGroups.flatMap(g => g.tags);
 // 渠道选项
 const channelOptions = [
   { value: 'push', label: 'Push推送' },
-  { value: 'inapp', label: '站内信' },
-  { value: 'both', label: 'Push+站内信联动' }
+  { value: 'inapp', label: '站内信' }
+];
+
+// 跳转链接选项
+const linkOptions = [
+  { value: 'msg_detail', label: '消息详情页' },
+  { value: 'h5', label: '自定义链接' },
+  { value: 'home', label: '首页' },
+  { value: 'plaza_hot', label: '广场-今日热点' },
+  { value: 'plaza_report', label: '广场-内容广场-研报' },
+  { value: 'plaza_learn', label: '广场-内容广场-学习' },
+  { value: 'plaza_chat', label: '广场-社区广场-热聊' },
+  { value: 'plaza_strategy', label: '广场-社区广场-策略' },
+  { value: 'user_manual', label: '用户手册' },
+  { value: 'profile', label: '个人主页' },
+  { value: 'master_rank', label: '量化大师榜' },
+  { value: 'strategy', label: '策略' }
 ];
 
 // 触发方式
 const triggerTypes = [
   { value: 'immediate', label: '立即发送' },
   { value: 'scheduled', label: '定时发送' },
-  { value: 'fixed', label: '固定时间点' },
+  { value: 'fixed', label: '重复时间' },
   { value: 'relative', label: '相对时间' }
 ];
 
@@ -1523,12 +1874,12 @@ let editingChannels = [];
 
 // ===== 渲染表格 =====
 function getChannelLabel(val) {
-  const m = { push: 'Push推送', inapp: '站内信', both: 'Push+站内信' };
+  const m = { push: 'Push推送', inapp: '站内信' };
   return m[val] || val;
 }
 
 function getChannelTag(val) {
-  const m = { push: 'tag-blue', inapp: 'tag-green', both: 'tag-orange' };
+  const m = { push: 'tag-blue', inapp: 'tag-green' };
   return m[val] || '';
 }
 
@@ -1546,10 +1897,14 @@ function getAudienceShortLabel(val) {
 }
 
 function getPriorityLabel(p, type) {
-  if (type !== 'auto' || !p) return '<span style="color:var(--text-muted);font-size:12px">--</span>';
-  const map = { 1: '紧急', 2: '高优', 3: '常规', 4: '低优' };
-  const colors = { 1: '#ef4444', 2: '#f59e0b', 3: 'var(--text-secondary)', 4: 'var(--text-muted)' };
-  return `<span style="font-size:12px;color:${colors[p] || colors[3]};font-weight:500">${map[p] || '常规'}</span>`;
+  if (p === null || p === undefined || p === '') return '<span style="color:var(--text-muted);font-size:12px">--</span>';
+  const num = Number(p);
+  let color = 'var(--text-secondary)';
+  if (num <= 10) color = '#ef4444';
+  else if (num <= 30) color = '#f59e0b';
+  else if (num <= 70) color = 'var(--text-secondary)';
+  else color = 'var(--text-muted)';
+  return `<span style="font-size:12px;color:${color};font-weight:500">${p}</span>`;
 }
 
 function renderTable(data) {
@@ -1560,16 +1915,22 @@ function renderTable(data) {
   }
   tbody.innerHTML = data.map((item, idx) => {
     const typeLabel = item.type === 'auto'
-      ? `<span class="type-tag auto">自动规则</span>`
-      : `<span class="type-tag manual">手动推送</span>`;
+      ? `<span class="type-tag auto">自动</span>`
+      : `<span class="type-tag manual">手动</span>`;
 
     const channelHtml = (item.channels || []).map(c =>
       `<span class="tag ${getChannelTag(c)}">${getChannelLabel(c)}</span>`
     ).join(' ');
 
-    const audienceHtml = (item.audience || []).map(a =>
-      `<span class="rule-tag active">${getAudienceShortLabel(a)}</span>`
-    ).join(' ');
+    const totalAudienceTags = audienceTags.length;
+    let audienceHtml;
+    if ((item.audience || []).length === totalAudienceTags) {
+      audienceHtml = '<span class="rule-tag active">全部用户</span>';
+    } else {
+      audienceHtml = (item.audience || []).map(a =>
+        `<span class="rule-tag active">${getAudienceShortLabel(a)}</span>`
+      ).join(' ');
+    }
 
     const statusMap = {
       draft: '<span class="status-badge draft">草稿</span>',
@@ -1585,7 +1946,6 @@ function renderTable(data) {
       if (item.status === 'running' || item.status === 'paused') {
         actionsHtml = `
           <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
-          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
           <button class="btn-edit-text" style="color:${item.status==='running'?'var(--warning)':'var(--success)'}" onclick="toggleAutoRule(${item.id})">${item.status==='running'?'暂停':'启用'}</button>
           <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
         `;
@@ -1599,6 +1959,7 @@ function renderTable(data) {
     } else {
       if (item.status === 'draft') {
         actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
           <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
           <button class="btn-send" onclick="openSendConfirm(${item.id})">立即发送</button>
           <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
@@ -1619,6 +1980,30 @@ function renderTable(data) {
       }
     }
 
+    // 文章信息
+    const articleObj = item.content_id ? articles.find(a => a.id === item.content_id) : null;
+    const articleHtml = articleObj
+      ? `<div class="td-ellipsis" title="${escapeHtml(articleObj.title)}">${escapeHtml(articleObj.title)}</div>`
+      : '<span style="color:var(--text-muted);font-size:12px">--</span>';
+
+    // 跳转链接信息
+    let linkHtml = '<span style="color:var(--text-muted);font-size:12px">--</span>';
+    if (articleObj) {
+      linkHtml = '<span style="color:var(--text-muted);font-size:12px">文章详情</span>';
+    } else if (item.link) {
+      const labelMap = {
+        'msg_detail': '消息详情页', 'h5': '自定义链接', 'home': '首页', 'plaza_hot': '广场-今日热点',
+        'plaza_report': '广场-内容广场-研报', 'plaza_learn': '广场-内容广场-学习',
+        'plaza_chat': '广场-社区广场-热聊', 'plaza_strategy': '广场-社区广场-策略',
+        'user_manual': '用户手册', 'profile': '个人主页', 'master_board': '量化大师榜',
+        'strategy': '策略'
+      };
+      const label = labelMap[item.link] || item.link;
+      linkHtml = item.link === 'h5' && item.linkUrl
+        ? `<span style="font-size:12px">自定义链接：${escapeHtml(item.linkUrl)}</span>`
+        : `<span style="font-size:12px">${label}</span>`;
+    }
+
     return `
       <tr>
         <td>${idx + 1}</td>
@@ -1627,10 +2012,12 @@ function renderTable(data) {
         <td>${channelHtml}</td>
         <td>${audienceHtml}</td>
         <td><span style="font-size:12px;color:var(--text-secondary)">${item.triggerDesc || '--'}</span></td>
+        <td>${articleHtml}</td>
+        <td>${linkHtml}</td>
         <td>${getPriorityLabel(item.priority, item.type)}</td>
         <td>${statusMap[item.status] || ''}</td>
         <td>${item.createTime}</td>
-        <td>${actionsHtml}</td>
+        <td class="col-actions">${actionsHtml}</td>
       </tr>
     `;
   }).join('');
@@ -1688,6 +2075,9 @@ function refreshTable() {
   const search = document.getElementById('searchInput')?.value || '';
   const typeFilter = document.getElementById('typeFilter')?.value || '';
   const statusFilter = document.getElementById('statusFilter')?.value || '';
+  const audienceFilter = document.getElementById('audienceFilter')?.value || '';
+  const priorityMin = document.getElementById('priorityMin')?.value;
+  const priorityMax = document.getElementById('priorityMax')?.value;
   let data = pushes;
   if (search) {
     const q = search.toLowerCase();
@@ -1695,6 +2085,15 @@ function refreshTable() {
   }
   if (typeFilter) data = data.filter(d => d.type === typeFilter);
   if (statusFilter) data = data.filter(d => d.status === statusFilter);
+  if (audienceFilter) data = data.filter(d => d.audience && d.audience.includes(audienceFilter));
+  if (priorityMin !== '' && priorityMin !== undefined && priorityMin !== null) {
+    const min = Number(priorityMin);
+    data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) >= min);
+  }
+  if (priorityMax !== '' && priorityMax !== undefined && priorityMax !== null) {
+    const max = Number(priorityMax);
+    data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) <= max);
+  }
   const total = data.length;
   const start = (currentPage - 1) * pageSize;
   const paged = data.slice(start, start + pageSize);
@@ -1708,6 +2107,9 @@ function resetFilters() {
   document.getElementById('searchInput').value = '';
   document.getElementById('typeFilter').value = '';
   document.getElementById('statusFilter').value = '';
+  document.getElementById('audienceFilter').value = '';
+  document.getElementById('priorityMin').value = '';
+  document.getElementById('priorityMax').value = '';
   currentPage = 1;
   refreshTable();
 }
@@ -1717,26 +2119,39 @@ function openDrawer(mode, id) {
   drawerMode = mode;
   editingId = (mode === 'new') ? null : id;
 
-  const titleMap = { new: '新建推送', edit: '编辑推送', view: '推送详情' };
-  document.getElementById('editTitle').textContent = titleMap[mode];
-
-  const isView = mode === 'view';
-  document.getElementById('btnSave').style.display = isView ? 'none' : '';
-
   let p = null;
   if (id && mode !== 'new') {
     p = pushes.find(e => e.id === id);
   }
 
+  // 只有草稿和待发送状态的推送可以编辑，其他状态强制切换为查看
+  if (mode === 'edit' && p && p.status !== 'draft' && p.status !== 'pending') {
+    drawerMode = 'view';
+  }
+
+  const titleMap = { new: '新建', edit: '编辑推送', view: '推送详情' };
+  document.getElementById('editTitle').textContent = titleMap[drawerMode];
+
+  const isView = drawerMode === 'view';
+  document.getElementById('btnSave').style.display = isView ? 'none' : '';
+
   // 「保存草稿」仅在新建或编辑草稿时出现；待发送/进行中/已发送等状态下保存草稿无意义
-  const showDraftBtn = !isView && (mode === 'new' || (p && p.status === 'draft'));
+  const showDraftBtn = !isView && (drawerMode === 'new' || (p && p.status === 'draft'));
   document.getElementById('btnDraft').style.display = showDraftBtn ? '' : 'none';
 
   editingAudience = p ? [...(p.audience || [])] : [];
   editingChannels = p ? [...(p.channels || [])] : [];
 
+  // 保存原始的 link 值，用于取消选择文章时恢复
+  window._lastLinkVal = p ? (p.link || 'msg_detail') : 'msg_detail';
+
   renderDrawerForm(p, isView);
-  if (!isView) { updateSubtitleHint(); updateSaveBtnLabel(); }
+  if (!isView) {
+    updateSubtitleHint();
+    updateSaveBtnLabel();
+    const isPending = p && p.status === 'pending';
+    if (!isPending) onArticleSelectChange();
+  }
 
   document.getElementById('drawerOverlay').classList.add('open');
   document.getElementById('editDrawer').classList.add('open');
@@ -1751,6 +2166,9 @@ function closeDrawer() {
 function renderDrawerForm(p, isView) {
   const body = document.getElementById('drawerBody');
   const disabled = isView ? 'disabled' : '';
+  // 待发送状态：仅发送时间允许修改，其余字段置灰
+  const isPendingEdit = !isView && p && p.status === 'pending';
+  const pendingDisabled = isPendingEdit ? 'disabled' : '';
   const pushType = p ? p.type : 'manual';
   let triggerType = p ? (p.triggerType || 'fixed') : 'fixed';
   const isAuto = pushType === 'auto';
@@ -1760,13 +2178,13 @@ function renderDrawerForm(p, isView) {
   // 推送名称
   html += `<div class="form-group">
     <label><span class="required">*</span> 推送名称</label>
-    <input type="text" id="pushName" value="${escapeHtml(p ? p.name : '')}" placeholder="如：新客24h未创建策略引导" ${disabled}>
+    <input type="text" id="pushName" value="${escapeHtml(p ? p.name : '')}" placeholder="如：新客24h未创建策略引导" ${disabled || pendingDisabled}>
   </div>`;
 
   // 目标人群（先选人群，再决定推送方式）
   html += `<div class="form-group" id="audienceGroup">
     <label><span class="required">*</span> 目标人群</label>
-    <div id="audienceSelector">${renderAudienceSelector(isView)}</div>
+    <div id="audienceSelector">${renderAudienceSelector(isView, isPendingEdit)}</div>
   </div>`;
 
   // 根据人群约束调整触发方式默认值
@@ -1776,9 +2194,9 @@ function renderDrawerForm(p, isView) {
   }
   html += `<div class="form-group">
     <label><span class="required">*</span> 推送类型</label>
-    <select id="pushType" ${disabled} onchange="onPushTypeChange()">
-      <option value="manual" ${pushType === 'manual' ? 'selected' : ''}>手动推送</option>
-      <option value="auto" ${pushType === 'auto' ? 'selected' : ''}>自动规则</option>
+    <select id="pushType" ${disabled || pendingDisabled} onchange="onPushTypeChange()">
+      <option value="manual" ${pushType === 'manual' ? 'selected' : ''}>手动</option>
+      <option value="auto" ${pushType === 'auto' ? 'selected' : ''}>自动</option>
     </select>
   </div>`;
 
@@ -1789,82 +2207,91 @@ function renderDrawerForm(p, isView) {
       <div class="form-group">
         <label><span class="required">*</span> 触发方式</label>
         ${audienceConstraints.allowRelative
-          ? `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
-               <option value="fixed" ${triggerType !== 'relative' ? 'selected' : ''}>固定时间点</option>
-               <option value="relative" ${triggerType === 'relative' ? 'selected' : ''}>相对时间</option>
+          ? `<select id="triggerTypeSelect" ${disabled || pendingDisabled} onchange="onTriggerTypeChange()">
+               <option value="scheduled" ${triggerType==='scheduled'?'selected':''}>定时发送</option>
+               <option value="fixed" ${triggerType==='fixed'?'selected':''}>重复时间</option>
+               <option value="relative" ${triggerType==='relative'?'selected':''}>相对时间</option>
              </select>`
-          : `<input type="hidden" id="triggerTypeSelect" value="fixed">
-             <span style="display:inline-block;padding:6px 10px;background:#f3f4f6;border-radius:6px;font-size:13px;color:#374151">固定时间点</span>`}
+          : `<select id="triggerTypeSelect" ${disabled || pendingDisabled} onchange="onTriggerTypeChange()">
+               <option value="scheduled" ${triggerType==='scheduled'?'selected':''}>定时发送</option>
+               <option value="fixed" ${triggerType!=='scheduled'&&triggerType!=='relative'?'selected':''}>重复时间</option>
+             </select>`}
       </div>
       <div id="triggerParams" style="display:${triggerType ? '' : 'none'}">
-        ${renderTriggerParams(triggerType, p, disabled, editingAudience)}
-      </div>
-      <div class="form-group" style="margin-top:8px">
-        <label>优先级</label>
-        <select id="pushPriority" ${disabled}>
-          <option value="1" ${p && p.priority === 1 ? 'selected' : ''}>1 - 紧急</option>
-          <option value="2" ${p && p.priority === 2 ? 'selected' : ''}>2 - 高优</option>
-          <option value="3" ${(!p || !p.priority || p.priority === 3) ? 'selected' : ''}>3 - 常规</option>
-          <option value="4" ${p && p.priority === 4 ? 'selected' : ''}>4 - 低优</option>
-        </select>
-        <div class="hint">同一用户同时命中多条规则时，仅推送优先级最高的一条，其余丢弃</div>
+        ${renderTriggerParams(triggerType, p, disabled, editingAudience, isPendingEdit)}
       </div>
     </div>
+  </div>
+  <div class="form-group">
+    <label>优先级</label>
+    ${isView
+      ? `<div style="font-size:13px;color:var(--text)">${p && p.priority !== null && p.priority !== undefined ? p.priority : '--'}</div>`
+      : `<input type="number" id="pushPriority" min="0" max="100" step="0.1" value="${p && p.priority !== null && p.priority !== undefined ? p.priority : ''}" placeholder="0-100，数值越小优先级越高" style="width:100%" ${pendingDisabled} onblur="onPriorityBlur()">`}
+    <div class="hint">0-100，最多1位小数，数值越小优先级越高。同一用户同时命中多条规则时，仅推送优先级最高的一条，其余丢弃</div>
   </div>`;
 
   // 内容配置
   const channels = p ? (p.channels || []) : [];
   html += `<div class="form-group">
     <label><span class="required">*</span> 推送渠道</label>
-    <div id="channelSelector">${renderChannelSelector(isView)}</div>
+    <div id="channelSelector">${renderChannelSelector(isView, isPendingEdit)}</div>
   </div>`;
 
   html += `<div class="form-group">
     <label><span class="required">*</span> 推送标题 <span class="hint">（Push建议≤30字）</span></label>
-    <input type="text" id="pushTitle" value="${escapeHtml(p ? p.title : '')}" placeholder="如：【量化王】新客福利，解锁低风险量化策略👉" maxlength="50" ${disabled}>
+    <input type="text" id="pushTitle" value="${escapeHtml(p ? p.title : '')}" placeholder="如：【量化王】新客福利，解锁低风险量化策略👉" maxlength="50" ${disabled || pendingDisabled}>
   </div>`;
 
   html += `<div class="form-group">
-    <label>副标题 <span class="hint">（非必填，站内信消息列表中标题下方的描述文本）</span></label>
-    <textarea id="pushSubtitle" rows="2" placeholder="如不填写，将自动截取所选文章正文前30字；若未选文章，则消息列表仅展示标题" ${disabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
+    <label>副标题 <span class="hint">（非必填，消息列表中的描述文本）</span></label>
+    <textarea id="pushSubtitle" rows="2" placeholder="如不填写，将自动截取所选文章正文前30字；若未选文章，则消息列表仅展示标题" ${disabled || pendingDisabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
     <div id="subtitleHint" style="font-size:11px;margin-top:4px"></div>
   </div>`;
 
   html += `<div class="form-group">
     <label>选择文章 <span class="hint">（非必填，从「推送内容」中选择已发布的文章）</span></label>
-    <div id="articleSelector">${renderArticleSelector(p ? (p.content_id || '') : '', isView)}</div>
+    <div id="articleSelector">${renderArticleSelector(p ? (p.content_id || '') : '', isView, isPendingEdit)}</div>
+    ${isPendingEdit && p && p.content_id ? `<input type="hidden" id="articleSelect" value="${p.content_id}">` : ''}
     <div class="hint">选择文章后，用户点击「查看详情」将跳转到文章详情页；不选则按原有跳转链接处理</div>
   </div>`;
 
+  // 跳转链接显示
+  let linkFieldHtml = '';
+  if (isView) {
+    if (p && p.content_id) {
+      linkFieldHtml = `<div style="font-size:13px;color:var(--text)">文章详情</div>`;
+    } else if (p && p.link === 'h5') {
+      linkFieldHtml = `<div style="font-size:13px;color:var(--text)">自定义链接：${escapeHtml(p.linkUrl || '')}</div>`;
+    } else {
+      const label = linkOptions.find(o => o.value === (p ? p.link : ''))?.label || '消息详情页';
+      linkFieldHtml = `<div style="font-size:13px;color:var(--text)">${label}</div>`;
+    }
+  } else {
+    const optionHtml = linkOptions.map(o => `<option value="${o.value}" ${o.value === (p ? p.link : '') ? 'selected' : (o.value === 'msg_detail' && (!p || !p.link) ? 'selected' : '')}>${o.label}</option>`).join('');
+    linkFieldHtml = `<select id="pushLink" style="width:100%" ${pendingDisabled} onchange="onPushLinkChange()">${optionHtml}</select>`;
+  }
+
   html += `<div class="form-group">
     <label>跳转链接 <span class="hint">（点击推送后跳转的App内页面，选择文章时自动指向文章详情页）</span></label>
-    <input type="text" id="pushLink" value="${escapeHtml(p ? p.link : '')}" placeholder="如：app://strategy/create" ${disabled}>
+    ${linkFieldHtml}
+    ${isPendingEdit && p && !p.content_id ? `<input type="hidden" id="pushLink" value="${p.link || 'msg_detail'}">` : ''}
+  </div>
+  <div class="form-group" id="h5LinkSection" style="display:${(p && p.link === 'h5') ? '' : 'none'};margin-top:8px">
+    <label><span class="required">*</span> 链接地址</label>
+    <input type="text" id="h5LinkUrl" value="${escapeHtml(p ? (p.linkUrl || '') : '')}" placeholder="请输入完整链接地址，支持H5页面（如https://example.com/page）或APP内路由" ${disabled || pendingDisabled}>
   </div>`;
 
-  // 推送时间（手动推送时显示）
-  const pushTime = p ? (p.pushTime || '') : '';
-  html += `<div id="timeSection" style="${isAuto ? 'display:none' : ''}">
-    <div class="form-group">
-      <label><span class="required">*</span> 推送时间</label>
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
-        <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer">
-          <input type="radio" name="timeMode" value="now" ${!pushTime ? 'checked' : ''} ${disabled} onchange="toggleTimeInput()"> 立即发送
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer">
-          <input type="radio" name="timeMode" value="scheduled" ${pushTime ? 'checked' : ''} ${disabled} onchange="toggleTimeInput()"> 定时发送
-        </label>
-      </div>
-      <input type="datetime-local" id="pushTimeInput" value="${pushTime}" style="${pushTime ? '' : 'display:none'}" ${disabled}>
-    </div>
-  </div>`;
+  // 推送时间（手动推送时不展示，因为只能立即发送）
+  html += `<div id="timeSection" style="display:none"></div>`;
 
-  // 防骚扰设置
-  html += `<div class="conditional-section" style="margin-top:8px">
+  // 防骚扰设置（手动推送或定时发送或重复时间时不展示）
+  const hideNoRepeat = pushType === 'manual' || (pushType === 'auto' && (triggerType === 'scheduled' || triggerType === 'fixed'));
+  html += `<div id="noRepeatSection" class="conditional-section" style="margin-top:8px;${hideNoRepeat ? 'display:none' : ''}">
     <h5>防骚扰设置</h5>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
       <span style="font-size:14px;color:var(--text)">同一规则对同一用户仅触发一次</span>
       <label class="switch">
-        <input type="checkbox" id="noRepeat" ${(p && p.noRepeat !== false) ? 'checked' : ''} ${disabled}>
+        <input type="checkbox" id="noRepeat" ${(p && p.noRepeat !== false) ? 'checked' : ''} ${disabled || pendingDisabled}>
         <span class="slider"></span>
       </label>
     </div>
@@ -1881,19 +2308,28 @@ function renderDrawerForm(p, isView) {
   }
 }
 
-function renderTriggerParams(triggerType, p, disabled, audience) {
+function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) {
   if (!triggerType) return '';
+  const pendingDisabled = isPendingEdit ? 'disabled' : '';
   let html = '';
 
-  if (triggerType === 'fixed') {
+  if (triggerType === 'scheduled') {
+    const scheduledTime = (p && p.pushTime) || '';
+    // 待发送状态：仅发送时间可编辑
+    html += `<div class="form-group">
+      <label>发送时间</label>
+      <input type="datetime-local" id="scheduledTime" value="${scheduledTime}" ${disabled} onclick="this.showPicker && this.showPicker()" style="cursor:pointer">
+    </div>`;
+  } else if (triggerType === 'fixed') {
     const cycle = (p && p.triggerCycle) || 'monthly';
     const dayOfWeek = (p && p.triggerDayOfWeek !== undefined) ? p.triggerDayOfWeek : 1;
     const dayOfMonth = (p && p.triggerDayOfMonth) ? p.triggerDayOfMonth : 1;
     const triggerTime = (p && p.triggerTime) ? p.triggerTime : '08:00';
+    // 待发送状态：执行周期和周几/日期置灰，仅执行时间可编辑
     html += `<div class="form-row" style="align-items:flex-end">
       <div class="form-group">
         <label>执行周期</label>
-        <select id="fixedCycle" ${disabled} onchange="onFixedCycleChange()">
+        <select id="fixedCycle" ${disabled || pendingDisabled} onchange="onFixedCycleChange()">
           <option value="daily" ${cycle==='daily'?'selected':''}>每日</option>
           <option value="weekly" ${cycle==='weekly'?'selected':''}>每周</option>
           <option value="monthly" ${cycle==='monthly'?'selected':''}>每月</option>
@@ -1902,7 +2338,7 @@ function renderTriggerParams(triggerType, p, disabled, audience) {
       <div class="form-group" id="fixedDayGroup" style="${cycle==='daily'?'display:none':''}">
         <label>${cycle==='weekly'?'周几':'日期'}</label>
         ${cycle==='weekly' ? `
-        <select id="fixedDayOfWeek" ${disabled}>
+        <select id="fixedDayOfWeek" ${disabled || pendingDisabled}>
           <option value="1" ${dayOfWeek==1?'selected':''}>周一</option>
           <option value="2" ${dayOfWeek==2?'selected':''}>周二</option>
           <option value="3" ${dayOfWeek==3?'selected':''}>周三</option>
@@ -1911,8 +2347,7 @@ function renderTriggerParams(triggerType, p, disabled, audience) {
           <option value="6" ${dayOfWeek==6?'selected':''}>周六</option>
           <option value="0" ${dayOfWeek==0?'selected':''}>周日</option>
         </select>` : `
-        <input type="number" id="fixedDayOfMonth" value="${dayOfMonth}" min="1" max="28" ${disabled}>`}
-        ${cycle==='monthly' ? '<div class="hint">1-28日</div>' : ''}
+        <input type="number" id="fixedDayOfMonth" value="${dayOfMonth}" min="1" max="28" ${disabled || pendingDisabled} onblur="onMonthDayBlur()">`}
       </div>
       <div class="form-group">
         <label>执行时间</label>
@@ -1939,10 +2374,11 @@ function renderTriggerParams(triggerType, p, disabled, audience) {
       : (visibleEvents[0]?.value || 'register');
     const eventSelected = v => v === safeEvent ? 'selected' : '';
 
+    // 待发送状态：全部置灰
     html += `<div class="form-row">
       <div class="form-group">
         <label>相对事件</label>
-        <select id="relativeEvent" ${disabled}>
+        <select id="relativeEvent" ${disabled || pendingDisabled}>
           ${visibleEvents.map(ev =>
             `<option value="${ev.value}" ${eventSelected(ev.value)}>${ev.label}</option>`
           ).join('')}
@@ -1951,10 +2387,9 @@ function renderTriggerParams(triggerType, p, disabled, audience) {
       <div class="form-group">
         <label>延迟时间</label>
         <div style="display:flex;align-items:center;gap:6px">
-          <input type="number" id="relativeDelay" value="${existingDelay}" min="1" style="width:100px" ${disabled}>
+          <input type="number" id="relativeDelay" value="${existingDelay}" min="0" max="999" step="1" style="width:100px" ${disabled || pendingDisabled} onblur="onRelativeDelayBlur()">
           <span>小时</span>
         </div>
-        <div class="hint">如：24小时（1天）、48小时（2天）、168小时（7天）</div>
       </div>
     </div>`;
   }
@@ -1973,8 +2408,27 @@ function onPushTypeChange() {
     triggerSection.style.display = 'none';
     timeSection.style.display = '';
   }
+  // 控制防骚扰设置显隐
+  const noRepeatSection = document.getElementById('noRepeatSection');
+  if (noRepeatSection) {
+    if (type === 'manual') {
+      noRepeatSection.style.display = 'none';
+    } else {
+      const tt = document.getElementById('triggerTypeSelect')?.value || 'fixed';
+      noRepeatSection.style.display = (tt === 'fixed' || tt === 'scheduled') ? 'none' : '';
+    }
+  }
   updateSaveBtnLabel();
   refreshTriggerSection();
+}
+
+function onPushLinkChange() {
+  const link = document.getElementById('pushLink').value;
+  window._lastLinkVal = link || 'msg_detail';
+  const h5Section = document.getElementById('h5LinkSection');
+  if (h5Section) {
+    h5Section.style.display = link === 'h5' ? '' : 'none';
+  }
 }
 
 // 人群变更后刷新触发配置联动
@@ -2003,12 +2457,15 @@ function refreshTriggerSection() {
     const label = formGroup.querySelector('label');
     if (audienceConstraints.allowRelative) {
       formGroup.innerHTML = label.outerHTML + `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
-        <option value="fixed" ${effectiveType !== 'relative' ? 'selected' : ''}>固定时间点</option>
-        <option value="relative" ${effectiveType === 'relative' ? 'selected' : ''}>相对时间</option>
+        <option value="scheduled" ${effectiveType==='scheduled'?'selected':''}>定时发送</option>
+        <option value="fixed" ${effectiveType==='fixed'?'selected':''}>重复时间</option>
+        <option value="relative" ${effectiveType==='relative'?'selected':''}>相对时间</option>
       </select>`;
     } else {
-      formGroup.innerHTML = label.outerHTML + `<input type="hidden" id="triggerTypeSelect" value="fixed">
-        <span style="display:inline-block;padding:6px 10px;background:#f3f4f6;border-radius:6px;font-size:13px;color:#374151">固定时间点</span>`;
+      formGroup.innerHTML = label.outerHTML + `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
+        <option value="scheduled" ${effectiveType==='scheduled'?'selected':''}>定时发送</option>
+        <option value="fixed" ${effectiveType!=='scheduled'?'selected':''}>重复时间</option>
+      </select>`;
     }
   }
 
@@ -2024,11 +2481,9 @@ function updateSaveBtnLabel() {
   const btn = document.getElementById('btnSave');
   if (!btn) return;
   const type = document.getElementById('pushType')?.value || 'manual';
-  // 编辑已有推送时，主按钮统一为「保存」，避免显示成「定时发送/立即发送」这类动作文案
-  if (drawerMode === 'edit') { btn.textContent = '保存'; return; }
   if (type === 'auto') { btn.textContent = '保存并启用'; return; }
-  const mode = document.querySelector('input[name="timeMode"]:checked');
-  btn.textContent = (mode && mode.value === 'scheduled') ? '定时发送' : '立即发送';
+  // 手动推送（新建或编辑）：统一显示立即发送
+  btn.textContent = '立即发送';
 }
 
 function onTriggerTypeChange() {
@@ -2039,6 +2494,11 @@ function onTriggerTypeChange() {
     params.innerHTML = renderTriggerParams(tt, null, false, editingAudience);
   } else {
     params.style.display = 'none';
+  }
+  // 控制防骚扰设置显隐
+  const noRepeatSection = document.getElementById('noRepeatSection');
+  if (noRepeatSection) {
+    noRepeatSection.style.display = (tt === 'fixed' || tt === 'scheduled') ? 'none' : '';
   }
 }
 
@@ -2059,7 +2519,7 @@ function onFixedCycleChange() {
       dayGroup.innerHTML = `<label>周几</label>${sel}`;
     } else {
       label.textContent = '日期';
-      dayGroup.innerHTML = '<label>日期</label><input type="number" id="fixedDayOfMonth" value="1" min="1" max="28"><div class="hint">1-28日</div>';
+      dayGroup.innerHTML = '<label>日期</label><input type="number" id="fixedDayOfMonth" value="1" min="1" max="28" onblur="onMonthDayBlur()">';
     }
   }
 }
@@ -2076,12 +2536,12 @@ function toggleTimeInput() {
 }
 
 // ===== 渠道选择器 =====
-function renderChannelSelector(isView) {
+function renderChannelSelector(isView, isDisabled) {
   const chips = channelOptions.map(o => {
     const sel = editingChannels.includes(o.value);
     if (isView && !sel) return '';
-    const click = isView ? '' : `onclick="toggleChannel('${o.value}')"`;
-    return `<span class="tag-chip ${sel ? 'selected' : ''}" ${click}>${o.label}</span>`;
+    const click = (isView || isDisabled) ? '' : `onclick="toggleChannel('${o.value}')"`;
+    return `<span class="tag-chip ${sel ? 'selected' : ''}" ${click} style="${isDisabled ? 'cursor:not-allowed;opacity:0.6' : ''}">${o.label}</span>`;
   }).join('');
   return `<div class="tag-selector">${chips || '<span style="color:var(--text-muted);font-size:12px">' + (isView ? '—' : '请选择推送渠道') + '</span>'}</div>`;
 }
@@ -2090,15 +2550,15 @@ function toggleChannel(value) {
   const i = editingChannels.indexOf(value);
   if (i >= 0) editingChannels.splice(i, 1);
   else editingChannels.push(value);
-  document.getElementById('channelSelector').innerHTML = renderChannelSelector(false);
+  document.getElementById('channelSelector').innerHTML = renderChannelSelector(false, false);
 }
 
 // ===== 人群选择器（分组展示）=====
-function renderAudienceSelector(isView) {
+function renderAudienceSelector(isView, isDisabled) {
   const allTagValues = audienceTags.map(t => t.value);
 
-  if (isView) {
-    // 查看模式：仅显示已选标签
+  if (isView || isDisabled) {
+    // 查看模式/禁用模式：仅显示已选标签
     if (editingAudience.length === allTagValues.length) {
       return '<div class="tag-selector"><span class="tag-chip selected">全部用户</span></div>';
     }
@@ -2231,6 +2691,35 @@ function updateCharCounter() {
   counter.className = 'char-counter' + (len > VAR_LIMIT ? ' over' : len > VAR_LIMIT * 0.8 ? ' warn' : '');
 }
 
+// ===== 优先级冲突检测 =====
+// audience: 当前推送目标人群标签数组
+// priority: 当前推送优先级数值
+// excludeId: 排除自身的推送ID（编辑时用）
+// 返回：true 表示无冲突，false 表示有冲突（已阻止后续操作）
+function checkPriorityConflict(audience, priority, excludeId) {
+  const conflictItems = [];
+  pushes.forEach(p => {
+    if (excludeId && p.id === excludeId) return;
+    if (p.status !== 'running' && p.status !== 'pending') return;
+    if (!p.audience || p.audience.length === 0) return;
+    if (Number(p.priority) !== Number(priority)) return;
+    const intersected = p.audience.filter(tag => audience.includes(tag));
+    if (intersected.length === 0) return;
+    const intersectedNames = intersected.map(tag => {
+      const found = audienceTags.find(t => t.value === tag);
+      return found ? found.label.split('（')[0] : tag;
+    }).join('、');
+    conflictItems.push({ name: p.name, priority: p.priority, intersect: intersectedNames });
+  });
+  if (conflictItems.length > 0) {
+    const names = conflictItems.slice(0, 3).map((item, i) => `${i + 1}. ${item.name}（优先级 ${item.priority}，冲突人群：${item.intersect}）`).join('<br>');
+    const moreHint = conflictItems.length > 3 ? `<br>等共 ${conflictItems.length} 条` : '';
+    showModal(`优先级冲突检测<br><br>以下推送与当前推送存在相同的目标人群且优先级同为 <b>${priority}</b>，可能导致推送行为不可预测：<br><br>${names}${moreHint}<br><br>请调整优先级数值或修改目标人群后再保存。`, null);
+    return false;
+  }
+  return true;
+}
+
 // ===== 保存 =====
 function savePush(action) {
   const name = document.getElementById('pushName').value.trim();
@@ -2239,12 +2728,27 @@ function savePush(action) {
   const subtitle = document.getElementById('pushSubtitle').value.trim();
   const contentId = document.getElementById('articleSelect')?.value || '';
   const link = document.getElementById('pushLink').value.trim();
-  const noRepeat = document.getElementById('noRepeat').checked;
+  const linkUrl = document.getElementById('h5LinkUrl')?.value.trim() || '';
+  const pushTypeForSave = document.getElementById('pushType').value;
+  const triggerTypeForSave = document.getElementById('triggerTypeSelect')?.value || 'fixed';
+  const hideNoRepeat = pushTypeForSave === 'manual' || (pushTypeForSave === 'auto' && (triggerTypeForSave === 'fixed' || triggerTypeForSave === 'scheduled'));
+  const noRepeatEl = document.getElementById('noRepeat');
+  const noRepeat = hideNoRepeat ? null : (noRepeatEl ? noRepeatEl.checked : true);
 
   if (!name) { showToast('请输入推送名称'); return; }
   if (!title) { showToast('请输入推送标题'); return; }
   if (editingChannels.length === 0) { showToast('请至少选择一个推送渠道'); return; }
   if (editingAudience.length === 0) { showToast('请至少选择一个目标人群'); return; }
+  if (link === 'h5' && !linkUrl) { showToast('请输入链接地址'); return; }
+  
+  // 如果选择了文章，校验文章有效性
+  if (contentId) {
+    const article = articles.find(a => a.id === contentId);
+    if (!article || article.disabled) { 
+      showToast('所选文章已失效，请重新选择文章'); 
+      return; 
+    }
+  }
 
   let triggerType = '';
   let triggerDesc = '';
@@ -2257,12 +2761,30 @@ function savePush(action) {
   let relativeEventVal = '';
   let relativeDelayVal = 0;
 
+  const priorityVal = document.getElementById('pushPriority').value;
+  if (priorityVal === '' || priorityVal === null || priorityVal === undefined) {
+    showToast('请填写优先级'); return;
+  }
+  priority = parseFloat(priorityVal);
+  if (isNaN(priority) || priority < 0 || priority > 100) { showToast('优先级需在0-100之间'); return; }
+  // 保留最多1位小数
+  priority = Math.round(priority * 10) / 10;
+
+  // 优先级冲突检测（复用于保存和启用暂停状态）
+  if (!checkPriorityConflict(editingAudience, priority, editingId)) {
+    return;
+  }
+
   if (pushType === 'auto') {
     triggerType = document.getElementById('triggerTypeSelect').value;
     if (!triggerType) { showToast('请选择触发方式'); return; }
-    priority = parseInt(document.getElementById('pushPriority').value) || 3;
 
-    if (triggerType === 'fixed') {
+    if (triggerType === 'scheduled') {
+      const scheduledTime = document.getElementById('scheduledTime').value;
+      if (!scheduledTime) { showToast('请选择发送时间'); return; }
+      pushTime = scheduledTime;
+      triggerDesc = `定时发送 ${scheduledTime}`;
+    } else if (triggerType === 'fixed') {
       const cycle = document.getElementById('fixedCycle').value;
       const time = document.getElementById('fixedTime').value;
       triggerCycle = cycle;
@@ -2281,19 +2803,15 @@ function savePush(action) {
       }
     } else if (triggerType === 'relative') {
       const event = document.getElementById('relativeEvent').value;
-      const delay = parseInt(document.getElementById('relativeDelay').value) || 0;
-      if (delay < 1) { showToast('延迟时间必须大于0'); return; }
+      const delay = parseInt(document.getElementById('relativeDelay').value);
+      if (isNaN(delay) || delay < 0 || delay > 999) { showToast('请输入0-999范围内的整数'); return; }
       relativeEventVal = event;
       relativeDelayVal = delay;
       const eventMap = { register: '注册后', strategy_create: '创建策略后', real_trade: '首次实盘后' };
       triggerDesc = (eventMap[event] || '') + delay + '小时';
     }
   } else {
-    const timeMode = document.querySelector('input[name="timeMode"]:checked');
-    if (timeMode && timeMode.value === 'scheduled') {
-      pushTime = document.getElementById('pushTimeInput').value;
-      if (!pushTime) { showToast('请选择定时发送时间'); return; }
-    }
+    pushTime = ''; // 手动推送只能立即发送
   }
 
   // 手动推送：定时发送 => 待发送；立即发送 => 已发送
@@ -2322,10 +2840,14 @@ function savePush(action) {
       p.subtitle = subtitle;
       p.content_id = contentId;
       p.link = link;
+      p.linkUrl = linkUrl;
       p.pushTime = pushTime;
       p.noRepeat = noRepeat;
       if (action === 'save') {
-        p.status = pushType === 'auto' ? 'running' : manualStatus;
+        // 自动规则：定时发送为待发送，其他为运行中；手动推送：定时发送为待发送，立即发送为已发送
+        p.status = pushType === 'auto' 
+          ? (triggerType === 'scheduled' ? 'pending' : 'running')
+          : manualStatus;
       }
     }
   } else {
@@ -2344,11 +2866,16 @@ function savePush(action) {
       relativeEvent: relativeEventVal,
       relativeDelay: relativeDelayVal,
       priority,
-      status: action === 'save' ? (pushType === 'auto' ? 'running' : manualStatus) : 'draft',
+      status: action === 'save' 
+        ? (pushType === 'auto' 
+          ? (triggerType === 'scheduled' ? 'pending' : 'running')
+          : manualStatus) 
+        : 'draft',
       title,
       subtitle,
       content_id: contentId,
       link,
+      linkUrl,
       pushTime,
       noRepeat,
       createTime: now,
@@ -2374,7 +2901,13 @@ function openSendConfirm(id) {
   if (!p) return;
 
   const channelStr = (p.channels || []).map(c => getChannelLabel(c)).join('、');
-  const audienceStr = (p.audience || []).map(a => getAudienceLabel(a)).join('、');
+  const totalAudienceTags = audienceTags.length;
+  let audienceStr;
+  if ((p.audience || []).length === totalAudienceTags) {
+    audienceStr = '全部用户';
+  } else {
+    audienceStr = (p.audience || []).map(a => getAudienceLabel(a)).join('、');
+  }
 
   document.getElementById('sendModalMsg').innerHTML = `
     即将发送推送「<b>${escapeHtml(p.name)}</b>」<br><br>
@@ -2416,6 +2949,18 @@ function toggleAutoRule(id) {
     p.status = 'paused';
     showToast('规则已暂停');
   } else if (p.status === 'paused') {
+    // 校验文章有效性
+    if (p.content_id) {
+      const article = articles.find(a => a.id === p.content_id);
+      if (!article || article.disabled) {
+        showToast('关联文章已失效，请修改文章后再启用', 'error');
+        return;
+      }
+    }
+    // 优先级冲突检测
+    if (!checkPriorityConflict(p.audience || [], p.priority, p.id)) {
+      return;
+    }
     p.status = 'running';
     showToast('规则已启用');
   }
@@ -2510,11 +3055,10 @@ function renderContentTable(data) {
             <input type="checkbox" ${item.disabled ? '' : 'checked'} onchange="toggleContentDisabled('${item.id}', this.checked)">
             <span class="toggle-slider"></span>
           </label>
-          <span style="font-size:11px;color:var(--text-muted);margin-left:6px">${item.disabled ? '禁用' : '启用'}</span>
         </td>
         <td>${refCount}</td>
         <td>${item.updateTime}</td>
-        <td>
+        <td class="col-actions">
           <button class="btn-edit-text" onclick="openContentDrawer('view', '${item.id}')">查看</button>
           <button class="btn-edit-text" onclick="openContentDrawer('edit', '${item.id}')">编辑</button>
           <button class="btn-danger-text" onclick="deleteContent('${item.id}')">删除</button>
@@ -2566,8 +3110,49 @@ function toggleContentDisabled(id, enabled) {
   const a = articles.find(e => e.id === id);
   if (!a) return;
   a.disabled = !enabled;
-  a.updateTime = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
-  showToast(enabled ? '文章已启用' : '文章已禁用', 'success');
+  a.updateTime = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-').replace(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})/, '$1 $2');
+  
+  // 如果是禁用文章，将关联的推送改为暂停状态
+  if (!enabled) {
+    pushes.forEach(p => {
+      if (p.content_id === id && (p.status === 'running' || p.status === 'pending')) {
+        p.status = 'paused';
+      }
+    });
+    refreshTable();
+  } else {
+    // 启用文章时，恢复推送状态
+    const now = new Date();
+    let hasOverdue = false;
+    
+    pushes.forEach(p => {
+      if (p.content_id === id) {
+        if (p.status === 'paused') {
+          if (p.triggerType === 'scheduled' && p.pushTime) {
+            const pushTime = new Date(p.pushTime);
+            if (pushTime <= now) {
+              hasOverdue = true;
+            } else {
+              p.status = 'pending';
+            }
+          } else {
+            p.status = 'running';
+          }
+        }
+      }
+    });
+    
+    refreshTable();
+    
+    if (hasOverdue) {
+      showToast('当前任务已过期，无法启用', 'error');
+      // 将禁用恢复为启用状态
+      a.disabled = false;
+      return;
+    }
+  }
+  
+  showToast(enabled ? '文章已启用' : '文章已禁用，关联推送已暂停', 'success');
 }
 
 // ===== 文章编辑器 =====
@@ -2593,20 +3178,20 @@ function deleteContent(id) {
   const refCount = pushes.filter(p => p.content_id === id).length;
   let msg = `确定删除文章「${escapeHtml(a.title)}」吗？删除后不可恢复。`;
   if (refCount > 0) {
-    msg = `该文章已被 ${refCount} 条推送关联，删除后这些关联推送将自动转为「草稿」，且「选择文章」重置为「-- 不选择文章 --」。<br>确定删除「${escapeHtml(a.title)}」吗？删除后不可恢复。`;
+    msg = `该文章已被 ${refCount} 条推送关联，删除后这些关联推送将自动转为「暂停」，且「选择文章」重置为「-- 不选择文章 --」。<br>确定删除「${escapeHtml(a.title)}」吗？删除后不可恢复。`;
   }
   openDeleteModal('删除文章', msg, () => {
-    // 关联推送：清空所选文章并转为草稿
+    // 关联推送：清空所选文章并转为暂停
     pushes.forEach(p => {
       if (p.content_id === id) {
         p.content_id = '';
-        p.status = 'draft';
+        p.status = 'paused';
       }
     });
     articles = articles.filter(e => e.id !== id);
     refreshContentTable();
     refreshTable();
-    showToast(refCount > 0 ? `已删除，${refCount} 条关联推送已转为草稿` : '已删除');
+    showToast(refCount > 0 ? `已删除，${refCount} 条关联推送已转为暂停` : '已删除');
   });
 }
 
@@ -2622,18 +3207,18 @@ function renderContentForm(a, isView = false) {
   const isDisabled = a ? a.disabled : false;
   body.innerHTML = `
     <div class="form-group">
-      <label><span class="required">*</span> 文章标题 <span class="hint">（内部辨识用，不展示给用户）</span></label>
+      <label><span class="required">*</span> 文章标题</label>
       <input type="text" id="contentTitle" value="${escapeHtml(a ? a.title : '')}" placeholder="如：新客开通量化策略SOP指引" maxlength="50" ${isView ? 'disabled' : ''}>
     </div>
     <div class="form-group">
       <label>文章正文 <span class="hint">（可视化编辑，使用下方按钮插入变量或设置格式）</span></label>
       <div class="editor-toolbar" ${isView ? 'style="display:none"' : ''}>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{用户昵称}')"><span class="var-badge">x</span>{用户昵称}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{策略名称}')"><span class="var-badge">x</span>{策略名称}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{收益情况}')"><span class="var-badge">x</span>{收益情况}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{登录时间}')"><span class="var-badge">x</span>{登录时间}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{用户昵称}')"><span class="var-badge">+</span>{用户昵称}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次创建的策略名称}')"><span class="var-badge">+</span>{最近一次创建的策略名称}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次创建的策略收益情况}')"><span class="var-badge">+</span>{最近一次创建的策略收益情况}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次登录时间}')"><span class="var-badge">+</span>{最近一次登录时间}</span>
+        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{距上次登录时间间隔（天）}')"><span class="var-badge">+</span>{距上次登录时间间隔（天）}</span>
         <span style="color:var(--border);margin:0 4px">|</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtParagraph()" style="background:#f0f4ff;color:var(--accent)"><b>¶</b> 段落</span>
         <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtBold()" style="background:#f0f4ff;color:var(--accent)"><b>B</b> 加粗</span>
         <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtLineBreak()" style="background:#f0f4ff;color:var(--accent)">↩ 换行</span>
         <span style="color:var(--border);margin:0 4px">|</span>
@@ -2654,9 +3239,6 @@ function renderContentForm(a, isView = false) {
         <span style="font-size:13px;color:var(--text-muted)" id="contentEnabledLabel">${isDisabled ? '禁用' : '启用'}</span>
       </div>
     </div>
-    ${isView ? '' : `<div class="info-tip" style="margin-top:8px">
-      提示：变量占位符（黄色高亮）在推送时会替换为每用户的真实数据。使用「段落」按钮包裹文本，使用「加粗」标记关键词，「换行」用于段内换行。
-    </div>`}
   `;
   // 开关切换文字同步
   document.getElementById('contentEnabled').addEventListener('change', function() {
@@ -2821,7 +3403,7 @@ function saveContent() {
   if (!title) { showToast('请输入文章标题'); return; }
   if (!body) { showToast('请输入文章正文'); return; }
 
-  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-').replace(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})/, '$1 $2');
 
   if (contentEditingId) {
     const a = articles.find(e => e.id === contentEditingId);
@@ -2848,46 +3430,114 @@ function saveContent() {
 }
 
 // ===== 推送表单中的文章选择器 =====
-function renderArticleSelector(selectedId, isView) {
-  const publishedArticles = articles.filter(a => !a.disabled);
-  if (isView) {
+function renderArticleSelector(selectedId, isView, isDisabled) {
+  if (isView || isDisabled) {
     if (!selectedId) return '<span style="color:var(--text-muted);font-size:12px">未选择</span>';
     const a = articles.find(e => e.id === selectedId);
-    return `<span style="font-size:13px;color:var(--text)">${a ? escapeHtml(a.title) : '(已删除)'}</span>`;
+    const isDisabledArticle = a && a.disabled;
+    return `<span style="font-size:13px;color:var(--text)">${a ? escapeHtml(a.title) : '(已删除)'}${isDisabledArticle ? ' <span style="color:var(--danger);font-size:12px">[失效]</span>' : ''}</span>`;
   }
+  // 只显示有效的文章
+  const validArticles = articles.filter(a => !a.disabled);
   let html = `<select id="articleSelect" style="width:100%" onchange="onArticleSelectChange()">
     <option value="">-- 不选择文章 --</option>`;
-  publishedArticles.forEach(a => {
+  validArticles.forEach(a => {
     html += `<option value="${a.id}" ${a.id === selectedId ? 'selected' : ''}>${escapeHtml(a.title)}</option>`;
   });
   html += `</select>`;
-  if (publishedArticles.length === 0) {
-    html += '<div class="hint" style="margin-top:4px;color:var(--warning)">暂无已发布的文章，请先在「推送内容」中创建文章</div>';
+  if (validArticles.length === 0) {
+    html += '<div class="hint" style="margin-top:4px;color:var(--warning)">暂无已发布的文章，请先在「推送内容」中创建并启用文章</div>';
   }
   return html;
 }
 
 function onArticleSelectChange() {
   updateSubtitleHint();
+  const articleId = document.getElementById('articleSelect')?.value || '';
+  const linkSelect = document.getElementById('pushLink');
+  const h5Section = document.getElementById('h5LinkSection');
+  if (linkSelect) {
+    if (articleId) {
+      linkSelect.innerHTML = `<option value="">--</option>`;
+      linkSelect.disabled = true;
+      linkSelect.style.background = '#f4f5f8';
+      linkSelect.style.color = 'var(--text-secondary)';
+      if (h5Section) h5Section.style.display = 'none';
+    } else {
+      const currentVal = window._lastLinkVal || 'msg_detail';
+      const linkHtml = linkOptions.map(o => `<option value="${o.value}" ${o.value === currentVal ? 'selected' : ''}>${o.label}</option>`).join('');
+      linkSelect.innerHTML = linkHtml;
+      linkSelect.disabled = false;
+      linkSelect.style.background = '';
+      linkSelect.style.color = '';
+    }
+  }
+}
+
+// ===== 优先级输入失焦校验 =====
+function onPriorityBlur() {
+  const input = document.getElementById('pushPriority');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  // 非数值或超出范围 → 清空+标红+提示
+  if (isNaN(num) || num < 0 || num > 100) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入0-100范围内的数值', 'error');
+    return;
+  }
+  // 合法数值 → 四舍五入保留1位小数
+  input.value = Math.round(num * 10) / 10;
+  input.classList.remove('input-error');
+}
+
+function onMonthDayBlur() {
+  const input = document.getElementById('fixedDayOfMonth');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  if (isNaN(num) || num < 1 || num > 28) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入1-28范围内的整数', 'error');
+    return;
+  }
+  input.value = Math.round(num);
+  input.classList.remove('input-error');
+}
+
+function onRelativeDelayBlur() {
+  const input = document.getElementById('relativeDelay');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  if (isNaN(num) || num < 0 || num > 999) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入0-999范围内的整数', 'error');
+    return;
+  }
+  input.value = Math.round(num);
+  input.classList.remove('input-error');
 }
 
 function updateSubtitleHint() {
   const hint = document.getElementById('subtitleHint');
   if (!hint) return;
-  const articleId = document.getElementById('articleSelect')?.value || '';
-  const subtitleVal = document.getElementById('pushSubtitle')?.value.trim();
-  if (!subtitleVal && articleId) {
-    const a = articles.find(e => e.id === articleId);
-    if (a) {
-      const plainText = a.body.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-      const preview = plainText.length > 30 ? plainText.slice(0, 30) + '...' : plainText;
-      hint.innerHTML = `<span style="color:var(--text-muted)">未填副标题，将自动截取文章正文：</span><span style="color:var(--accent)">「${escapeHtml(preview)}」</span>`;
-    }
-  } else if (!subtitleVal && !articleId) {
-    hint.innerHTML = '<span style="color:var(--warning)">未填副标题且未选文章，消息列表将仅展示标题</span>';
-  } else {
-    hint.innerHTML = '';
-  }
+  hint.innerHTML = '';
 }
 
 // ===== Toast =====
@@ -2897,6 +3547,23 @@ function showToast(msg, type) {
   el.textContent = msg;
   document.getElementById('toastContainer').appendChild(el);
   setTimeout(() => el.remove(), 2000);
+}
+
+// ===== Modal =====
+function showModal(htmlContent, onConfirm) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  const cancelBtn = document.getElementById('modalCancel');
+  if (!overlay || !content) return;
+  content.innerHTML = htmlContent;
+  overlay.style.display = 'flex';
+  const close = function() { overlay.style.display = 'none'; };
+  cancelBtn.onclick = function() { close(); if (typeof onConfirm === 'function') onConfirm(false); };
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 // ===== 初始化 =====
