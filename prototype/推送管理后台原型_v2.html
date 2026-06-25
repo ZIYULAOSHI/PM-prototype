@@ -673,23 +673,6 @@ tbody tr:last-child td { border-bottom: none; }
   line-height: 1.6;
 }
 
-/* ===== 变量插入 ===== */
-.var-tags {
-  display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap;
-}
-.var-tag {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 2px 8px; border-radius: 4px;
-  background: #eef2ff; color: var(--accent);
-  font-size: 12px; cursor: pointer; user-select: none;
-  border: 1px solid transparent;
-  transition: border-color 0.15s, background 0.15s;
-}
-.var-tag:hover { border-color: var(--accent); background: #dfe4ff; }
-.var-tag .var-badge {
-  font-size: 10px; background: var(--accent); color: #fff;
-  border-radius: 2px; padding: 0 3px; line-height: 14px;
-}
 .char-counter { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
 .char-counter.warn { color: #d97706; }
 .char-counter.over { color: #dc2626; }
@@ -1151,11 +1134,9 @@ tbody tr:last-child td { border-bottom: none; }
 
 .rule-tag.active { background: #ecfdf5; color: #047857; }
 
-/* 文章变量高亮 */
-.var-highlight { background: #fef3c7; color: #92400e; padding: 0 2px; border-radius: 2px; font-weight: 500; }
-
-/* 文章编辑器工具栏 */
-.editor-toolbar {
+/* ===== 通用富文本编辑器组件 ===== */
+.rte-wrap { width: 100%; }
+.rte-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -1166,13 +1147,25 @@ tbody tr:last-child td { border-bottom: none; }
   border-radius: var(--radius) var(--radius) 0 0;
   align-items: center;
 }
-
-.editor-toolbar + textarea {
-  border-radius: 0 0 var(--radius) var(--radius);
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
-
-/* 富文本可视化编辑器 */
-.rich-editor {
+.rte-btn:hover { border-color: var(--accent); color: var(--accent); background: #f5f8ff; }
+.rte-btn-media { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.rte-btn-media:hover { border-color: #047857; background: #d1fae5; color: #047857; }
+.rte-divider { width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
+.rte-editor {
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius) var(--radius);
@@ -1186,19 +1179,22 @@ tbody tr:last-child td { border-bottom: none; }
   color: var(--text);
   outline: none;
 }
-.rich-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
-.rich-editor:empty::before {
+.rte-wrap:not(:has(.rte-toolbar)) .rte-editor {
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.rte-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
+.rte-editor:empty::before {
   content: attr(data-placeholder);
   color: var(--text-muted);
   pointer-events: none;
 }
-.rich-editor p { margin: 0 0 10px 0; }
-.rich-editor p:last-child { margin-bottom: 0; }
-.rich-editor strong { font-weight: 600; }
-.rich-editor ul, .rich-editor ol { margin: 6px 0 10px 20px; }
-.rich-editor li { margin-bottom: 4px; }
-.rich-editor .var-highlight { user-select: all; cursor: default; }
-.rich-editor img { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
+.rte-editor p { margin: 0 0 10px 0; }
+.rte-editor p:last-child { margin-bottom: 0; }
+.rte-editor strong, .rte-editor b { font-weight: 600; }
+.rte-editor ul, .rte-editor ol { margin: 6px 0 10px 20px; }
+.rte-editor li { margin-bottom: 4px; }
+.rte-editor img { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
 
 /* 正文内 PDF 附件卡片 */
 .attach-card {
@@ -1798,10 +1794,9 @@ let pushes = [
     channels: ['push'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '注册后 0~24小时',
+    triggerDesc: '注册后 延迟24小时',
     relativeField: 'reg_time',
-    relativeFrom: 0,
-    relativeTo: 24,
+    relativeDelay: 24,
     priority: 8,
     status: 'running',
     title: '【量化王】新客福利，解锁低风险量化策略',
@@ -1821,10 +1816,9 @@ let pushes = [
     channels: ['inapp'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '最近创建策略后 0~48小时',
+    triggerDesc: '最近创建策略后 延迟48小时',
     relativeField: 'last_strategy_time',
-    relativeFrom: 0,
-    relativeTo: 48,
+    relativeDelay: 48,
     priority: 40,
     status: 'running',
     title: '新客福利规则与教程',
@@ -1844,10 +1838,9 @@ let pushes = [
     channels: ['push', 'inapp'],
     audience: ['growing'],
     triggerType: 'relative',
-    triggerDesc: '首次实盘后 0~72小时',
+    triggerDesc: '首次实盘后 延迟72小时',
     relativeField: 'first_real_trade_time',
-    relativeFrom: 0,
-    relativeTo: 72,
+    relativeDelay: 72,
     priority: 1.5,
     status: 'running',
     title: '【量化王】恭喜您完成首次实盘',
@@ -1867,10 +1860,9 @@ let pushes = [
     channels: ['push'],
     audience: ['new_user', 'pending_active'],
     triggerType: 'relative',
-    triggerDesc: '注册后 0~72小时',
+    triggerDesc: '注册后 延迟72小时',
     relativeField: 'reg_time',
-    relativeFrom: 0,
-    relativeTo: 72,
+    relativeDelay: 72,
     priority: 20,
     status: 'paused',
     title: '【量化王】3天未实盘引导',
@@ -1890,10 +1882,9 @@ let pushes = [
     channels: ['inapp'],
     audience: ['new_user'],
     triggerType: 'relative',
-    triggerDesc: '注册后 0~120小时',
+    triggerDesc: '注册后 延迟120小时',
     relativeField: 'reg_time',
-    relativeFrom: 0,
-    relativeTo: 120,
+    relativeDelay: 120,
     priority: 70,
     status: 'draft',
     title: '【量化王】新手成长引导',
@@ -1919,7 +1910,7 @@ let articles = [
   {
     id: 'ART_20260610_001',
     title: '新客开通量化策略SOP指引',
-    body: '<p>亲爱的<span class="var-highlight">{用户昵称}</span>，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况：<span class="var-highlight">{最近一次创建的策略收益情况}</span></p>',
+    body: '<p>亲爱的用户，欢迎加入量化王！</p><p>以下是您的专属开通指引：</p><p><strong>第一步：创建策略</strong></p><p>进入「策略」页面，点击「创建策略」按钮，选择您偏好的策略类型。</p><p><strong>第二步：开始模拟</strong></p><p>创建后系统自动为您分配100万模拟资金，您可以在模拟环境中体验策略运行效果。</p><p><strong>第三步：跟踪收益</strong></p><p>随时查看您的收益情况，在策略详情页可查看实时收益数据。</p>',
     disabled: false,
     updateTime: '2026-06-10 14:30',
     creator: '李向梅'
@@ -1927,7 +1918,7 @@ let articles = [
   {
     id: 'ART_20260611_001',
     title: '618理财节活动规则说明',
-    body: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：<span class="var-highlight">{用户昵称}</span>，您的最近一次登录时间为 <span class="var-highlight">{最近一次登录时间}</span>，距上次登录时间间隔（天） <span class="var-highlight">{距上次登录时间间隔（天）}</span>，请及时参与活动哦！</p>',
+    body: '<p><strong>618理财节专属福利</strong></p><p>活动时间：2026年6月15日 - 6月30日</p><p>参与方式：</p><ul><li>活动期间创建任意策略即可获得88元体验金</li><li>策略实盘交易即送1个月VIP会员</li><li>邀请好友注册双方各得50元体验金</li></ul><p>温馨提示：活动期间登录 App 即可查看专属福利，请及时参与！</p>',
     disabled: false,
     updateTime: '2026-06-11 09:15',
     creator: '张磊'
@@ -1935,7 +1926,7 @@ let articles = [
   {
     id: 'ART_20260605_001',
     title: '5月收益复盘报告',
-    body: '<p><span class="var-highlight">{用户昵称}</span>，您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>收益情况：<span class="var-highlight">{最近一次创建的策略收益情况}</span></p><p>当前策略：<span class="var-highlight">{最近一次创建的策略名称}</span></p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>',
+    body: '<p>您好！</p><p>以下是您5月的量化策略收益复盘：</p><p>本月市场整体呈现震荡走势，您的策略表现稳健。建议关注以下优化方向：</p><ol><li>适当增加低波动品种配置</li><li>关注月末流动性变化</li></ol>',
     disabled: false,
     updateTime: '2026-06-05 10:00',
     creator: '李向梅'
@@ -2620,13 +2611,13 @@ function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) 
       </div>
     </div>`;
   } else if (triggerType === 'relative') {
-    // 相对时间：从字段注册表的「时间类(datetime)字段」中选择 + 距今 N~M 小时区间
-    // 字段全部来自与自定义人群相同的字段注册表，新增字段=研发在注册表加一行，无需发版
+    // 相对时间：从字段注册表的「时间类(datetime)字段」中选择 + 延迟 N 小时
     const timeFields = getDatetimeFields();
     const existingField = (p && p.relativeField) || (timeFields[0] ? timeFields[0].field : 'reg_time');
     const safeField = timeFields.some(f => f.field === existingField) ? existingField : (timeFields[0]?.field || 'reg_time');
-    const existingFrom = (p && p.relativeFrom !== undefined && p.relativeFrom !== null && p.relativeFrom !== '') ? p.relativeFrom : 0;
-    const existingTo = (p && p.relativeTo !== undefined && p.relativeTo !== null && p.relativeTo !== '') ? p.relativeTo : 24;
+    const existingDelay = (p && p.relativeDelay !== undefined && p.relativeDelay !== null && p.relativeDelay !== '')
+      ? p.relativeDelay
+      : (p && p.relativeTo !== undefined && p.relativeTo !== null && p.relativeTo !== '' ? p.relativeTo : 24);
 
     html += `<div class="form-row">
       <div class="form-group">
@@ -2636,11 +2627,9 @@ function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) 
         </select>
       </div>
       <div class="form-group">
-        <label>区间</label>
+        <label>延迟时间</label>
         <div style="display:flex;align-items:center;gap:6px">
-          <input type="number" id="relativeFrom" value="${existingFrom}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeFrom')">
-          <span>~</span>
-          <input type="number" id="relativeTo" value="${existingTo}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeTo')">
+          <input type="number" id="relativeDelay" value="${existingDelay}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeDelay')">
           <span>小时</span>
         </div>
       </div>
@@ -3410,7 +3399,7 @@ function estimateAudience() {
 }
 
 // ===== 人群-触发联动约束 =====
-// 相对时间触发已改为「时间字段 + 距今区间」，与目标人群解耦，恒允许选择
+// 相对时间触发已改为「时间字段 + 延迟时间」，与目标人群解耦，恒允许选择
 function getAudienceConstraints() {
   return { allowRelative: true, disabledEvents: [] };
 }
@@ -3548,8 +3537,7 @@ function savePush(action) {
   let triggerDayOfMonth = null;
   let triggerTimeVal = '';
   let relativeFieldVal = '';
-  let relativeFromVal = 0;
-  let relativeToVal = 0;
+  let relativeDelayVal = 0;
 
   const priorityVal = document.getElementById('pushPriority').value;
   if (priorityVal === '' || priorityVal === null || priorityVal === undefined) {
@@ -3596,16 +3584,13 @@ function savePush(action) {
       }
     } else if (triggerType === 'relative') {
       const field = document.getElementById('relativeField').value;
-      const from = parseInt(document.getElementById('relativeFrom').value);
-      const to = parseInt(document.getElementById('relativeTo').value);
+      const delay = parseInt(document.getElementById('relativeDelay').value);
       if (!field) { showToast('请选择触发节点'); return; }
-      if (isNaN(from) || from < 0 || from > 999 || isNaN(to) || to < 0 || to > 999) { showToast('区间需为0-999的整数'); return; }
-      if (from >= to) { showToast('区间的起始小时需小于结束小时'); return; }
+      if (isNaN(delay) || delay < 0 || delay > 999) { showToast('延迟时间需为0-999的整数'); return; }
       relativeFieldVal = field;
-      relativeFromVal = from;
-      relativeToVal = to;
+      relativeDelayVal = delay;
       const fieldDef = findAudienceFieldDef(field);
-      triggerDesc = `${fieldDef ? formatTriggerNodeLabel(fieldDef.label) : field} ${from}~${to}小时`;
+      triggerDesc = `${fieldDef ? formatTriggerNodeLabel(fieldDef.label) : field} 延迟${delay}小时`;
     }
   } else {
     pushTime = ''; // 手动推送只能立即发送
@@ -3637,8 +3622,9 @@ function savePush(action) {
       p.triggerDayOfMonth = triggerDayOfMonth;
       p.triggerTime = triggerTimeVal;
       p.relativeField = relativeFieldVal;
-      p.relativeFrom = relativeFromVal;
-      p.relativeTo = relativeToVal;
+      p.relativeDelay = relativeDelayVal;
+      delete p.relativeFrom;
+      delete p.relativeTo;
       p.priority = priority;
       p.title = title;
       p.subtitle = subtitle;
@@ -3672,8 +3658,7 @@ function savePush(action) {
       triggerDayOfMonth,
       triggerTime: triggerTimeVal,
       relativeField: relativeFieldVal,
-      relativeFrom: relativeFromVal,
-      relativeTo: relativeToVal,
+      relativeDelay: relativeDelayVal,
       priority,
       status: action === 'save' 
         ? (pushType === 'auto' 
@@ -4012,6 +3997,142 @@ function closeContentDrawer() {
   contentEditingId = null;
 }
 
+// ===== 通用富文本编辑器组件（加粗 / 换行 / 图片 / PDF）=====
+const RichTextEditor = {
+  _savedRanges: {},
+
+  render({ id = 'rteEditor', readonly = false, placeholder = '在此编辑内容...' } = {}) {
+    const ph = escapeHtml(placeholder);
+    if (readonly) {
+      return `<div class="rte-wrap">
+        <div id="${id}" class="rte-editor" contenteditable="false" data-placeholder="${ph}"></div>
+      </div>`;
+    }
+    return `<div class="rte-wrap">
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" title="加粗" onmousedown="event.preventDefault()" onclick="RichTextEditor.fmtBold('${id}')"><b>B</b> 加粗</button>
+        <button type="button" class="rte-btn" title="换行" onmousedown="event.preventDefault()" onclick="RichTextEditor.fmtLineBreak('${id}')">↩ 换行</button>
+        <span class="rte-divider"></span>
+        <button type="button" class="rte-btn rte-btn-media" onmousedown="RichTextEditor.saveSelection('${id}')" onclick="RichTextEditor.triggerImageUpload('${id}')">＋ 图片</button>
+        <button type="button" class="rte-btn rte-btn-media" onmousedown="RichTextEditor.saveSelection('${id}')" onclick="RichTextEditor.triggerAttachUpload('${id}')">＋ PDF</button>
+      </div>
+      <input type="file" id="${id}_img" accept="image/*" style="display:none" onchange="RichTextEditor.handleImageUpload('${id}', this)">
+      <input type="file" id="${id}_pdf" accept="application/pdf" style="display:none" onchange="RichTextEditor.handleAttachUpload('${id}', this)">
+      <div id="${id}" class="rte-editor" contenteditable="true" data-placeholder="${ph}"></div>
+    </div>`;
+  },
+
+  init(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = this._prepareHtml(html || '');
+  },
+
+  getHtml(id) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    let html = el.innerHTML;
+    html = html.replace(/\s*contenteditable="false"/g, '');
+    html = html.replace(/&nbsp;/g, ' ');
+    html = html.trim();
+    if (html === '<br>' || html === '<p></p>' || html === '<p><br></p>') html = '';
+    return html;
+  },
+
+  _prepareHtml(html) {
+    if (!html) return '';
+    return html.replace(/<a class="attach-card"/g, '<a class="attach-card" contenteditable="false"');
+  },
+
+  _editor(id) {
+    return document.getElementById(id);
+  },
+
+  fmtBold(id) {
+    this._editor(id)?.focus();
+    document.execCommand('bold');
+  },
+
+  fmtLineBreak(id) {
+    this._editor(id)?.focus();
+    document.execCommand('insertHTML', false, '<br>');
+  },
+
+  saveSelection(id) {
+    const sel = window.getSelection();
+    const editor = this._editor(id);
+    if (sel && sel.rangeCount > 0 && editor) {
+      const range = sel.getRangeAt(0);
+      if (editor.contains(range.commonAncestorContainer)) {
+        this._savedRanges[id] = range.cloneRange();
+        return;
+      }
+    }
+    this._savedRanges[id] = null;
+  },
+
+  insertHtml(id, htmlStr) {
+    const editor = this._editor(id);
+    if (!editor) return;
+    editor.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const saved = this._savedRanges[id];
+    if (saved) {
+      sel.addRange(saved);
+    } else {
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      sel.addRange(range);
+    }
+    document.execCommand('insertHTML', false, htmlStr);
+    this._savedRanges[id] = null;
+  },
+
+  triggerImageUpload(id) {
+    document.getElementById(id + '_img')?.click();
+  },
+
+  handleImageUpload(id, input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); input.value = ''; return; }
+    if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过 5MB'); input.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.insertHtml(id, `<img src="${e.target.result}" alt="${escapeHtml(file.name)}"><p><br></p>`);
+      showToast('图片已插入', 'success');
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  },
+
+  triggerAttachUpload(id) {
+    document.getElementById(id + '_pdf')?.click();
+  },
+
+  handleAttachUpload(id, input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') { showToast('请选择 PDF 文件'); input.value = ''; return; }
+    if (file.size > 20 * 1024 * 1024) { showToast('附件大小不能超过 20MB'); input.value = ''; return; }
+    const url = URL.createObjectURL(file);
+    const card = `<a class="attach-card" href="${url}" target="_blank" contenteditable="false">` +
+      `<span class="attach-icon">PDF</span>` +
+      `<span class="attach-info"><span class="attach-name">${escapeHtml(file.name)}</span><span class="attach-size">${this.formatFileSize(file.size)}</span></span>` +
+      `</a><p><br></p>`;
+    this.insertHtml(id, card);
+    showToast('PDF 已插入', 'success');
+    input.value = '';
+  },
+
+  formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+};
+
 function renderContentForm(a, isView = false) {
   const body = document.getElementById('contentDrawerBody');
   const initBody = a ? a.body : '';
@@ -4022,23 +4143,8 @@ function renderContentForm(a, isView = false) {
       <input type="text" id="contentTitle" value="${escapeHtml(a ? a.title : '')}" placeholder="如：新客开通量化策略SOP指引" maxlength="50" ${isView ? 'disabled' : ''}>
     </div>
     <div class="form-group">
-      <label>文章正文 <span class="hint">（可视化编辑，使用下方按钮插入变量或设置格式）</span></label>
-      <div class="editor-toolbar" ${isView ? 'style="display:none"' : ''}>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{用户昵称}')"><span class="var-badge">+</span>{用户昵称}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次创建的策略名称}')"><span class="var-badge">+</span>{最近一次创建的策略名称}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次创建的策略收益情况}')"><span class="var-badge">+</span>{最近一次创建的策略收益情况}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{最近一次登录时间}')"><span class="var-badge">+</span>{最近一次登录时间}</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="insertContentVar('{距上次登录时间间隔（天）}')"><span class="var-badge">+</span>{距上次登录时间间隔（天）}</span>
-        <span style="color:var(--border);margin:0 4px">|</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtBold()" style="background:#f0f4ff;color:var(--accent)"><b>B</b> 加粗</span>
-        <span class="var-tag" onmousedown="event.preventDefault()" onclick="fmtLineBreak()" style="background:#f0f4ff;color:var(--accent)">↩ 换行</span>
-        <span style="color:var(--border);margin:0 4px">|</span>
-        <span class="var-tag" onmousedown="saveEditorSelection()" onclick="triggerImageUpload()" style="background:#ecfdf5;color:#047857"><b>＋</b> 图片</span>
-        <span class="var-tag" onmousedown="saveEditorSelection()" onclick="triggerAttachUpload()" style="background:#ecfdf5;color:#047857"><b>＋</b> 附件(PDF)</span>
-      </div>
-      <input type="file" id="contentImageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
-      <input type="file" id="contentAttachInput" accept="application/pdf" style="display:none" onchange="handleAttachUpload(this)">
-      <div id="contentBody" class="rich-editor" contenteditable="${isView ? 'false' : 'true'}" ${isView ? 'style="border-top:1px solid var(--border);border-radius:var(--radius)"' : ''} data-placeholder="在此编辑文章内容，可使用上方按钮插入变量、格式、图片与附件。"></div>
+      <label>文章正文 <span class="hint">（支持加粗、换行、图片与 PDF 附件）</span></label>
+      ${RichTextEditor.render({ id: 'contentBody', readonly: isView, placeholder: '在此编辑文章内容...' })}
     </div>
     <div class="form-group">
       <label>启用状态</label>
@@ -4051,143 +4157,10 @@ function renderContentForm(a, isView = false) {
       </div>
     </div>
   `;
-  // 开关切换文字同步
   document.getElementById('contentEnabled').addEventListener('change', function() {
     document.getElementById('contentEnabledLabel').textContent = this.checked ? '启用' : '禁用';
   });
-  // 载入正文到可视化编辑器
-  const editor = document.getElementById('contentBody');
-  editor.innerHTML = prepareEditorHtml(initBody);
-}
-
-// 将存储的 HTML 载入编辑器：把变量占位符渲染成不可编辑的高亮标签
-function prepareEditorHtml(html) {
-  if (!html) return '';
-  // 已包裹的变量标签设为原子（不可编辑）
-  html = html.replace(/<span class="var-highlight">/g, '<span class="var-highlight" contenteditable="false">');
-  // 附件卡片设为原子（不可编辑）
-  html = html.replace(/<a class="attach-card"/g, '<a class="attach-card" contenteditable="false"');
-  // 未包裹的裸占位符 {xxx} 也高亮（避免影响标签内属性，仅处理标签外文本）
-  html = html.replace(/(>|^)([^<]*)/g, (m, lead, text) => {
-    return lead + text.replace(/\{[^}]+\}/g, '<span class="var-highlight" contenteditable="false">$&</span>');
-  });
-  return html;
-}
-
-// 读取编辑器内容并还原为存储用 HTML
-function getEditorHtml() {
-  const editor = document.getElementById('contentBody');
-  if (!editor) return '';
-  let html = editor.innerHTML;
-  html = html.replace(/\s*contenteditable="false"/g, '');
-  html = html.replace(/&nbsp;/g, ' ');
-  html = html.trim();
-  if (html === '<br>' || html === '<p></p>' || html === '<p><br></p>') html = '';
-  return html;
-}
-
-function insertContentVar(v) {
-  const editor = document.getElementById('contentBody');
-  if (!editor) return;
-  editor.focus();
-  const chip = `<span class="var-highlight" contenteditable="false">${v}</span>&nbsp;`;
-  document.execCommand('insertHTML', false, chip);
-}
-
-function fmtBold() {
-  document.getElementById('contentBody').focus();
-  document.execCommand('bold');
-}
-
-function fmtParagraph() {
-  document.getElementById('contentBody').focus();
-  document.execCommand('formatBlock', false, 'p');
-}
-
-function fmtLineBreak() {
-  document.getElementById('contentBody').focus();
-  document.execCommand('insertHTML', false, '<br>');
-}
-
-// ===== 正文图片 / 附件插入 =====
-let savedEditorRange = null;
-
-// 在打开文件选择框前保存光标位置（文件框会让编辑器失焦）
-function saveEditorSelection() {
-  const sel = window.getSelection();
-  const editor = document.getElementById('contentBody');
-  if (sel && sel.rangeCount > 0 && editor) {
-    const range = sel.getRangeAt(0);
-    if (editor.contains(range.commonAncestorContainer)) {
-      savedEditorRange = range.cloneRange();
-      return;
-    }
-  }
-  savedEditorRange = null;
-}
-
-// 在保存的光标处（或正文末尾）插入 HTML
-function insertHtmlAtEditor(htmlStr) {
-  const editor = document.getElementById('contentBody');
-  if (!editor) return;
-  editor.focus();
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  if (savedEditorRange) {
-    sel.addRange(savedEditorRange);
-  } else {
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    sel.addRange(range);
-  }
-  document.execCommand('insertHTML', false, htmlStr);
-  savedEditorRange = null;
-}
-
-function triggerImageUpload() {
-  document.getElementById('contentImageInput').click();
-}
-
-function handleImageUpload(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); input.value = ''; return; }
-  if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过 5MB'); input.value = ''; return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    // 原型阶段用本地 DataURL 预览；真实开发时改为上传接口返回的 URL
-    insertHtmlAtEditor(`<img src="${e.target.result}" alt="${escapeHtml(file.name)}"><p><br></p>`);
-    showToast('图片已插入', 'success');
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
-}
-
-function triggerAttachUpload() {
-  document.getElementById('contentAttachInput').click();
-}
-
-function handleAttachUpload(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  if (file.type !== 'application/pdf') { showToast('请选择 PDF 文件'); input.value = ''; return; }
-  if (file.size > 20 * 1024 * 1024) { showToast('附件大小不能超过 20MB'); input.value = ''; return; }
-  // 原型阶段用本地 blob 链接预览；真实开发时改为上传接口返回的 URL
-  const url = URL.createObjectURL(file);
-  const card = `<a class="attach-card" href="${url}" target="_blank" contenteditable="false">` +
-    `<span class="attach-icon">PDF</span>` +
-    `<span class="attach-info"><span class="attach-name">${escapeHtml(file.name)}</span><span class="attach-size">${formatFileSize(file.size)}</span></span>` +
-    `</a><p><br></p>`;
-  insertHtmlAtEditor(card);
-  showToast('附件已插入', 'success');
-  input.value = '';
-}
-
-function formatFileSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  RichTextEditor.init('contentBody', initBody);
 }
 
 function generateArticleId() {
@@ -4209,7 +4182,7 @@ function generateArticleId() {
 
 function saveContent() {
   const title = document.getElementById('contentTitle').value.trim();
-  const body = getEditorHtml();
+  const body = RichTextEditor.getHtml('contentBody');
   const enabled = document.getElementById('contentEnabled')?.checked ?? true;
   if (!title) { showToast('请输入文章标题'); return; }
   if (!body) { showToast('请输入文章正文'); return; }
@@ -4326,7 +4299,7 @@ function onMonthDayBlur() {
   input.classList.remove('input-error');
 }
 
-// 小时输入校验（0-999 整数），用于「相对时间」的距今区间
+// 小时输入校验（0-999 整数），用于「相对时间」的延迟时间
 function clampHourInput(id) {
   const input = document.getElementById(id);
   if (!input) return;
