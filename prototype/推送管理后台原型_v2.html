@@ -1461,8 +1461,8 @@ tbody tr:last-child td { border-bottom: none; }
 <div id="modalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center"><div id="modalBox" style="background:#fff;border-radius:8px;padding:24px;max-width:480px;max-height:min(80vh);box-shadow:0 12px 48px rgba(0,0,0,0.15);margin:20px"><div id="modalContent" style="font-size:14px;line-height:1.7;color:#333"></div><div style="margin-top:20px;text-align:right"><button id="modalCancel" style="padding:8px 20px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:13px;cursor:pointer">知道了</button></div></div></div>
 
 <script>
-// ===== 推送数据 =====
-let pushes = [
+// ===== 推送数据（种子模板，刷新时随机组合目标人群与自定义条件） =====
+const pushSeedTemplates = [
   // ========= 手动推送（6条） =========
   {
     id: 1,
@@ -1900,8 +1900,7 @@ let pushes = [
 ];
 
 let nextId = 21;
-// 随机打乱数据顺序
-pushes.sort(() => Math.random() - 0.5);
+let pushes = [];
 let editingId = null;
 let drawerMode = 'new';
 
@@ -1972,30 +1971,72 @@ const audienceTags = audienceTagGroups.flatMap(g => g.tags);
 // 每个字段：field 字段标识 / label 展示名 / type 数据类型(number数值 enum枚举 bool布尔 datetime时间) / unit 单位 / options 枚举可选值
 const audienceFieldRegistry = [
   { group: '用户属性', fields: [
-    { field: 'user_age',   label: '年龄',     type: 'number', unit: '岁' },
-    { field: 'gender',     label: '性别',     type: 'enum',   options: ['男', '女', '未知'] },
-    { field: 'city',       label: '城市',     type: 'enum',   options: ['北京', '上海', '广州', '深圳', '杭州', '其他'] },
-    { field: 'reg_days',   label: '注册天数', type: 'number', unit: '天' },
-    { field: 'reg_time',   label: '注册时间', type: 'datetime' }
+    { field: 'reg_days',            label: '注册天数',           type: 'number', unit: '天' },
+    { field: 'reg_channel',         label: '注册渠道',           type: 'enum',   options: ['App Store', '应用宝', '华为应用市场', '小米应用商店', '官网', '邀请注册', '其他'] },
+    { field: 'gender',              label: '性别',               type: 'enum',   options: ['男', '女', '未知'] },
+    { field: 'age',                 label: '年龄',               type: 'number', unit: '岁' },
+    { field: 'phone_bound',         label: '手机号是否绑定',     type: 'bool' },
+    { field: 'wechat_bind_status',  label: '微信绑定状态',       type: 'enum',   options: ['已绑定', '未绑定'] },
+    { field: 'bind_days_ago',       label: '绑定时间距今天数',   type: 'number', unit: '天' },
+    { field: 'device_type',         label: '设备类型',           type: 'enum',   options: ['iOS', 'Android', '鸿蒙', '其他'] },
+    { field: 'is_blacklist',        label: '是否黑名单',         type: 'bool' },
+    { field: 'violation_type',      label: '违规类型',           type: 'enum',   options: ['广告营销', '辱骂骚扰', '虚假信息', '其他'] },
+    { field: 'realname_status',     label: '实名认证状态',       type: 'enum',   options: ['已认证', '未认证', '认证中', '认证失败'] },
+    { field: 'last_login_days_ago', label: '最近登录距今天数',   type: 'number', unit: '天' },
+    { field: 'first_login_days_ago', label: '首次登录距今时间',  type: 'number', unit: '天' },
+    { field: 'login_freq_7d',       label: '登录频次（近7日）',  type: 'number', unit: '次' },
+    { field: 'login_freq_30d',      label: '登录频次（近30日）', type: 'number', unit: '次' },
+    { field: 'login_device_cnt',    label: '登录设备数',         type: 'number', unit: '台' },
+    { field: 'watched_video',       label: '是否观看过视频',     type: 'bool' },
+    { field: 'video_progress',      label: '视频学习进度',       type: 'number', unit: '%' },
+    { field: 'used_watchlist',      label: '是否使用自选股',     type: 'bool' },
+    { field: 'submitted_feedback',  label: '是否提交过意见反馈', type: 'bool' }
   ]},
-  { group: '账号状态', fields: [
-    { field: 'account_status',  label: '账号状态',     type: 'enum', options: ['正常', '已拉黑', '已注销'] },
-    { field: 'is_vip',          label: '是否VIP会员',  type: 'bool' },
-    { field: 'is_unsubscribed', label: '是否已退订推送', type: 'bool' },
-    { field: 'last_login_time', label: '最近登录时间', type: 'datetime' }
+  { group: '策略状态', fields: [
+    { field: 'strategy_score',      label: '策略综合评分',         type: 'number', unit: '分' },
+    { field: 'profit_7d',           label: '7日收益',              type: 'number', unit: '%' },
+    { field: 'profit_30d',          label: '30日收益',             type: 'number', unit: '%' },
+    { field: 'profit_90d',          label: '90日收益',             type: 'number', unit: '%' },
+    { field: 'profit_half_year',    label: '半年收益',             type: 'number', unit: '%' },
+    { field: 'profit_1y',           label: '年收益',               type: 'number', unit: '%' },
+    { field: 'strategy_rank_pct',   label: '策略排名百分位',       type: 'number', unit: '%' },
+    { field: 'is_clone_strategy',   label: '是否克隆策略',         type: 'bool' },
+    { field: 'broker_account_opened', label: '是否开通券商账户',   type: 'bool' },
+    { field: 'broker_name',         label: '所属券商',             type: 'enum',   options: ['华泰证券', '中信证券', '国泰君安', '广发证券', '招商证券', '其他'] },
+    { field: 'strategy_copy_cnt',   label: '社区策略被复制次数',   type: 'number', unit: '次' },
+    { field: 'strategy_fav_cnt',    label: '社区策略被收藏次数',   type: 'number', unit: '次' }
   ]},
-  { group: '策略行为', fields: [
-    { field: 'strategy_pub_cnt',     label: '累计发布策略数',   type: 'number', unit: '个' },
-    { field: 'strategy_run_cnt',     label: '实盘运行策略数',   type: 'number', unit: '个' },
-    { field: 'strategy_profit_rank', label: '策略收益排名百分位', type: 'number', unit: '%' },
-    { field: 'last_strategy_time',   label: '最近创建策略时间', type: 'datetime' },
-    { field: 'first_real_trade_time', label: '首次实盘时间',     type: 'datetime' }
-  ]},
-  { group: '社区 / 群聊行为', fields: [
-    { field: 'chat_msg_cnt_7d', label: '近7日群聊发言数', type: 'number', unit: '条' },
-    { field: 'post_cnt_30d',    label: '近30日广场发帖数', type: 'number', unit: '条' },
-    { field: 'is_group_member', label: '是否群聊成员',     type: 'bool' }
+  { group: '社交行为', fields: [
+    { field: 'follow_cnt',          label: '关注人数',             type: 'number', unit: '人' },
+    { field: 'fan_cnt',             label: '粉丝数',               type: 'number', unit: '人' },
+    { field: 'follows_master',      label: '是否关注名师',         type: 'bool' },
+    { field: 'like_received_cnt',   label: '被赞数',               type: 'number', unit: '次' },
+    { field: 'follow_received_cnt', label: '被关注数',             type: 'number', unit: '人' },
+    { field: 'invite_cnt',          label: '邀请人数',             type: 'number', unit: '人' },
+    { field: 'invited_register',    label: '是否被邀请注册',       type: 'bool' },
+    { field: 'group_join_cnt',      label: '加入群聊数量',         type: 'number', unit: '个' },
+    { field: 'group_role',          label: '群聊角色',             type: 'enum',   options: ['群主', '管理员', '普通成员'] },
+    { field: 'fav_strategy_type_pref', label: '收藏策略类型偏好', type: 'enum',   options: ['趋势策略', '网格策略', '价值投资', '量化选股', '其他'] },
+    { field: 'used_customer_service', label: '是否使用过客服功能', type: 'bool' },
+    { field: 'chat_msg_cnt_30d',    label: '近30日群聊发言数',     type: 'number', unit: '条' },
+    { field: 'chat_msg_cnt_7d',     label: '近7日群聊发言数',      type: 'number', unit: '条' },
+    { field: 'content_view_cnt_30d', label: '近30日内容浏览数',    type: 'number', unit: '次' },
+    { field: 'share_cnt_30d',       label: '近30日分享次数',       type: 'number', unit: '次' },
+    { field: 'comment_cnt_30d',     label: '近30日评论数',         type: 'number', unit: '条' },
+    { field: 'like_cnt_30d',        label: '近30日点赞数',         type: 'number', unit: '次' },
+    { field: 'fav_cnt_30d',         label: '近30日收藏数',         type: 'number', unit: '次' }
   ]}
+];
+
+// 相对时间触发节点（datetime 类字段，供「注册后 / 创建策略后」等延迟推送使用，与自定义圈人条件独立维护）
+const relativeTriggerFieldRegistry = [
+  { field: 'reg_time',              label: '注册时间',           type: 'datetime' },
+  { field: 'first_login_time',      label: '首次登录时间',       type: 'datetime' },
+  { field: 'last_login_time',       label: '最近登录时间',       type: 'datetime' },
+  { field: 'last_strategy_time',    label: '最近创建策略时间',   type: 'datetime' },
+  { field: 'first_real_trade_time', label: '首次实盘时间',       type: 'datetime' },
+  { field: 'broker_open_time',      label: '开通券商账户时间',   type: 'datetime' },
+  { field: 'wechat_bind_time',      label: '微信绑定时间',       type: 'datetime' }
 ];
 
 // 各数据类型支持的算子
@@ -2010,17 +2051,17 @@ const audienceOperators = {
 const audiencePresets = [
   { key: 'all',      label: '全部用户',   rule: { logic:'AND', conditions: [] } },
   { key: 'top_user', label: '头部用户（收益前30%）', rule: { logic:'AND', conditions: [
-      { field:'strategy_profit_rank', op:'lte', value:30 },
-      { field:'last_strategy_time',   op:'before_days', value:30 } ] } },
+      { field:'strategy_rank_pct', op:'lte', value:30 },
+      { field:'profit_30d',        op:'gt',  value:0 } ] } },
   { key: 'new_user', label: '新用户（注册≤15天未建策略）', rule: { logic:'AND', conditions: [
-      { field:'reg_days',        op:'lte', value:15 },
-      { field:'strategy_pub_cnt', op:'eq',  value:0 } ] } },
+      { field:'reg_days',       op:'lte', value:15 },
+      { field:'strategy_score', op:'eq',  value:0 } ] } },
   { key: 'dormant',  label: '沉睡用户（30天未登录）', rule: { logic:'AND', conditions: [
-      { field:'last_login_time', op:'before_days', value:30 } ] } },
-  { key: 'active_creator', label: '活跃策略作者（示例：发过策略+群聊活跃）', rule: { logic:'AND', conditions: [
-      { field:'strategy_pub_cnt', op:'gt',  value:0 },
-      { field:'account_status',   op:'not_in', value:['已拉黑'] },
-      { field:'chat_msg_cnt_7d',  op:'gte', value:1 } ] } }
+      { field:'last_login_days_ago', op:'gte', value:30 } ] } },
+  { key: 'active_creator', label: '活跃策略作者（示例：有策略+群聊活跃）', rule: { logic:'AND', conditions: [
+      { field:'strategy_score', op:'gt',  value:0 },
+      { field:'is_blacklist',   op:'eq',  value:'false' },
+      { field:'chat_msg_cnt_7d', op:'gte', value:1 } ] } }
 ];
 
 function findAudienceFieldDef(field) {
@@ -2038,13 +2079,7 @@ function formatTriggerNodeLabel(label) {
 
 // 取出字段注册表中所有「时间类」字段，供「相对时间」触发选择（与自定义人群同源）
 function getDatetimeFields() {
-  const out = [];
-  for (const g of audienceFieldRegistry) {
-    for (const f of g.fields) {
-      if (f.type === 'datetime') out.push(f);
-    }
-  }
-  return out;
+  return relativeTriggerFieldRegistry.slice();
 }
 
 // 渠道选项
@@ -2150,7 +2185,7 @@ function renderTable(data) {
       let chips = [];
       if (tags.length === totalAudienceTags && tags.length > 0) chips.push('全部用户');
       else chips = tags.map(a => getAudienceShortLabel(a));
-      if (item.audienceRule) chips.push('自定义条件');
+      if (hasCustomAudienceRule(item)) chips.push('自定义条件');
       if (chips.length === 0) chips.push('全部用户');
       audienceHtml = chips.map(c => `<span class="rule-tag active" title="${escapeHtml(summary)}">${c}</span>`).join(' ');
     } else if ((item.audience || []).length === totalAudienceTags) {
@@ -2941,6 +2976,158 @@ function getEffectiveRule() {
   return buildRuleFromFlat(editingAudienceRule.conditions, editingAudienceRule.ops);
 }
 
+// ===== 刷新时随机组合目标人群（含自定义条件） =====
+const GROUP_CHAT_AUDIENCE_FIELDS = ['group_join_cnt', 'group_role', 'chat_msg_cnt_30d', 'chat_msg_cnt_7d'];
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function randInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+function randPick(arr) {
+  return arr[randInt(0, arr.length - 1)];
+}
+function randBool(p) {
+  return Math.random() < p;
+}
+
+function getAllAudienceFieldDefs() {
+  const out = [];
+  for (const g of audienceFieldRegistry) {
+    for (const f of g.fields) out.push(f);
+  }
+  return out;
+}
+
+function buildRandomConditionValue(def) {
+  const ops = audienceOperators[def.type] || [];
+  const op = randPick(ops);
+  const c = { field: def.field, op: op.op };
+  if (def.type === 'number') {
+    if (op.op === 'between') {
+      const a = randInt(1, 40);
+      c.value = a;
+      c.value2 = a + randInt(5, 30);
+    } else {
+      c.value = def.unit === '%' ? randInt(1, 100) : randInt(1, 50);
+    }
+  } else if (def.type === 'enum') {
+    const n = randInt(1, Math.min(2, def.options.length));
+    c.value = shuffleArray(def.options).slice(0, n);
+  } else if (def.type === 'bool') {
+    c.value = randBool(0.5) ? 'true' : 'false';
+  }
+  return c;
+}
+
+function generateRandomAudienceFlat(options) {
+  const { requireGroupChat = false } = options || {};
+  const allFields = getAllAudienceFieldDefs();
+  const nonGroupFields = allFields.filter(f => !GROUP_CHAT_AUDIENCE_FIELDS.includes(f.field));
+  const condCount = randInt(1, requireGroupChat ? 3 : 2);
+  const conditions = [];
+  const ops = [];
+
+  if (requireGroupChat) {
+    const gf = findAudienceFieldDef(randPick(GROUP_CHAT_AUDIENCE_FIELDS));
+    if (gf) conditions.push(buildRandomConditionValue(gf));
+  }
+
+  while (conditions.length < condCount) {
+    conditions.push(buildRandomConditionValue(randPick(nonGroupFields)));
+  }
+
+  for (let i = 1; i < conditions.length; i++) {
+    ops.push(randBool(0.25) ? 'OR' : 'AND');
+  }
+
+  return { logic: 'AND', conditions, ops };
+}
+
+function buildAudienceSummaryFromData(audience, flatRule, combine) {
+  const allTagValues = audienceTags.map(t => t.value);
+  const eff = (flatRule && flatRule.conditions && flatRule.conditions.length)
+    ? buildRuleFromFlat(flatRule.conditions, flatRule.ops || [])
+    : { logic: 'AND', conditions: [], ops: [] };
+  const hasCustom = countConditions(eff) > 0;
+
+  let tagPart = '';
+  if (audience.length > 0 && audience.length === allTagValues.length) {
+    tagPart = '全部用户';
+  } else if (audience.length > 0) {
+    const names = audience.map(getAudienceLabel);
+    tagPart = names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+  }
+
+  let customPart = '';
+  if (hasCustom) {
+    const s = summarizeRule(eff);
+    customPart = countConditions(eff) > 1 ? '（' + s + '）' : s;
+  }
+
+  if (!tagPart && !customPart) return '全部用户';
+  if (tagPart && customPart) return tagPart + (combine === 'AND' ? ' 且 ' : ' 或 ') + customPart;
+  return tagPart || customPart;
+}
+
+function hasCustomAudienceRule(item) {
+  if (item.audienceRule && countConditions(item.audienceRule) > 0) return true;
+  return !!(item.audienceFlat && item.audienceFlat.conditions && item.audienceFlat.conditions.length > 0);
+}
+
+function getPushEffectiveRule(item) {
+  if (item.audienceRule && item.audienceRule.conditions) return item.audienceRule;
+  if (item.audienceFlat && item.audienceFlat.conditions && item.audienceFlat.conditions.length) {
+    return buildRuleFromFlat(item.audienceFlat.conditions, item.audienceFlat.ops || []);
+  }
+  return null;
+}
+
+function randomizePushAudienceData() {
+  const templates = JSON.parse(JSON.stringify(pushSeedTemplates));
+  const n = templates.length;
+  const maxCustom = Math.floor(n * 0.3);
+  const customCount = maxCustom > 0 ? randInt(1, maxCustom) : 0;
+  const customIndices = customCount > 0 ? shuffleArray(templates.map((_, i) => i)).slice(0, customCount) : [];
+  const groupChatIndex = customCount > 0 ? randPick(customIndices) : null;
+  const allTagValues = audienceTags.map(t => t.value);
+
+  return templates.map((push, idx) => {
+    const p = { ...push };
+
+    if (randBool(0.12)) {
+      p.audience = [...allTagValues];
+    } else {
+      const cnt = randInt(1, Math.min(3, allTagValues.length));
+      p.audience = shuffleArray(allTagValues).slice(0, cnt);
+    }
+    p.audienceCombine = randBool(0.2) ? 'OR' : 'AND';
+
+    if (customIndices.includes(idx)) {
+      const flat = generateRandomAudienceFlat({ requireGroupChat: idx === groupChatIndex });
+      const eff = buildRuleFromFlat(flat.conditions, flat.ops || []);
+      p.audienceFlat = flat;
+      p.audienceRule = JSON.parse(JSON.stringify(eff));
+      p.audienceSummary = buildAudienceSummaryFromData(p.audience, flat, p.audienceCombine);
+    } else {
+      delete p.audienceFlat;
+      delete p.audienceRule;
+      p.audienceSummary = buildAudienceSummaryFromData(p.audience, null, p.audienceCombine);
+    }
+
+    return p;
+  });
+}
+
+pushes = randomizePushAudienceData();
+pushes.sort(() => Math.random() - 0.5);
+
 function renderAudienceBuilder() {
   // 收起状态：仅展示最终人群
   if (audienceBuilderCollapsed) {
@@ -3472,7 +3659,7 @@ function checkPriorityConflict(audience, priority, excludeId, audienceRule) {
       }
     }
     // 2) 自定义条件完全相同
-    if (curRuleKey && p.audienceRule && canonicalizeRule(p.audienceRule) === curRuleKey) {
+    if (curRuleKey && getPushEffectiveRule(p) && canonicalizeRule(getPushEffectiveRule(p)) === curRuleKey) {
       reasons.push('自定义条件完全相同');
     }
 
