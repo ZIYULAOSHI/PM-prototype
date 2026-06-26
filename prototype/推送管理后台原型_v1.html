@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化王管理后台 - 推送管理 (V1)</title>
+<style>
+:root {
+  --bg: #f4f5f8;
+  --surface: #fafbfd;
+  --sidebar-bg: #1a1d24;
+  --sidebar-text: #9ba3b4;
+  --sidebar-active: #e8edf5;
+  --sidebar-active-bg: rgba(74, 108, 247, 0.1);
+  --text: #1e2130;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7ed;
+  --accent: #3b6df0;
+  --primary: #3b6df0;
+  --accent-light: #e8edf9;
+  --danger: #e5484d;
+  --danger-light: #fef2f2;
+  --success: #30a46c;
+  --success-light: #eef9f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8edf5;
+  letter-spacing: .5px;
+}
+
+.sidebar-logo span {
+  font-size: 11px;
+  color: var(--sidebar-text);
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.nav-section { margin-bottom: 4px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 13px;
+  gap: 10px;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-item.active {
+  color: #c8d4f7;
+  background: rgba(59, 109, 240, 0.12);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-item .icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item.active .icon { opacity: 0.9; }
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  padding: 9px 18px;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 13px;
+  gap: 10px;
+  transition: all var(--transition);
+}
+
+.nav-group-header:hover {
+  color: #c8cedb;
+  background: rgba(255,255,255,0.03);
+}
+
+.nav-group-header .arrow {
+  margin-left: auto;
+  font-size: 10px;
+  transition: transform var(--transition);
+}
+
+.nav-group.open .nav-group-header .arrow {
+  transform: rotate(90deg);
+}
+
+.nav-sub {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 250ms ease;
+}
+
+.nav-group.open .nav-sub {
+  max-height: 200px;
+}
+
+.nav-sub .nav-item {
+  padding-left: 46px;
+  font-size: 12.5px;
+}
+
+/* Main Area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-bar {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb span {
+  color: var(--text-muted);
+  margin: 0 6px;
+}
+
+.breadcrumb .current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Filter Bar */
+.filter-bar {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-bar input[type="text"],
+.filter-bar select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.filter-bar input[type="text"]:focus,
+.filter-bar select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.filter-bar input[type="text"] { width: 220px; }
+.filter-bar select { width: 130px; }
+.filter-bar input::placeholder { color: var(--text-muted); }
+
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2f5cd6; }
+
+.btn-default {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-default:hover { background: var(--bg); border-color: #cdd2db; }
+
+.btn-new { margin-left: auto; }
+
+.btn-danger-text {
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.btn-danger-text:hover { background: var(--danger-light); }
+
+.btn-edit-text {
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-edit-text:hover { background: var(--accent-light); }
+
+.btn-send {
+  color: var(--success);
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-right: 2px;
+}
+.btn-send:hover { background: var(--success-light); }
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  background: #f8f9fb;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+thead th.col-actions {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: #f8f9fb;
+  box-shadow: -4px 0 8px -4px rgba(0,0,0,0.08);
+}
+
+tbody td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f1f5;
+  color: var(--text);
+  vertical-align: middle;
+  background: var(--surface);
+}
+
+tbody td.col-actions {
+  position: sticky;
+  right: 0;
+  background: var(--surface);
+  z-index: 1;
+  box-shadow: -4px 0 8px -4px rgba(0,0,0,0.08);
+}
+
+tbody tr:hover td { background: #fafbfd; }
+tbody tr:hover td.col-actions { background: #fafbfd; }
+
+tbody tr:last-child td { border-bottom: none; }
+
+.td-ellipsis {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-badge.running { color: var(--success); }
+.status-badge.running::before { background: var(--success); }
+.status-badge.paused { color: var(--warning); }
+.status-badge.paused::before { background: var(--warning); }
+
+/* Copy ID Button */
+.copy-id-btn {
+  cursor: pointer;
+  color: var(--accent);
+  margin-left: 6px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.copy-id-btn:hover { opacity: 1; }
+.copy-id-btn:active { opacity: 0.4; }
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  vertical-align: middle;
+}
+.toggle-switch input { display: none; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+/* 只读/禁用状态：明确不可点击 */
+.toggle-switch input:disabled + .toggle-slider { cursor: not-allowed; opacity: 0.45; }
+.toggle-switch.is-readonly { cursor: not-allowed; }
+.status-badge.draft { color: var(--text-muted); }
+.status-badge.draft::before { background: var(--text-muted); }
+.status-badge.sent { color: var(--accent); }
+.status-badge.sent::before { background: var(--accent); }
+.status-badge.pending { color: #7c5cff; }
+.status-badge.pending::before { background: #7c5cff; }
+
+/* Tags */
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag-blue { background: #eef2ff; color: #4f46e5; }
+.tag-green { background: #ecfdf5; color: #047857; }
+.tag-orange { background: #fef3c7; color: #b45309; }
+
+.type-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.type-tag.manual { background: #eef2ff; color: #4f46e5; }
+.type-tag.auto { background: #fdf2f8; color: #be185d; }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  gap: 6px;
+  border-top: 1px solid #f0f1f5;
+}
+
+.pagination .page-info {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-right: 10px;
+}
+
+.pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+
+.pagination button:hover { border-color: var(--accent); color: var(--accent); }
+.pagination button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 22px;
+  transition: all 200ms ease;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.switch input:checked + .slider { background: var(--success); }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+
+/* Drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.drawer-overlay.open { opacity: 1; visibility: visible; }
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 560px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.drawer-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group label .required {
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form-group .hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="datetime-local"]:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 109, 240, 0.08);
+}
+
+.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.char-counter { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+.char-counter.warn { color: #d97706; }
+.char-counter.over { color: #dc2626; }
+
+.form-group select:disabled,
+.form-group input:disabled,
+.form-group textarea:disabled {
+  background: #f4f5f8;
+  color: var(--text-secondary);
+  cursor: default;
+  border-color: #e8e9ee;
+  opacity: 1;
+  -webkit-text-fill-color: var(--text-secondary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+/* Conditional section */
+.conditional-section {
+  background: #f8f9fb;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.conditional-section h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Tag Selector */
+.tag-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.tag-chip:hover { border-color: var(--accent); }
+
+.tag-chip.selected {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Switch Row */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== 目标人群分组下拉多选 ===== */
+.audience-dropdown { position: relative; }
+.audience-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 40px; padding: 4px 10px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: #fff; cursor: pointer; gap: 8px;
+  transition: border-color var(--transition);
+}
+.audience-dropdown-trigger:hover { border-color: var(--accent); }
+.audience-dropdown-trigger:focus-within,
+.audience-dropdown.open > .audience-dropdown-trigger { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+.audience-dropdown-chips {
+  display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-width: 0;
+}
+.audience-dropdown-chips .placeholder {
+  color: var(--text-muted); font-size: 13px; padding: 4px 0;
+}
+.audience-dropdown-arrow {
+  font-size: 11px; color: var(--text-muted); flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.audience-dropdown.open > .audience-dropdown-trigger .audience-dropdown-arrow {
+  transform: rotate(180deg);
+}
+.audience-dropdown-panel {
+  display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  max-height: 320px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 100; padding: 8px 0;
+}
+.audience-dropdown.open > .audience-dropdown-panel { display: block; }
+.audience-dropdown-group-label {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  padding: 6px 14px 4px; text-transform: none;
+}
+.audience-dropdown-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px; font-size: 13px; color: var(--text-primary);
+  cursor: pointer; transition: background 0.15s;
+}
+.audience-dropdown-option:hover { background: #f3f4f6; }
+.audience-dropdown-option input[type="checkbox"] {
+  width: 15px; height: 15px; margin: 0; flex-shrink: 0;
+  accent-color: var(--accent); cursor: pointer;
+}
+.audience-dropdown-option input[type="checkbox"]:indeterminate {
+  accent-color: var(--accent);
+}
+.audience-dropdown-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 12px;
+  background: var(--accent-light); color: var(--accent);
+  font-size: 12px; font-weight: 500;
+}
+.audience-dropdown-chip .remove {
+  cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.6;
+}
+.audience-dropdown-chip .remove:hover { opacity: 1; }
+
+/* ===== 目标人群条件构造器 ===== */
+.aud-builder { border:1px solid var(--border); border-radius:10px; padding:12px; background:#fafbfc; }
+.aud-builder-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.aud-builder-hint { font-size:12px; color:var(--text-muted); }
+.aud-preset-select { height:30px; border:1px solid var(--border); border-radius:6px; font-size:12px; padding:0 8px; background:#fff; color:var(--text-primary); cursor:pointer; }
+.aud-group { border:1px dashed var(--border); border-radius:8px; padding:10px 10px 10px 12px; background:#fff; }
+.aud-group.nested { background:#f6f8fc; border-color:#c7d2fe; margin:6px 0; }
+.aud-group-bar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.aud-logic-seg { display:inline-flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.aud-logic-seg button { border:none; background:#fff; font-size:12px; padding:4px 10px; cursor:pointer; color:var(--text-secondary); }
+.aud-logic-seg button.active { background:var(--accent); color:#fff; }
+.aud-logic-label { font-size:12px; color:var(--text-muted); }
+.aud-cond { display:flex; align-items:center; gap:6px; margin:6px 0; flex-wrap:wrap; }
+.aud-cond select, .aud-cond input { height:32px; border:1px solid var(--border); border-radius:6px; font-size:13px; padding:0 8px; background:#fff; color:var(--text-primary); }
+.aud-field { min-width:160px; }
+.aud-op { min-width:96px; }
+.aud-val { display:inline-flex; align-items:center; gap:4px; flex-wrap:nowrap; }
+.aud-val input { width:118px; }
+.aud-unit { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+.aud-enum-chips { display:inline-flex; flex-wrap:wrap; gap:4px; }
+.aud-enum-chip { font-size:12px; padding:4px 10px; border-radius:13px; border:1px solid var(--border); background:#fff; cursor:pointer; color:var(--text-secondary); }
+.aud-enum-chip.on { background:var(--accent-light); border-color:var(--accent); color:var(--accent); font-weight:500; }
+.aud-del { width:26px; height:26px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; font-size:16px; border-radius:5px; flex-shrink:0; }
+.aud-del:hover { background:#fee2e2; color:#ef4444; }
+.aud-del-btn { height:32px; padding:0 12px; border:1px solid #fecaca; background:#fff; color:#ef4444; cursor:pointer; font-size:12px; border-radius:6px; flex-shrink:0; margin-left:auto; }
+.aud-del-btn:hover { background:#fee2e2; border-color:#ef4444; }
+.aud-joiner { font-size:12px; color:var(--accent); font-weight:600; padding:2px 0 2px 4px; }
+.aud-actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.aud-add-btn { font-size:12px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:6px; padding:5px 12px; cursor:pointer; }
+.aud-add-btn:hover { background:#dbe4ff; }
+.aud-group-del { margin-left:auto; font-size:12px; color:var(--text-muted); background:transparent; border:none; cursor:pointer; }
+.aud-group-del:hover { color:#ef4444; }
+.aud-empty { font-size:12px; color:var(--text-muted); padding:12px; text-align:center; background:#fff; border-radius:6px; border:1px dashed var(--border); }
+.aud-estimate { display:flex; align-items:center; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.aud-est-btn { font-size:12px; border:1px solid var(--accent); color:var(--accent); background:#fff; border-radius:6px; padding:5px 14px; cursor:pointer; }
+.aud-est-btn:hover { background:var(--accent-light); }
+.aud-est-result { font-size:12px; color:var(--text-secondary); }
+.aud-est-result b { color:var(--accent); font-size:14px; }
+.aud-section { margin-bottom:12px; }
+.aud-section-title { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.aud-section-title .hint { font-size:11px; font-weight:400; color:var(--text-muted); }
+.aud-quick { display:flex; flex-direction:column; gap:10px; background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+.aud-quick-group-label { font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:6px; }
+.aud-quick-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.aud-quick-chip { font-size:12px; padding:5px 12px; border-radius:14px; border:1px solid var(--border); background:#fff; cursor:pointer; color:var(--text-secondary); transition:all .15s; }
+.aud-quick-chip:hover { border-color:var(--accent); }
+.aud-quick-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:500; }
+.aud-preview { margin-top:12px; padding:12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px; }
+.aud-preview-title { font-size:12px; font-weight:600; color:#4338ca; margin-bottom:8px; }
+.aud-preview-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:12px; }
+.aud-preview-k { flex-shrink:0; width:60px; color:var(--text-muted); padding-top:3px; }
+.aud-preview-v { flex:1; color:var(--text-primary); display:flex; flex-wrap:wrap; gap:5px; align-items:center; line-height:1.7; }
+.aud-preview-v .muted { color:var(--text-muted); }
+.aud-pv-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:11px; background:#fff; border:1px solid #c7d2fe; color:#4338ca; font-size:11px; }
+.aud-pv-chip .x { cursor:pointer; opacity:.55; font-size:13px; }
+.aud-pv-chip .x:hover { opacity:1; }
+.aud-combine { display:flex; align-items:center; gap:8px; margin:8px 0; }
+.aud-combine-label { font-size:11px; color:var(--text-muted); }
+.aud-final { margin-top:8px; padding-top:8px; border-top:1px dashed #c7d2fe; font-size:12px; color:#3730a3; line-height:1.7; }
+.aud-final b { color:#4338ca; }
+/* 收起/展开 */
+.aud-collapse-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; background:#f1f5f9; border:1px solid var(--border); border-radius:8px; cursor:pointer; margin-bottom:12px; }
+.aud-builder.collapsed .aud-collapse-bar { margin-bottom:0; }
+.aud-collapse-bar:hover { background:#e8eef5; }
+.aud-collapse-title { font-size:12px; font-weight:600; color:var(--text-primary); flex-shrink:0; }
+.aud-collapse-summary { font-size:12px; color:#3730a3; flex:1; line-height:1.6; }
+.aud-collapse-summary b { color:#4338ca; }
+.aud-collapse-toggle { font-size:12px; color:var(--accent); flex-shrink:0; display:inline-flex; align-items:center; gap:4px; }
+.aud-arrow { font-size:9px; }
+/* 预设人群定义说明（问号悬浮） */
+.aud-help { position:relative; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; background:var(--text-muted); color:#fff; font-size:10px; cursor:help; font-weight:600; }
+.aud-help-pop { display:none; position:absolute; top:22px; left:0; z-index:200; width:330px; max-height:340px; overflow-y:auto; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:10px 12px; font-weight:400; text-align:left; cursor:default; }
+.aud-help-pop::before { content:''; position:absolute; top:-10px; left:0; right:0; height:10px; }
+.aud-help:hover .aud-help-pop { display:block; }
+.aud-help-title { font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px; }
+.aud-help-group { margin-bottom:8px; }
+.aud-help-g-label { font-size:11px; font-weight:600; color:var(--accent); margin-bottom:3px; }
+.aud-help-item { font-size:11px; color:var(--text-secondary); line-height:1.65; }
+.aud-help-item b { color:var(--text-primary); font-weight:600; }
+/* AI 自然语言圈人 */
+.aud-ai { background:linear-gradient(135deg,#eef2ff,#f5f3ff); border:1px solid #c7d2fe; border-radius:8px; padding:10px 12px; margin-bottom:10px; }
+.aud-ai-head { font-size:12px; color:#4338ca; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.aud-ai-badge { background:#6366f1; color:#fff; font-size:10px; padding:1px 7px; border-radius:4px; letter-spacing:.5px; }
+.aud-ai-input { width:100%; min-height:46px; border:1px solid #c7d2fe; border-radius:6px; padding:8px 10px; font-size:13px; resize:vertical; font-family:inherit; box-sizing:border-box; color:var(--text-primary); }
+.aud-ai-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-light); }
+.aud-ai-actions { margin-top:8px; }
+.aud-ai-btn { font-size:12px; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 14px; cursor:pointer; font-weight:500; }
+.aud-ai-btn:hover { opacity:.9; }
+.aud-ai-examples { font-size:11px; color:var(--text-muted); margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.aud-ai-eg { background:#fff; border:1px dashed #c7d2fe; border-radius:11px; padding:2px 9px; cursor:pointer; color:#4338ca; }
+.aud-ai-eg:hover { background:#eef2ff; }
+/* 预览区内可编辑的条件胶囊 */
+.aud-preview-row-block { align-items:flex-start; }
+.aud-pv-edit { flex:1; min-width:0; }
+.aud-pv-conds { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.aud-cond-pill { display:inline-flex; align-items:center; padding:3px 10px; border-radius:13px; background:#fff; border:1px solid #c7d2fe; color:#4338ca; font-size:12px; cursor:pointer; transition:all .15s; }
+.aud-cond-pill:hover { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-light); }
+.aud-cond-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.aud-cond-pill.incomplete { border-style:dashed; color:var(--text-muted); }
+.aud-logic-link { font-size:12px; font-weight:700; cursor:pointer; padding:1px 6px; border-radius:5px; user-select:none; border:1px solid transparent; }
+.aud-logic-link.is-and { color:var(--accent); background:var(--accent-light); }
+.aud-logic-link.is-or { color:#b45309; background:#fef3c7; }
+.aud-logic-link:hover { border-color:currentColor; }
+.aud-paren { font-size:20px; font-weight:700; color:#b45309; line-height:1; padding:0 1px; }
+.aud-add-pill { font-size:12px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:13px; padding:3px 11px; cursor:pointer; }
+.aud-add-pill:hover { background:#dbe4ff; }
+.aud-cond-editor { width:100%; margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; box-sizing:border-box; }
+/* 自定义条件入口（快捷人群模块底部） */
+.aud-custom-add { width:72px; height:28px; border:1px dashed var(--accent); color:var(--accent); background:var(--accent-light); border-radius:8px; cursor:pointer; font-size:17px; line-height:1; }
+.aud-custom-add:hover { background:#dbe4ff; }
+.aud-quick-head { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:2px; flex-wrap:wrap; }
+.aud-quick-head .hint { font-size:11px; font-weight:400; color:var(--text-muted); }
+.aud-quick-foot { border-top:1px dashed var(--border); margin-top:6px; padding-top:10px; display:flex; flex-direction:column; gap:10px; }
+.aud-estimate-inline { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.aud-quick-chip.custom { position:relative; background:#fff7ed; border:1px solid #fdba74; color:#b45309; max-width:100%; }
+.aud-quick-chip.custom:hover { border-color:#f59e0b; }
+.aud-chip-close { position:absolute; top:-7px; right:-7px; width:16px; height:16px; border-radius:50%; background:#ef4444; color:#fff; font-size:12px; line-height:16px; text-align:center; display:none; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.aud-quick-chip.custom:hover .aud-chip-close { display:block; }
+.aud-chip-close:hover { background:#dc2626; }
+.aud-custom-empty { font-size:12px; color:var(--text-muted); align-self:center; }
+/* 自定义条件弹窗 */
+.aud-popup-mask { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1600; display:flex; align-items:center; justify-content:center; }
+.aud-popup { width:560px; max-width:92vw; max-height:84vh; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.25); padding:18px 20px; box-sizing:border-box; }
+.aud-popup-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.aud-popup-title { font-size:15px; font-weight:600; color:var(--text-primary); }
+.aud-popup-close { cursor:pointer; color:var(--text-muted); font-size:22px; background:none; border:none; line-height:1; }
+.aud-popup-close:hover { color:var(--text-primary); }
+.aud-popup-foot { display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding-top:12px; border-top:1px solid var(--border); }
+.aud-popup-done { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:8px 22px; font-size:13px; cursor:pointer; }
+.aud-popup-done:hover { opacity:.9; }
+.aud-popup-done:disabled { background:#cbd5e1; cursor:not-allowed; opacity:1; }
+.switch-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Info Tip */
+.info-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: #2563eb;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* Preview box */
+.preview-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: #f6f7fb;
+  margin-top: 4px;
+}
+
+.preview-box .preview-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Notification card (mimics phone push) */
+.preview-notif {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.preview-notif .notif-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--primary, #2f6bff);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.preview-notif .notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-notif .notif-app {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.preview-notif .preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.preview-notif .preview-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-cancel:hover { background: var(--bg); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2130;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 2000;
+  animation: toastIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.toast.success { background: #166534; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  animation: modalIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.modal p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Rule badge in list */
+.rule-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.rule-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.rule-tag.active { background: #ecfdf5; color: #047857; }
+
+/* ===== 通用富文本编辑器组件 ===== */
+.rte-wrap { width: 100%; }
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fafbfd;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  align-items: center;
+}
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.rte-btn:hover { border-color: var(--accent); color: var(--accent); background: #f5f8ff; }
+.rte-btn-media { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.rte-btn-media:hover { border-color: #047857; background: #d1fae5; color: #047857; }
+.rte-divider { width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
+.rte-editor {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 12px 14px;
+  min-height: 160px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  outline: none;
+}
+.rte-wrap:not(:has(.rte-toolbar)) .rte-editor {
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.rte-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,246,.1); }
+.rte-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.rte-editor p { margin: 0 0 10px 0; }
+.rte-editor p:last-child { margin-bottom: 0; }
+.rte-editor strong, .rte-editor b { font-weight: 600; }
+.rte-editor ul, .rte-editor ol { margin: 6px 0 10px 20px; }
+.rte-editor li { margin-bottom: 4px; }
+.rte-editor img { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
+
+/* 正文内 PDF 附件卡片 */
+.attach-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fafbfd;
+  text-decoration: none;
+  max-width: 340px;
+  cursor: pointer;
+  vertical-align: top;
+}
+.attach-card:hover { border-color: var(--accent); background: #f5f8ff; }
+.attach-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+}
+.attach-info { display: flex; flex-direction: column; min-width: 0; }
+.attach-name { font-size: 13px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-size { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* 内容预览框 */
+.content-preview-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 80px;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.content-preview-box p { margin: 0 0 10px 0; }
+.content-preview-box p:last-child { margin-bottom: 0; }
+.content-preview-box strong { color: var(--text); font-weight: 600; }
+.content-preview-box ul, .content-preview-box ol { margin: 6px 0 10px 20px; }
+.content-preview-box li { margin-bottom: 4px; }
+.content-preview-box img { max-width: 100%; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>量化王管理后台</h1>
+    <span>QuantKing Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="#"><span class="icon">⌂</span> 首页</a>
+    <a class="nav-item" href="#"><span class="icon">⬇</span> 安装包管理</a>
+    <a class="nav-item" href="#"><span class="icon">⚙</span> 功能管理</a>
+    <a class="nav-item" href="#"><span class="icon">◈</span> 策略管理</a>
+    <a class="nav-item" href="#"><span class="icon">◎</span> 量化圈子管理</a>
+    <a class="nav-item" href="#"><span class="icon">▣</span> 课程管理</a>
+    <a class="nav-item" href="#"><span class="icon">⬡</span> 券商管理</a>
+    <a class="nav-item" href="#"><span class="icon">☷</span> 文章管理</a>
+    <a class="nav-item" href="#"><span class="icon">☺</span> 老师管理</a>
+    <a class="nav-item" href="#"><span class="icon">◫</span> 群聊管理</a>
+    <div class="nav-section">
+      <div class="nav-group open" onclick="this.classList.toggle('open')">
+        <div class="nav-group-header">
+          <span class="icon">◉</span> 营销页管理
+          <span class="arrow">▶</span>
+        </div>
+        <div class="nav-sub">
+          <a class="nav-item" href="#" onclick="switchToPage('abTest');return false;">A/B 测试</a>
+          <a class="nav-item active" href="#" onclick="switchToPage('pushManage');return false;">推送管理</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-item" href="#">
+      <span class="icon">▤</span> 数据统计
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<div class="main-area">
+  <div class="top-bar">
+    <div class="breadcrumb" id="breadcrumb">
+      <span>首页</span><span>›</span><span class="current">推送管理</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- ===== 推送管理页面 ===== -->
+    <div id="pushManagePage">
+      <div class="page-header">
+        <h2>推送管理</h2>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="搜索推送名称" id="searchInput">
+        <select id="typeFilter">
+          <option value="">全部类型</option>
+          <option value="manual">手动</option>
+          <option value="auto">自动</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="pending">待发送</option>
+          <option value="running">运行中</option>
+          <option value="paused">已暂停</option>
+          <option value="sent">已发送</option>
+        </select>
+        <select id="audienceFilter">
+          <option value="">全部人群</option>
+          <option value="top_user">头部用户</option>
+          <option value="non_top_user">非头部用户</option>
+          <option value="new_user">新用户</option>
+          <option value="pending_active">待激活用户</option>
+          <option value="growing">成长用户</option>
+          <option value="retained">留存用户</option>
+          <option value="active">活跃用户</option>
+          <option value="warning">预警用户</option>
+          <option value="low_active">低活跃用户</option>
+          <option value="dormant">沉睡用户</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;color:var(--text-muted)">优先级</span>
+          <input type="number" id="priorityMin" min="0" max="100" step="0.1" placeholder="最小" style="width:70px">
+          <span style="color:var(--text-muted)">~</span>
+          <input type="number" id="priorityMax" min="0" max="100" step="0.1" placeholder="最大" style="width:70px">
+        </div>
+        <button class="btn btn-default" onclick="resetFilters()">重置</button>
+        <button class="btn btn-default" onclick="filterData()">查询</button>
+        <button class="btn btn-primary btn-new" onclick="openDrawer('new')">+ 新建</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:160px">推送名称</th>
+              <th style="width:80px">推送类型</th>
+              <th style="width:100px">推送渠道</th>
+              <th style="width:140px">目标人群</th>
+              <th style="width:110px">触发方式</th>
+              <th style="width:140px">跳转链接</th>
+              <th style="width:60px">优先级</th>
+              <th style="width:80px">状态</th>
+              <th style="width:120px">创建时间</th>
+              <th class="col-actions" style="width:200px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <h3 id="editTitle">新建</h3>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <button class="btn btn-cancel" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-default" id="btnDraft" onclick="savePush('draft')">保存草稿</button>
+    <button class="btn btn-primary" id="btnSave" onclick="savePush('save')">保存并启用</button>
+  </div>
+</div>
+
+<!-- Send Confirm Modal -->
+<div class="modal-overlay" id="sendModal" style="display:none">
+  <div class="modal">
+    <h3>确认发送</h3>
+    <p id="sendModalMsg"></p>
+    <p id="sendModalWarning" style="font-size:12px;color:var(--warning);display:none"></p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeSendModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmSend()">确认发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal" style="display:none">
+  <div class="modal">
+    <h3 id="deleteModalTitle">删除确认</h3>
+    <p id="deleteModalMsg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDeleteModal()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+<div id="modalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center"><div id="modalBox" style="background:#fff;border-radius:8px;padding:24px;max-width:480px;max-height:min(80vh);box-shadow:0 12px 48px rgba(0,0,0,0.15);margin:20px"><div id="modalContent" style="font-size:14px;line-height:1.7;color:#333"></div><div style="margin-top:20px;text-align:right"><button id="modalCancel" style="padding:8px 20px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:13px;cursor:pointer">知道了</button></div></div></div>
+
+<script>
+// ===== 推送数据（V1 种子模板，刷新时随机组合快捷人群标签） =====
+const pushSeedTemplates = [
+  // ========= 手动推送（6条） =========
+  {
+    id: 1,
+    name: '新用户注册欢迎',
+    type: 'manual',
+    channels: ['push'],
+    audience: ['new_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 5.5,
+    status: 'sent',
+    title: '【量化王】欢迎加入量化王，开启量化投资之旅',
+    subtitle: '新手专享福利：100万模拟资金已到账，立即体验',
+    content_id: '',
+    body: '恭喜您成功注册量化王，100万模拟资金已自动到账，立即开启您的量化投资之旅！',
+    link: 'home',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-01 10:00',
+    creator: '李向梅'
+  },
+  {
+    id: 2,
+    name: '首次登录引导',
+    type: 'manual',
+    channels: ['inapp'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 50,
+    status: 'sent',
+    title: '新客开通量化策略SOP',
+    subtitle: '3步快速开通您的第一个量化策略',
+    content_id: 'ART_20260610_001',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-02 09:00',
+    creator: '李向梅'
+  },
+  {
+    id: 3,
+    name: '模拟交易盈利提醒',
+    type: 'manual',
+    channels: ['push', 'inapp'],
+    audience: ['top_user', 'non_top_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 2.5,
+    status: 'draft',
+    title: '【量化王】系统维护通知',
+    subtitle: '系统将于今晚22:00-24:00进行例行维护，期间可能影响使用',
+    content_id: '',
+    body: '系统将于今晚22:00-24:00进行例行维护，期间可能影响部分功能，请提前做好相关操作安排。',
+    link: 'profile',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-03 14:30',
+    creator: '王静'
+  },
+  {
+    id: 4,
+    name: '策略到期提醒',
+    type: 'manual',
+    channels: ['push'],
+    audience: ['growing', 'retained'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 85,
+    status: 'sent',
+    title: '【量化王】您的5月收益复盘报告',
+    subtitle: '',
+    content_id: 'ART_20260605_001',
+    body: '您5月的量化策略收益报告已生成',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-04 16:00',
+    creator: '张磊'
+  },
+  {
+    id: 5,
+    name: 'VIP会员权益推荐',
+    type: 'manual',
+    channels: ['inapp'],
+    audience: ['growing'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 60,
+    status: 'draft',
+    title: '【量化王】新版本功能预告',
+    subtitle: '全新AI选股策略即将上线',
+    content_id: '',
+    body: 'AI选股策略即将上线，敬请期待',
+    link: 'strategy',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-05 11:00',
+    creator: '张磊'
+  },
+  {
+    id: 6,
+    name: '市场行情异动推送',
+    type: 'manual',
+    channels: ['push', 'inapp'],
+    audience: ['top_user'],
+    triggerType: '',
+    triggerDesc: '--',
+    priority: 10,
+    status: 'sent',
+    title: '【量化王】VIP专属活动',
+    subtitle: 'VIP会员专享618福利',
+    content_id: 'ART_20260611_001',
+    body: 'VIP会员专享618理财节活动规则',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-06 09:30',
+    creator: '李向梅'
+  },
+  // ========= 自动规则-定时发送（4条） =========
+  {
+    id: 7,
+    name: '新手任务完成奖励',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-15 10:00',
+    priority: 12,
+    status: 'pending',
+    title: '【量化王】618理财节即将开启',
+    subtitle: '618理财节限时来袭，多重专属福利等你解锁',
+    content_id: '',
+    body: '618理财节限时来袭，多重专属福利等你解锁',
+    link: 'plaza_hot',
+    pushTime: '2026-06-15 10:00',
+    noRepeat: null,
+    createTime: '2026-06-10 09:00',
+    creator: '张磊'
+  },
+  {
+    id: 8,
+    name: '活动专属福利通知',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['growing', 'retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-19 08:00',
+    priority: 25.5,
+    status: 'running',
+    title: '【量化王】本周市场行情分析',
+    subtitle: '本周围绕市场走势、热门策略表现、策略表现分析',
+    content_id: 'ART_20260611_001',
+    body: '618理财节活动规则说明',
+    link: 'msg_detail',
+    pushTime: '2026-06-19 08:00',
+    noRepeat: null,
+    createTime: '2026-06-07 10:00',
+    creator: '李向梅'
+  },
+  {
+    id: 9,
+    name: '持仓策略调整建议',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['top_user', 'growing'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-20 09:00',
+    priority: 35,
+    status: 'pending',
+    title: '【量化王】端午节专属活动',
+    subtitle: '端午安康，专属福利活动即将开启',
+    content_id: '',
+    body: '端午节安康，专属福利活动即将开启',
+    link: 'plaza_strategy',
+    pushTime: '2026-06-20 09:00',
+    noRepeat: null,
+    createTime: '2026-06-08 14:00',
+    creator: '王静'
+  },
+  {
+    id: 10,
+    name: '周度收益复盘报告',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['retained'],
+    triggerType: 'scheduled',
+    triggerDesc: '定时发送 2026-06-30 20:00',
+    priority: 50.5,
+    status: 'running',
+    title: '【量化王】6月策略榜单',
+    subtitle: '6月量化策略大师榜，看看你排第几',
+    content_id: '',
+    body: '6月量化策略大师榜已更新，点击查看',
+    link: 'master_board',
+    pushTime: '2026-06-30 20:00',
+    noRepeat: null,
+    createTime: '2026-06-09 16:00',
+    creator: '张磊'
+  },
+  // ========= 自动规则-重复时间（5条） =========
+  {
+    id: 11,
+    name: '量化策略推荐',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['growing', 'retained'],
+    triggerType: 'fixed',
+    triggerDesc: '每日 08:00',
+    triggerCycle: 'daily',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 65,
+    status: 'running',
+    title: '【量化王】每日签到提醒',
+    subtitle: '每日签到，获取专属奖励',
+    content_id: '',
+    body: '快来签到获取今日专属奖励',
+    link: 'home',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-01 08:00',
+    creator: '李向梅'
+  },
+  {
+    id: 12,
+    name: '社区互动提醒',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['top_user'],
+    triggerType: 'fixed',
+    triggerDesc: '每周一 09:00',
+    triggerCycle: 'weekly',
+    triggerDayOfWeek: 1,
+    triggerDayOfMonth: null,
+    triggerTime: '09:00',
+    priority: 18,
+    status: 'running',
+    title: '【量化王】本周精选策略推荐',
+    subtitle: '基于您的投资偏好，本周精选策略推荐',
+    content_id: 'ART_20260610_001',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-02 10:00',
+    creator: '李向梅'
+  },
+  {
+    id: 13,
+    name: '用户升级通知',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['warning'],
+    triggerType: 'fixed',
+    triggerDesc: '每月1日 10:00',
+    triggerCycle: 'monthly',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: 1,
+    triggerTime: '10:00',
+    priority: 90.5,
+    status: 'running',
+    title: '【量化王】本月运营动态',
+    subtitle: '',
+    content_id: '',
+    body: '本月运营动态和新功能上线通知',
+    link: 'user_manual',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-03 11:00',
+    creator: '王静'
+  },
+  {
+    id: 14,
+    name: '新客注册奖励',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['warning', 'growing'],
+    triggerType: 'fixed',
+    triggerDesc: '每日 08:00',
+    triggerCycle: 'daily',
+    triggerDayOfWeek: null,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 25,
+    status: 'paused',
+    title: '【量化王】您的策略收益更新了',
+    subtitle: '您关注的策略有新的行情变化',
+    content_id: '',
+    body: '您已有一段时间未登录，您关注的策略有新的行情变化',
+    link: 'home',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-04 09:15',
+    creator: '王静'
+  },
+  {
+    id: 15,
+    name: '生日专属祝福',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['retained', 'growing'],
+    triggerType: 'fixed',
+    triggerDesc: '每周一 08:00',
+    triggerCycle: 'weekly',
+    triggerDayOfWeek: 1,
+    triggerDayOfMonth: null,
+    triggerTime: '08:00',
+    priority: 55,
+    status: 'draft',
+    title: '【量化王】您的本周收益报告',
+    subtitle: '',
+    content_id: 'ART_20260605_001',
+    body: '5月收益复盘报告',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-05 12:00',
+    creator: '张磊'
+  },
+  // ========= 自动规则-相对时间（5条） =========
+  {
+    id: 16,
+    name: '注册3天未登录回访',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '注册后 延迟24小时',
+    relativeField: 'reg_time',
+    relativeDelay: 24,
+    priority: 8,
+    status: 'running',
+    title: '【量化王】新客福利，解锁低风险量化策略',
+    subtitle: '',
+    content_id: '',
+    body: '您已完成注册但尚未创建策略，立即创建您的第一个量化策略',
+    link: 'strategy',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-06 10:30',
+    creator: '李向梅'
+  },
+  {
+    id: 17,
+    name: '创建策略后未实盘跟进',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '最近创建策略后 延迟48小时',
+    relativeField: 'last_strategy_time',
+    relativeDelay: 48,
+    priority: 40,
+    status: 'running',
+    title: '新客福利规则与教程',
+    subtitle: '我们为您准备了专属福利和操作教程',
+    content_id: 'ART_20260610_001',
+    body: '新客开通量化策略SOP指引',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-07 14:00',
+    creator: '李向梅'
+  },
+  {
+    id: 18,
+    name: '首次实盘交易跟进',
+    type: 'auto',
+    channels: ['push', 'inapp'],
+    audience: ['growing'],
+    triggerType: 'relative',
+    triggerDesc: '首次实盘后 延迟72小时',
+    relativeField: 'first_real_trade_time',
+    relativeDelay: 72,
+    priority: 1.5,
+    status: 'running',
+    title: '【量化王】恭喜您完成首次实盘',
+    subtitle: '完成首次实盘后，您的专属福利已发放',
+    content_id: 'ART_20260611_001',
+    body: '618理财节活动规则说明',
+    link: 'msg_detail',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-08 16:00',
+    creator: '张磊'
+  },
+  {
+    id: 19,
+    name: '618理财节预热推送',
+    type: 'auto',
+    channels: ['push'],
+    audience: ['new_user', 'pending_active'],
+    triggerType: 'relative',
+    triggerDesc: '注册后 延迟72小时',
+    relativeField: 'reg_time',
+    relativeDelay: 72,
+    priority: 20,
+    status: 'paused',
+    title: '【量化王】3天未实盘引导',
+    subtitle: '',
+    content_id: '',
+    body: '您注册已3天未实盘，立即查看低风险新手策略推荐',
+    link: 'strategy',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-09 10:00',
+    creator: '王静'
+  },
+  {
+    id: 20,
+    name: '周年庆专属活动',
+    type: 'auto',
+    channels: ['inapp'],
+    audience: ['new_user'],
+    triggerType: 'relative',
+    triggerDesc: '注册后 延迟120小时',
+    relativeField: 'reg_time',
+    relativeDelay: 120,
+    priority: 70,
+    status: 'draft',
+    title: '【量化王】新手成长引导',
+    subtitle: '新手5日引导，助您快速上手',
+    content_id: '',
+    body: '新手5日引导推送，助您快速上手量化投资',
+    link: 'user_manual',
+    pushTime: '',
+    noRepeat: null,
+    createTime: '2026-06-10 14:00',
+    creator: '李向梅'
+  }
+];
+
+let nextId = 21;
+let pushes = [];
+let editingId = null;
+let drawerMode = 'new';
+
+// 用户分层标签（按三大维度分组）
+const audienceTagGroups = [
+  {
+    label: '榜单排名分层',
+    tags: [
+      { value: 'top_user', label: '头部用户（策略收益前30%，策略创建≥1月）' },
+      { value: 'non_top_user', label: '非头部用户（其余用户）' }
+    ]
+  },
+  {
+    label: '用户生命周期分层',
+    tags: [
+      { value: 'new_user', label: '新用户（首次登录≤15天，未创建策略）' },
+      { value: 'pending_active', label: '待激活用户（首次登录>15天，未创建策略）' },
+      { value: 'growing', label: '成长用户（已创建策略，未实盘运行）' },
+      { value: 'retained', label: '留存用户（已实盘运行）' }
+    ]
+  },
+  {
+    label: '用户活跃度分层',
+    tags: [
+      { value: 'active', label: '活跃用户（距上次登录<7天）' },
+      { value: 'warning', label: '预警用户（7天≤距上次登录<15天）' },
+      { value: 'low_active', label: '低活跃用户（15天≤距上次登录<30天）' },
+      { value: 'dormant', label: '沉睡用户（距上次登录≥30天）' }
+    ]
+  }
+];
+
+// 扁平化用于查找
+const audienceTags = audienceTagGroups.flatMap(g => g.tags);
+
+// 相对时间触发节点（datetime 类字段，供「注册后 / 创建策略后」等延迟推送使用）
+const relativeTriggerFieldRegistry = [
+  { field: 'reg_time',              label: '注册时间',           type: 'datetime' },
+  { field: 'first_login_time',      label: '首次登录时间',       type: 'datetime' },
+  { field: 'last_login_time',       label: '最近登录时间',       type: 'datetime' },
+  { field: 'last_strategy_time',    label: '最近创建策略时间',   type: 'datetime' },
+  { field: 'first_real_trade_time', label: '首次实盘时间',       type: 'datetime' },
+  { field: 'broker_open_time',      label: '开通券商账户时间',   type: 'datetime' },
+  { field: 'wechat_bind_time',      label: '微信绑定时间',       type: 'datetime' }
+];
+
+function findAudienceFieldDef(field) {
+  return relativeTriggerFieldRegistry.find(x => x.field === field) || null;
+}
+
+// 相对时间「触发节点」展示名：字段 label 末尾「时间」→「后」（如 注册时间 → 注册后）
+function formatTriggerNodeLabel(label) {
+  return (label || '').replace(/时间$/, '后');
+}
+
+// 取出字段注册表中所有「时间类」字段，供「相对时间」触发选择（与自定义人群同源）
+function getDatetimeFields() {
+  return relativeTriggerFieldRegistry.slice();
+}
+
+// 渠道选项
+const channelOptions = [
+  { value: 'push', label: 'Push推送' },
+  { value: 'inapp', label: '站内信' }
+];
+
+// 跳转链接选项
+const linkOptions = [
+  { value: 'msg_detail', label: '消息详情页' },
+  { value: 'h5', label: '自定义链接' },
+  { value: 'home', label: '首页' },
+  { value: 'plaza_hot', label: '广场-今日热点' },
+  { value: 'plaza_report', label: '广场-内容广场-研报' },
+  { value: 'plaza_learn', label: '广场-内容广场-学习' },
+  { value: 'plaza_chat', label: '广场-社区广场-热聊' },
+  { value: 'plaza_strategy', label: '广场-社区广场-策略' },
+  { value: 'user_manual', label: '用户手册' },
+  { value: 'profile', label: '个人主页' },
+  { value: 'master_rank', label: '量化大师榜' },
+  { value: 'strategy', label: '策略' }
+];
+
+// 触发方式
+const triggerTypes = [
+  { value: 'immediate', label: '立即发送' },
+  { value: 'scheduled', label: '定时发送' },
+  { value: 'fixed', label: '重复时间' },
+  { value: 'relative', label: '相对时间' }
+];
+
+let editingAudience = [];
+let editingChannels = [];
+let audienceBuilderCollapsed = true;
+let editingAudienceEstimate = '';
+
+// ===== 渲染表格 =====
+function getChannelLabel(val) {
+  const m = { push: 'Push推送', inapp: '站内信' };
+  return m[val] || val;
+}
+
+function getChannelTag(val) {
+  const m = { push: 'tag-blue', inapp: 'tag-green' };
+  return m[val] || '';
+}
+
+function getAudienceLabel(val) {
+  const found = audienceTags.find(t => t.value === val);
+  return found ? found.label.split('（')[0] : val;
+}
+
+function getAudienceShortLabel(val) {
+  const found = audienceTags.find(t => t.value === val);
+  if (!found) return val;
+  // 取括号前部分，若无括号则截取前6字
+  const base = found.label.split('（')[0].split('(')[0];
+  return base.length > 6 ? base.slice(0, 6) + '…' : base;
+}
+
+function getPriorityLabel(p, type) {
+  if (p === null || p === undefined || p === '') return '<span style="color:var(--text-muted);font-size:12px">--</span>';
+  const num = Number(p);
+  let color = 'var(--text-secondary)';
+  if (num <= 10) color = '#ef4444';
+  else if (num <= 30) color = '#f59e0b';
+  else if (num <= 70) color = 'var(--text-secondary)';
+  else color = 'var(--text-muted)';
+  return `<span style="font-size:12px;color:${color};font-weight:500">${p}</span>`;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无数据</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, idx) => {
+    const typeLabel = item.type === 'auto'
+      ? `<span class="type-tag auto">自动</span>`
+      : `<span class="type-tag manual">手动</span>`;
+
+    const channelHtml = (item.channels || []).map(c =>
+      `<span class="tag ${getChannelTag(c)}">${getChannelLabel(c)}</span>`
+    ).join(' ');
+
+    const totalAudienceTags = audienceTags.length;
+    let audienceHtml;
+    if (item.audienceSummary !== undefined && item.audienceSummary !== '') {
+      const summary = item.audienceSummary || '全部用户';
+      const tags = item.audience || [];
+      let chips = [];
+      if (tags.length === totalAudienceTags && tags.length > 0) chips.push('全部用户');
+      else chips = tags.map(a => getAudienceShortLabel(a));
+      if (chips.length === 0) chips.push('全部用户');
+      audienceHtml = chips.map(c => `<span class="rule-tag active" title="${escapeHtml(summary)}">${c}</span>`).join(' ');
+    } else if ((item.audience || []).length === totalAudienceTags) {
+      audienceHtml = '<span class="rule-tag active">全部用户</span>';
+    } else {
+      audienceHtml = (item.audience || []).map(a =>
+        `<span class="rule-tag active">${getAudienceShortLabel(a)}</span>`
+      ).join(' ');
+    }
+
+    const statusMap = {
+      draft: '<span class="status-badge draft">草稿</span>',
+      pending: '<span class="status-badge pending">待发送</span>',
+      running: '<span class="status-badge running">运行中</span>',
+      paused: '<span class="status-badge paused">已暂停</span>',
+      sent: '<span class="status-badge sent">已发送</span>'
+    };
+
+    const isAuto = item.type === 'auto';
+    let actionsHtml = '';
+    if (isAuto) {
+      if (item.status === 'running' || item.status === 'paused') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" style="color:${item.status==='running'?'var(--warning)':'var(--success)'}" onclick="toggleAutoRule(${item.id})">${item.status==='running'?'暂停':'启用'}</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      }
+    } else {
+      if (item.status === 'draft') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-send" onclick="openSendConfirm(${item.id})">立即发送</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else if (item.status === 'pending') {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-edit-text" onclick="openDrawer('edit', ${item.id})">编辑</button>
+          <button class="btn-send" onclick="openSendConfirm(${item.id})">立即发送</button>
+          <button class="btn-edit-text" style="color:var(--warning)" onclick="cancelSchedule(${item.id})">取消定时</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      } else {
+        actionsHtml = `
+          <button class="btn-edit-text" onclick="openDrawer('view', ${item.id})">查看</button>
+          <button class="btn-danger-text" onclick="deletePush(${item.id})">删除</button>
+        `;
+      }
+    }
+
+    // 跳转链接信息
+    let linkHtml = '<span style="color:var(--text-muted);font-size:12px">--</span>';
+    if (item.link) {
+      const labelMap = {
+        'msg_detail': '消息详情页', 'h5': '自定义链接', 'home': '首页', 'plaza_hot': '广场-今日热点',
+        'plaza_report': '广场-内容广场-研报', 'plaza_learn': '广场-内容广场-学习',
+        'plaza_chat': '广场-社区广场-热聊', 'plaza_strategy': '广场-社区广场-策略',
+        'user_manual': '用户手册', 'profile': '个人主页', 'master_board': '量化大师榜',
+        'strategy': '策略'
+      };
+      const label = labelMap[item.link] || item.link;
+      linkHtml = item.link === 'h5' && item.linkUrl
+        ? `<span style="font-size:12px">自定义链接：${escapeHtml(item.linkUrl)}</span>`
+        : `<span style="font-size:12px">${label}</span>`;
+    }
+
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td><div class="td-ellipsis" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div></td>
+        <td>${typeLabel}</td>
+        <td>${channelHtml}</td>
+        <td>${audienceHtml}</td>
+        <td><span style="font-size:12px;color:var(--text-secondary)">${item.triggerDesc || '--'}</span></td>
+        <td>${linkHtml}</td>
+        <td>${getPriorityLabel(item.priority, item.type)}</td>
+        <td>${statusMap[item.status] || ''}</td>
+        <td>${item.createTime}</td>
+        <td class="col-actions">${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderPagination(total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) return '';
+  let html = `<span class="page-info">共 ${total} 条</span>`;
+  html += `<button ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})">‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})">›</button>`;
+  return html;
+}
+
+let currentPage = 1;
+const pageSize = 10;
+
+// ===== 页面切换 =====
+let currentMainPage = 'pushManage';
+function switchToPage(page) {
+  currentMainPage = page;
+  const bc = document.getElementById('breadcrumb');
+  const navItems = document.querySelectorAll('.nav-sub .nav-item');
+  navItems.forEach(el => el.classList.remove('active'));
+
+  if (page === 'pushManage') {
+    bc.innerHTML = '<span>首页</span><span>›</span><span class="current">推送管理</span>';
+    document.getElementById('pushManagePage').style.display = '';
+    navItems[1]?.classList.add('active');
+  } else if (page === 'abTest') {
+    bc.innerHTML = '<span>首页</span><span>›</span><span>营销页管理</span><span>›</span><span class="current">A/B 测试</span>';
+    document.getElementById('pushManagePage').style.display = 'none';
+    navItems[0]?.classList.add('active');
+  }
+}
+
+function refreshTable() {
+  const search = document.getElementById('searchInput')?.value || '';
+  const typeFilter = document.getElementById('typeFilter')?.value || '';
+  const statusFilter = document.getElementById('statusFilter')?.value || '';
+  const audienceFilter = document.getElementById('audienceFilter')?.value || '';
+  const priorityMin = document.getElementById('priorityMin')?.value;
+  const priorityMax = document.getElementById('priorityMax')?.value;
+  let data = pushes;
+  if (search) {
+    const q = search.toLowerCase();
+    data = data.filter(d => d.name.toLowerCase().includes(q));
+  }
+  if (typeFilter) data = data.filter(d => d.type === typeFilter);
+  if (statusFilter) data = data.filter(d => d.status === statusFilter);
+  if (audienceFilter) data = data.filter(d => d.audience && d.audience.includes(audienceFilter));
+  if (priorityMin !== '' && priorityMin !== undefined && priorityMin !== null) {
+    const min = Number(priorityMin);
+    data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) >= min);
+  }
+  if (priorityMax !== '' && priorityMax !== undefined && priorityMax !== null) {
+    const max = Number(priorityMax);
+    data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) <= max);
+  }
+  const total = data.length;
+  const start = (currentPage - 1) * pageSize;
+  const paged = data.slice(start, start + pageSize);
+  renderTable(paged);
+  document.getElementById('pagination').innerHTML = renderPagination(total, currentPage, pageSize);
+}
+
+function goPage(page) { currentPage = page; refreshTable(); }
+function filterData() { currentPage = 1; refreshTable(); }
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('typeFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('audienceFilter').value = '';
+  document.getElementById('priorityMin').value = '';
+  document.getElementById('priorityMax').value = '';
+  currentPage = 1;
+  refreshTable();
+}
+
+// ===== 抽屉 =====
+function openDrawer(mode, id) {
+  drawerMode = mode;
+  editingId = (mode === 'new') ? null : id;
+
+  let p = null;
+  if (id && mode !== 'new') {
+    p = pushes.find(e => e.id === id);
+  }
+
+  // 只有草稿和待发送状态的推送可以编辑，其他状态强制切换为查看
+  if (mode === 'edit' && p && p.status !== 'draft' && p.status !== 'pending') {
+    drawerMode = 'view';
+  }
+
+  const titleMap = { new: '新建', edit: '编辑推送', view: '推送详情' };
+  document.getElementById('editTitle').textContent = titleMap[drawerMode];
+
+  const isView = drawerMode === 'view';
+  document.getElementById('btnSave').style.display = isView ? 'none' : '';
+
+  // 「保存草稿」仅在新建或编辑草稿时出现；待发送/进行中/已发送等状态下保存草稿无意义
+  const showDraftBtn = !isView && (drawerMode === 'new' || (p && p.status === 'draft'));
+  document.getElementById('btnDraft').style.display = showDraftBtn ? '' : 'none';
+
+  editingAudience = p ? [...(p.audience || [])] : [];
+  editingChannels = p ? [...(p.channels || [])] : [];
+  editingAudienceEstimate = '';
+  audienceBuilderCollapsed = true;
+
+  renderDrawerForm(p, isView);
+  if (!isView) {
+    updateSubtitleHint();
+    updateSaveBtnLabel();
+  }
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('editDrawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('editDrawer').classList.remove('open');
+  editingId = null;
+}
+
+function renderDrawerForm(p, isView) {
+  const body = document.getElementById('drawerBody');
+  const disabled = isView ? 'disabled' : '';
+  // 待发送状态：仅发送时间允许修改，其余字段置灰
+  const isPendingEdit = !isView && p && p.status === 'pending';
+  const pendingDisabled = isPendingEdit ? 'disabled' : '';
+  const pushType = p ? p.type : 'manual';
+  let triggerType = p ? (p.triggerType || 'fixed') : 'fixed';
+  const isAuto = pushType === 'auto';
+
+  let html = '';
+
+  // 推送名称
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送名称</label>
+    <input type="text" id="pushName" value="${escapeHtml(p ? p.name : '')}" placeholder="如：新客24h未创建策略引导" ${disabled || pendingDisabled}>
+  </div>`;
+
+  // 目标人群（先选人群，再决定推送方式）
+  // 新建、编辑(非待发送)：可视化条件构造器（自由配置）；查看/待发送：只读
+  const useAudienceBuilder = (drawerMode === 'new' || (drawerMode === 'edit' && !isPendingEdit));
+  let audienceInner;
+  if (useAudienceBuilder) {
+    audienceInner = renderAudienceBuilder();
+  } else if (p && p.audienceSummary !== undefined && p.audienceSummary !== '') {
+    // 由条件构造器创建的推送，查看/编辑暂以只读摘要展示（待复用条件构造器后支持编辑）
+    audienceInner = `<div class="preview-box"><div class="preview-label">目标人群</div>
+      <div style="font-size:13px;color:var(--text-primary);line-height:1.6">${escapeHtml(p.audienceSummary || '全部用户')}</div></div>`;
+  } else {
+    audienceInner = renderAudienceSelector(isView, isPendingEdit);
+  }
+  html += `<div class="form-group" id="audienceGroup">
+    <label><span class="required">*</span> 目标人群</label>
+    <div id="audienceSelector">${audienceInner}</div>
+  </div>`;
+
+  // 根据人群约束调整触发方式默认值
+  const audienceConstraints = getAudienceConstraints(editingAudience, triggerType);
+  if (!audienceConstraints.allowRelative && triggerType === 'relative') {
+    triggerType = 'fixed';
+  }
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送类型</label>
+    <select id="pushType" ${disabled || pendingDisabled} onchange="onPushTypeChange()">
+      <option value="manual" ${pushType === 'manual' ? 'selected' : ''}>手动</option>
+      <option value="auto" ${pushType === 'auto' ? 'selected' : ''}>自动</option>
+    </select>
+  </div>`;
+
+  // 触发配置（自动规则时显示，根据目标人群联动）
+  html += `<div id="triggerSection" style="${isAuto ? '' : 'display:none'}">
+    <div class="conditional-section">
+      <h5>触发规则配置</h5>
+      <div class="form-group">
+        <label><span class="required">*</span> 触发方式</label>
+        ${audienceConstraints.allowRelative
+          ? `<select id="triggerTypeSelect" ${disabled || pendingDisabled} onchange="onTriggerTypeChange()">
+               <option value="scheduled" ${triggerType==='scheduled'?'selected':''}>定时发送</option>
+               <option value="fixed" ${triggerType==='fixed'?'selected':''}>重复时间</option>
+               <option value="relative" ${triggerType==='relative'?'selected':''}>相对时间</option>
+             </select>`
+          : `<select id="triggerTypeSelect" ${disabled || pendingDisabled} onchange="onTriggerTypeChange()">
+               <option value="scheduled" ${triggerType==='scheduled'?'selected':''}>定时发送</option>
+               <option value="fixed" ${triggerType!=='scheduled'&&triggerType!=='relative'?'selected':''}>重复时间</option>
+             </select>`}
+      </div>
+      <div id="triggerParams" style="display:${triggerType ? '' : 'none'}">
+        ${renderTriggerParams(triggerType, p, disabled, editingAudience, isPendingEdit)}
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>优先级</label>
+    ${isView
+      ? `<div style="font-size:13px;color:var(--text)">${p && p.priority !== null && p.priority !== undefined ? p.priority : '--'}</div>`
+      : `<input type="number" id="pushPriority" min="0" max="100" step="0.1" value="${p && p.priority !== null && p.priority !== undefined ? p.priority : ''}" placeholder="0-100，数值越小优先级越高" style="width:100%" ${pendingDisabled} onblur="onPriorityBlur()">`}
+    <div class="hint">0-100，最多1位小数，数值越小优先级越高。同一用户同时命中多条规则时，仅推送优先级最高的一条，其余丢弃</div>
+  </div>`;
+
+  // 内容配置
+  const channels = p ? (p.channels || []) : [];
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送渠道</label>
+    <div id="channelSelector">${renderChannelSelector(isView, isPendingEdit)}</div>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label><span class="required">*</span> 推送标题 <span class="hint">（Push建议≤30字）</span></label>
+    <input type="text" id="pushTitle" value="${escapeHtml(p ? p.title : '')}" placeholder="如：【量化王】新客福利，解锁低风险量化策略👉" maxlength="50" ${disabled || pendingDisabled}>
+  </div>`;
+
+  html += `<div class="form-group">
+    <label>副标题 <span class="hint">（非必填，消息列表中的描述文本）</span></label>
+    <textarea id="pushSubtitle" rows="2" placeholder="如不填写，消息列表仅展示标题" ${disabled || pendingDisabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
+    <div id="subtitleHint" style="font-size:11px;margin-top:4px"></div>
+  </div>`;
+
+  // 跳转链接显示
+  let linkFieldHtml = '';
+  if (isView) {
+    if (p && p.link === 'h5') {
+      linkFieldHtml = `<div style="font-size:13px;color:var(--text)">自定义链接：${escapeHtml(p.linkUrl || '')}</div>`;
+    } else {
+      const label = linkOptions.find(o => o.value === (p ? p.link : ''))?.label || '消息详情页';
+      linkFieldHtml = `<div style="font-size:13px;color:var(--text)">${label}</div>`;
+    }
+  } else {
+    const optionHtml = linkOptions.map(o => `<option value="${o.value}" ${o.value === (p ? p.link : '') ? 'selected' : (o.value === 'msg_detail' && (!p || !p.link) ? 'selected' : '')}>${o.label}</option>`).join('');
+    linkFieldHtml = `<select id="pushLink" style="width:100%" ${pendingDisabled} onchange="onPushLinkChange()">${optionHtml}</select>`;
+  }
+
+  html += `<div class="form-group">
+    <label>跳转链接 <span class="hint">（点击推送后跳转的App内页面）</span></label>
+    ${linkFieldHtml}
+    ${isPendingEdit && p ? `<input type="hidden" id="pushLink" value="${p.link || 'msg_detail'}">` : ''}
+  </div>
+  <div class="form-group" id="h5LinkSection" style="display:${(p && p.link === 'h5') ? '' : 'none'};margin-top:8px">
+    <label><span class="required">*</span> 链接地址</label>
+    <input type="text" id="h5LinkUrl" value="${escapeHtml(p ? (p.linkUrl || '') : '')}" placeholder="请输入完整链接地址，支持H5页面（如https://example.com/page）或APP内路由" ${disabled || pendingDisabled}>
+  </div>`;
+
+  // 推送时间（手动推送时不展示，因为只能立即发送）
+  html += `<div id="timeSection" style="display:none"></div>`;
+
+  // 防骚扰设置（手动推送或定时发送或重复时间时不展示）
+  const hideNoRepeat = pushType === 'manual' || (pushType === 'auto' && (triggerType === 'scheduled' || triggerType === 'fixed'));
+  html += `<div id="noRepeatSection" class="conditional-section" style="margin-top:8px;${hideNoRepeat ? 'display:none' : ''}">
+    <h5>防骚扰设置</h5>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <span style="font-size:14px;color:var(--text)">同一规则对同一用户仅触发一次</span>
+      <label class="switch">
+        <input type="checkbox" id="noRepeat" ${(p && p.noRepeat !== false) ? 'checked' : ''} ${disabled || pendingDisabled}>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>`;
+
+  body.innerHTML = html;
+  // 编辑模式下，设置全部用户复选框的 indeterminate 状态
+  if (!isView) {
+    const allCheckbox = document.getElementById('audienceAllCheckbox');
+    const allTagValues = audienceTags.map(t => t.value);
+    if (allCheckbox && editingAudience.length > 0 && editingAudience.length < allTagValues.length) {
+      allCheckbox.indeterminate = true;
+    }
+  }
+}
+
+function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) {
+  if (!triggerType) return '';
+  const pendingDisabled = isPendingEdit ? 'disabled' : '';
+  let html = '';
+
+  if (triggerType === 'scheduled') {
+    const scheduledTime = (p && p.pushTime) || '';
+    // 待发送状态：仅发送时间可编辑
+    html += `<div class="form-group">
+      <label>发送时间</label>
+      <input type="datetime-local" id="scheduledTime" value="${scheduledTime}" ${disabled} onclick="this.showPicker && this.showPicker()" style="cursor:pointer">
+    </div>`;
+  } else if (triggerType === 'fixed') {
+    const cycle = (p && p.triggerCycle) || 'monthly';
+    const dayOfWeek = (p && p.triggerDayOfWeek !== undefined) ? p.triggerDayOfWeek : 1;
+    const dayOfMonth = (p && p.triggerDayOfMonth) ? p.triggerDayOfMonth : 1;
+    const triggerTime = (p && p.triggerTime) ? p.triggerTime : '08:00';
+    // 待发送状态：执行周期和周几/日期置灰，仅执行时间可编辑
+    html += `<div class="form-row" style="align-items:flex-end">
+      <div class="form-group">
+        <label>执行周期</label>
+        <select id="fixedCycle" ${disabled || pendingDisabled} onchange="onFixedCycleChange()">
+          <option value="daily" ${cycle==='daily'?'selected':''}>每日</option>
+          <option value="weekly" ${cycle==='weekly'?'selected':''}>每周</option>
+          <option value="monthly" ${cycle==='monthly'?'selected':''}>每月</option>
+        </select>
+      </div>
+      <div class="form-group" id="fixedDayGroup" style="${cycle==='daily'?'display:none':''}">
+        <label>${cycle==='weekly'?'周几':'日期'}</label>
+        ${cycle==='weekly' ? `
+        <select id="fixedDayOfWeek" ${disabled || pendingDisabled}>
+          <option value="1" ${dayOfWeek==1?'selected':''}>周一</option>
+          <option value="2" ${dayOfWeek==2?'selected':''}>周二</option>
+          <option value="3" ${dayOfWeek==3?'selected':''}>周三</option>
+          <option value="4" ${dayOfWeek==4?'selected':''}>周四</option>
+          <option value="5" ${dayOfWeek==5?'selected':''}>周五</option>
+          <option value="6" ${dayOfWeek==6?'selected':''}>周六</option>
+          <option value="0" ${dayOfWeek==0?'selected':''}>周日</option>
+        </select>` : `
+        <input type="number" id="fixedDayOfMonth" value="${dayOfMonth}" min="1" max="28" ${disabled || pendingDisabled} onblur="onMonthDayBlur()">`}
+      </div>
+      <div class="form-group">
+        <label>执行时间</label>
+        <input type="time" id="fixedTime" value="${triggerTime}" ${disabled}>
+      </div>
+    </div>`;
+  } else if (triggerType === 'relative') {
+    // 相对时间：从字段注册表的「时间类(datetime)字段」中选择 + 延迟 N 小时
+    const timeFields = getDatetimeFields();
+    const existingField = (p && p.relativeField) || (timeFields[0] ? timeFields[0].field : 'reg_time');
+    const safeField = timeFields.some(f => f.field === existingField) ? existingField : (timeFields[0]?.field || 'reg_time');
+    const existingDelay = (p && p.relativeDelay !== undefined && p.relativeDelay !== null && p.relativeDelay !== '')
+      ? p.relativeDelay
+      : (p && p.relativeTo !== undefined && p.relativeTo !== null && p.relativeTo !== '' ? p.relativeTo : 24);
+
+    html += `<div class="form-row">
+      <div class="form-group">
+        <label>触发节点</label>
+        <select id="relativeField" ${disabled || pendingDisabled}>
+          ${timeFields.map(f => `<option value="${f.field}" ${f.field === safeField ? 'selected' : ''}>${formatTriggerNodeLabel(f.label)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>延迟时间</label>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" id="relativeDelay" value="${existingDelay}" min="0" max="999" step="1" style="width:80px" ${disabled || pendingDisabled} onblur="clampHourInput('relativeDelay')">
+          <span>小时</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function onPushTypeChange() {
+  const type = document.getElementById('pushType').value;
+  const triggerSection = document.getElementById('triggerSection');
+  const timeSection = document.getElementById('timeSection');
+  if (type === 'auto') {
+    triggerSection.style.display = '';
+    timeSection.style.display = 'none';
+  } else {
+    triggerSection.style.display = 'none';
+    timeSection.style.display = '';
+  }
+  // 控制防骚扰设置显隐
+  const noRepeatSection = document.getElementById('noRepeatSection');
+  if (noRepeatSection) {
+    if (type === 'manual') {
+      noRepeatSection.style.display = 'none';
+    } else {
+      const tt = document.getElementById('triggerTypeSelect')?.value || 'fixed';
+      noRepeatSection.style.display = (tt === 'fixed' || tt === 'scheduled') ? 'none' : '';
+    }
+  }
+  updateSaveBtnLabel();
+  refreshTriggerSection();
+}
+
+function onPushLinkChange() {
+  const link = document.getElementById('pushLink').value;
+  const h5Section = document.getElementById('h5LinkSection');
+  if (h5Section) {
+    h5Section.style.display = link === 'h5' ? '' : 'none';
+  }
+}
+
+// 人群变更后刷新触发配置联动
+function refreshTriggerSection() {
+  const type = document.getElementById('pushType')?.value;
+  if (type !== 'auto') return;
+  const triggerSection = document.getElementById('triggerSection');
+  if (!triggerSection || triggerSection.style.display === 'none') return;
+
+  const disabled = document.getElementById('pushType')?.disabled ? 'disabled' : '';
+  const audienceConstraints = getAudienceConstraints(editingAudience);
+
+  // 读取当前触发方式值
+  let tt = 'fixed';
+  const existing = document.getElementById('triggerTypeSelect');
+  if (existing) {
+    tt = existing.value || 'fixed';
+  }
+
+  // 如果不支持相对且当前是 relative，切回 fixed
+  const effectiveType = (!audienceConstraints.allowRelative && tt === 'relative') ? 'fixed' : tt;
+
+  // 找到触发方式的父容器 form-group，替换内容
+  const formGroup = existing?.closest('.form-group');
+  if (formGroup) {
+    const label = formGroup.querySelector('label');
+    if (audienceConstraints.allowRelative) {
+      formGroup.innerHTML = label.outerHTML + `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
+        <option value="scheduled" ${effectiveType==='scheduled'?'selected':''}>定时发送</option>
+        <option value="fixed" ${effectiveType==='fixed'?'selected':''}>重复时间</option>
+        <option value="relative" ${effectiveType==='relative'?'selected':''}>相对时间</option>
+      </select>`;
+    } else {
+      formGroup.innerHTML = label.outerHTML + `<select id="triggerTypeSelect" ${disabled} onchange="onTriggerTypeChange()">
+        <option value="scheduled" ${effectiveType==='scheduled'?'selected':''}>定时发送</option>
+        <option value="fixed" ${effectiveType!=='scheduled'?'selected':''}>重复时间</option>
+      </select>`;
+    }
+  }
+
+  // 更新触发参数区
+  const params = document.getElementById('triggerParams');
+  if (params) {
+    params.innerHTML = renderTriggerParams(effectiveType, null, disabled, editingAudience);
+  }
+}
+
+// 根据推送类型/发送方式更新主按钮文案
+function updateSaveBtnLabel() {
+  const btn = document.getElementById('btnSave');
+  if (!btn) return;
+  const type = document.getElementById('pushType')?.value || 'manual';
+  if (type === 'auto') { btn.textContent = '保存并启用'; return; }
+  // 手动推送（新建或编辑）：统一显示立即发送
+  btn.textContent = '立即发送';
+}
+
+function onTriggerTypeChange() {
+  const tt = document.getElementById('triggerTypeSelect').value;
+  const params = document.getElementById('triggerParams');
+  if (tt) {
+    params.style.display = '';
+    params.innerHTML = renderTriggerParams(tt, null, false, editingAudience);
+  } else {
+    params.style.display = 'none';
+  }
+  // 控制防骚扰设置显隐
+  const noRepeatSection = document.getElementById('noRepeatSection');
+  if (noRepeatSection) {
+    noRepeatSection.style.display = (tt === 'fixed' || tt === 'scheduled') ? 'none' : '';
+  }
+}
+
+function onFixedCycleChange() {
+  const cycle = document.getElementById('fixedCycle').value;
+  const dayGroup = document.getElementById('fixedDayGroup');
+  if (cycle === 'daily') {
+    dayGroup.style.display = 'none';
+  } else {
+    dayGroup.style.display = '';
+    const label = dayGroup.querySelector('label');
+    if (cycle === 'weekly') {
+      label.textContent = '周几';
+      let sel = '<select id="fixedDayOfWeek">';
+      const days = ['周一','周二','周三','周四','周五','周六','周日'];
+      days.forEach((d, i) => { sel += `<option value="${i===6?0:i+1}">${d}</option>`; });
+      sel += '</select>';
+      dayGroup.innerHTML = `<label>周几</label>${sel}`;
+    } else {
+      label.textContent = '日期';
+      dayGroup.innerHTML = '<label>日期</label><input type="number" id="fixedDayOfMonth" value="1" min="1" max="28" onblur="onMonthDayBlur()">';
+    }
+  }
+}
+
+function toggleTimeInput() {
+  const mode = document.querySelector('input[name="timeMode"]:checked');
+  const input = document.getElementById('pushTimeInput');
+  if (mode && mode.value === 'scheduled') {
+    input.style.display = '';
+  } else {
+    input.style.display = 'none';
+  }
+  updateSaveBtnLabel();
+}
+
+// ===== 渠道选择器 =====
+function renderChannelSelector(isView, isDisabled) {
+  const chips = channelOptions.map(o => {
+    const sel = editingChannels.includes(o.value);
+    if (isView && !sel) return '';
+    const click = (isView || isDisabled) ? '' : `onclick="toggleChannel('${o.value}')"`;
+    return `<span class="tag-chip ${sel ? 'selected' : ''}" ${click} style="${isDisabled ? 'cursor:not-allowed;opacity:0.6' : ''}">${o.label}</span>`;
+  }).join('');
+  return `<div class="tag-selector">${chips || '<span style="color:var(--text-muted);font-size:12px">' + (isView ? '—' : '请选择推送渠道') + '</span>'}</div>`;
+}
+
+function toggleChannel(value) {
+  const i = editingChannels.indexOf(value);
+  if (i >= 0) editingChannels.splice(i, 1);
+  else editingChannels.push(value);
+  document.getElementById('channelSelector').innerHTML = renderChannelSelector(false, false);
+}
+
+// ===== 人群选择器（分组展示）=====
+function renderAudienceSelector(isView, isDisabled) {
+  const allTagValues = audienceTags.map(t => t.value);
+
+  if (isView || isDisabled) {
+    // 查看模式/禁用模式：仅显示已选标签
+    if (editingAudience.length === allTagValues.length) {
+      return '<div class="tag-selector"><span class="tag-chip selected">全部用户</span></div>';
+    }
+    const selected = editingAudience.map(v => audienceTags.find(t => t.value === v)).filter(Boolean);
+    if (selected.length === 0) return '<div class="tag-selector"><span style="color:var(--text-muted);font-size:12px">—</span></div>';
+    return `<div class="tag-selector">${selected.map(t =>
+      `<span class="tag-chip selected">${t.label}</span>`
+    ).join('')}</div>`;
+  }
+
+  // 编辑模式：复选框列表
+  const allSelected = editingAudience.length === allTagValues.length;
+  const selected = editingAudience.map(v => audienceTags.find(t => t.value === v)).filter(Boolean);
+
+  // 已选标签 chips
+  const chipsHTML = allSelected
+    ? '<span class="audience-dropdown-chip">全部用户<span class="remove" onclick="event.stopPropagation();clearAllAudience()">&times;</span></span>'
+    : (selected.length > 0
+      ? selected.map(t => `<span class="audience-dropdown-chip">${t.label}<span class="remove" onclick="event.stopPropagation();toggleAudience('${t.value}')">&times;</span></span>`).join('')
+      : '<span class="placeholder">请选择目标人群</span>');
+
+  // 下拉面板
+  let panelHTML = `<div class="audience-dropdown-option" onclick="event.stopPropagation();toggleAllAudience()" style="border-bottom:1px solid var(--border);margin-bottom:4px;font-weight:500">
+    <input type="checkbox" id="audienceAllCheckbox" ${allSelected ? 'checked' : ''} onclick="event.preventDefault()">
+    <span>全部用户</span>
+  </div>`;
+  audienceTagGroups.forEach(group => {
+    panelHTML += `<div class="audience-dropdown-group-label">${group.label}</div>`;
+    group.tags.forEach(t => {
+      const sel = editingAudience.includes(t.value);
+      panelHTML += `<div class="audience-dropdown-option" onclick="event.stopPropagation();toggleAudience('${t.value}')">
+        <input type="checkbox" ${sel ? 'checked' : ''} onclick="event.preventDefault()">
+        <span>${t.label}</span>
+      </div>`;
+    });
+  });
+
+  return `<div class="audience-dropdown" id="audienceDropdown">
+    <div class="audience-dropdown-trigger" onclick="event.stopPropagation();toggleAudienceDropdown()">
+      <div class="audience-dropdown-chips">${chipsHTML}</div>
+      <span class="audience-dropdown-arrow">&#9660;</span>
+    </div>
+    <div class="audience-dropdown-panel">${panelHTML}</div>
+  </div>`;
+}
+
+function toggleAudienceDropdown() {
+  const dd = document.getElementById('audienceDropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+
+function toggleAllAudience() {
+  const allTagValues = audienceTags.map(t => t.value);
+  if (editingAudience.length === allTagValues.length) {
+    editingAudience = [];
+  } else {
+    editingAudience = [...allTagValues];
+  }
+  rerenderAudienceDropdown();
+}
+
+function toggleAudience(value) {
+  const i = editingAudience.indexOf(value);
+  if (i >= 0) editingAudience.splice(i, 1);
+  else editingAudience.push(value);
+  rerenderAudienceDropdown();
+}
+
+function clearAllAudience() {
+  editingAudience = [];
+  rerenderAudienceDropdown();
+}
+
+function rerenderAudienceDropdown() {
+  const wasOpen = document.getElementById('audienceDropdown')?.classList.contains('open');
+  document.getElementById('audienceSelector').innerHTML = renderAudienceSelector(false);
+  if (wasOpen) {
+    document.getElementById('audienceDropdown')?.classList.add('open');
+  }
+  // 设置全部用户复选框的 indeterminate 状态（无论下拉是否打开都要设）
+  const allCheckbox = document.getElementById('audienceAllCheckbox');
+  const allTagValues = audienceTags.map(t => t.value);
+  if (allCheckbox && editingAudience.length > 0 && editingAudience.length < allTagValues.length) {
+    allCheckbox.indeterminate = true;
+  }
+  refreshTriggerSection();
+}
+
+// 点击下拉外部区域关闭
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('audienceDropdown');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+// ===== 目标人群（V1：仅快捷标签） =====
+function buildAudienceSummaryFromData(audience) {
+  const allTagValues = audienceTags.map(t => t.value);
+  if (audience.length === 0 || audience.length === allTagValues.length) return '全部用户';
+  const names = audience.map(getAudienceLabel);
+  return names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+}
+
+function randomizePushAudienceData() {
+  const templates = JSON.parse(JSON.stringify(pushSeedTemplates));
+  const allTagValues = audienceTags.map(t => t.value);
+  return templates.map(push => {
+    const p = { ...push };
+    delete p.content_id;
+    if (Math.random() < 0.12) {
+      p.audience = [...allTagValues];
+    } else {
+      const cnt = 1 + Math.floor(Math.random() * Math.min(3, allTagValues.length));
+      const shuffled = allTagValues.slice().sort(() => Math.random() - 0.5);
+      p.audience = shuffled.slice(0, cnt);
+    }
+    delete p.audienceFlat;
+    delete p.audienceRule;
+    delete p.audienceCombine;
+    p.audienceSummary = buildAudienceSummaryFromData(p.audience);
+    return p;
+  });
+}
+
+pushes = randomizePushAudienceData();
+pushes.sort(() => Math.random() - 0.5);
+
+function renderAudienceBuilder() {
+  // 收起状态：仅展示最终人群
+  if (audienceBuilderCollapsed) {
+    return `<div class="aud-builder collapsed">
+      <div class="aud-collapse-bar" onclick="toggleAudienceCollapse()">
+        <span class="aud-collapse-summary">最终人群 = <b>${buildAudienceSummary()}</b></span>
+        <span class="aud-collapse-toggle">展开编辑 <span class="aud-arrow">▼</span></span>
+      </div>
+    </div>`;
+  }
+
+  const quickHTML = audienceTagGroups.map(g => `
+    <div class="aud-quick-group">
+      <div class="aud-quick-group-label">${g.label}</div>
+      <div class="aud-quick-chips">
+        ${g.tags.map(t => `<span class="aud-quick-chip ${editingAudience.includes(t.value) ? 'on' : ''}" title="${escapeHtml(t.label)}" onclick="toggleQuickTag('${t.value}')">${t.label.split('（')[0]}</span>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const footer = `
+    <div class="aud-quick-foot">
+      <div class="aud-estimate-inline">
+        <button type="button" class="aud-est-btn" onclick="estimateAudience()">预估人数</button>
+        <span class="aud-est-result" id="audEstResult">${editingAudienceEstimate || ''}</span>
+      </div>
+    </div>`;
+
+  return `<div class="aud-builder">
+    <div class="aud-collapse-bar" onclick="toggleAudienceCollapse()">
+      <span class="aud-collapse-title">人群配置</span>
+      <span class="aud-collapse-toggle">收起 <span class="aud-arrow">▲</span></span>
+    </div>
+    <div class="aud-section">
+      <div class="aud-quick">
+        <div class="aud-quick-head">快捷人群 ${renderAudienceHelp()} <span class="hint">点击选择，可多选；不选择任何标签默认为全部用户</span></div>
+        ${quickHTML}${footer}
+      </div>
+    </div>
+  </div>`;
+}
+
+// 快捷人群「?」说明：悬浮展示各预设标签的人群定义
+function renderAudienceHelp() {
+  const groupsHTML = audienceTagGroups.map(g => `
+    <div class="aud-help-group">
+      <div class="aud-help-g-label">${g.label}</div>
+      ${g.tags.map(t => {
+        const name = t.label.split('（')[0];
+        const def = (t.label.split('（')[1] || '').replace('）', '');
+        return `<div class="aud-help-item"><b>${name}</b>：${def || '—'}</div>`;
+      }).join('')}
+    </div>`).join('');
+  return `<span class="aud-help" onclick="event.stopPropagation()">?<span class="aud-help-pop">
+    <div class="aud-help-title">预设人群定义</div>${groupsHTML}</span></span>`;
+}
+
+function toggleAudienceCollapse() {
+  audienceBuilderCollapsed = !audienceBuilderCollapsed;
+  rerenderAudienceBuilder();
+}
+
+// 合成最终人群的可读描述
+function buildAudienceSummary() {
+  const allTags = audienceTags.map(t => t.value);
+  if (editingAudience.length === 0 || editingAudience.length === allTags.length) return '全部用户';
+  const names = editingAudience.map(getAudienceLabel);
+  return names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+}
+
+function toggleQuickTag(v) {
+  const i = editingAudience.indexOf(v);
+  if (i >= 0) editingAudience.splice(i, 1); else editingAudience.push(v);
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+function rerenderAudienceBuilder() {
+  const host = document.getElementById('audienceSelector');
+  if (host) host.innerHTML = renderAudienceBuilder();
+}
+
+// 模拟人数预估：仅用于原型演示，真实计算由人群服务执行
+function estimateAudience() {
+  const n = editingAudience.length;
+  const base = 1268000;
+  const est = n === 0 ? base : Math.max(800, Math.round(base / Math.pow(2.4, n) * (0.8 + Math.random() * 0.4)));
+  editingAudienceEstimate = `预计覆盖约 <b>${est.toLocaleString()}</b> 人 <span style="color:var(--text-muted)">（模拟数据，实际以人群服务计算为准）</span>`;
+  const el = document.getElementById('audEstResult');
+  if (el) el.innerHTML = editingAudienceEstimate;
+}
+
+// ===== 人群-触发联动约束 =====
+// 相对时间触发已改为「时间字段 + 延迟时间」，与目标人群解耦，恒允许选择
+function getAudienceConstraints() {
+  return { allowRelative: true, disabledEvents: [] };
+}
+
+// ===== 变量插入 =====
+const VAR_LIMIT = 110; // iOS 锁屏 4 行推荐上限
+
+function insertVariable(v) {
+  const ta = document.getElementById('pushBody');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const text = ta.value;
+  ta.value = text.slice(0, start) + v + text.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + v.length;
+  ta.focus();
+  updateCharCounter();
+}
+
+function updateCharCounter() {
+  const ta = document.getElementById('pushBody');
+  const counter = document.getElementById('charCounter');
+  if (!ta || !counter) return;
+  const len = ta.value.length;
+  counter.textContent = len + ' / ' + VAR_LIMIT + ' 推荐';
+  counter.className = 'char-counter' + (len > VAR_LIMIT ? ' over' : len > VAR_LIMIT * 0.8 ? ' warn' : '');
+}
+
+// ===== 优先级冲突检测 =====
+function checkPriorityConflict(audience, priority, excludeId) {
+  const conflictItems = [];
+  pushes.forEach(p => {
+    if (excludeId && p.id === excludeId) return;
+    if (p.status !== 'running' && p.status !== 'pending') return;
+    if (Number(p.priority) !== Number(priority)) return;
+
+    const reasons = [];
+    if (p.audience && p.audience.length && audience && audience.length) {
+      const intersected = p.audience.filter(tag => audience.includes(tag));
+      if (intersected.length > 0) {
+        const intersectedNames = intersected.map(tag => {
+          const found = audienceTags.find(t => t.value === tag);
+          return found ? found.label.split('（')[0] : tag;
+        }).join('、');
+        reasons.push('相同人群标签：' + intersectedNames);
+      }
+    }
+    if (reasons.length === 0) return;
+    conflictItems.push({ name: p.name, priority: p.priority, reason: reasons.join('；') });
+  });
+  if (conflictItems.length > 0) {
+    const names = conflictItems.slice(0, 3).map((item, i) => `${i + 1}. ${item.name}（优先级 ${item.priority}，冲突原因：${item.reason}）`).join('<br>');
+    const moreHint = conflictItems.length > 3 ? `<br>等共 ${conflictItems.length} 条` : '';
+    showModal(`优先级冲突检测<br><br>以下推送与当前推送存在相同的目标人群标签且优先级同为 <b>${priority}</b>，可能导致推送行为不可预测：<br><br>${names}${moreHint}<br><br>请调整优先级数值或修改目标人群后再保存。`, null);
+    return false;
+  }
+  return true;
+}
+
+// ===== 保存 =====
+function savePush(action) {
+  const name = document.getElementById('pushName').value.trim();
+  const pushType = document.getElementById('pushType').value;
+  const title = document.getElementById('pushTitle').value.trim();
+  const subtitle = document.getElementById('pushSubtitle').value.trim();
+  const link = document.getElementById('pushLink').value.trim();
+  const linkUrl = document.getElementById('h5LinkUrl')?.value.trim() || '';
+  const pushTypeForSave = document.getElementById('pushType').value;
+  const triggerTypeForSave = document.getElementById('triggerTypeSelect')?.value || 'fixed';
+  const hideNoRepeat = pushTypeForSave === 'manual' || (pushTypeForSave === 'auto' && (triggerTypeForSave === 'fixed' || triggerTypeForSave === 'scheduled'));
+  const noRepeatEl = document.getElementById('noRepeat');
+  const noRepeat = hideNoRepeat ? null : (noRepeatEl ? noRepeatEl.checked : true);
+
+  if (!name) { showToast('请输入推送名称'); return; }
+  if (!title) { showToast('请输入推送标题'); return; }
+  if (editingChannels.length === 0) { showToast('请至少选择一个推送渠道'); return; }
+  // 新建、编辑(非待发送)：校验条件构造器规则；查看/待发送：沿用原标签必填校验
+  const existingPushForSave = editingId ? pushes.find(e => e.id === editingId) : null;
+  const isPendingEditSave = !!(existingPushForSave && existingPushForSave.status === 'pending');
+  const useAudienceBuilder = (drawerMode === 'new' || (drawerMode === 'edit' && !isPendingEditSave));
+  // V1：仅快捷人群标签，不选标签表示全部用户
+  if (link === 'h5' && !linkUrl) { showToast('请输入链接地址'); return; }
+  let triggerType = '';
+  let triggerDesc = '';
+  let pushTime = '';
+  let priority = 3;
+  let triggerCycle = '';
+  let triggerDayOfWeek = null;
+  let triggerDayOfMonth = null;
+  let triggerTimeVal = '';
+  let relativeFieldVal = '';
+  let relativeDelayVal = 0;
+
+  const priorityVal = document.getElementById('pushPriority').value;
+  if (priorityVal === '' || priorityVal === null || priorityVal === undefined) {
+    showToast('请填写优先级'); return;
+  }
+  priority = parseFloat(priorityVal);
+  if (isNaN(priority) || priority < 0 || priority > 100) { showToast('优先级需在0-100之间'); return; }
+  // 保留最多1位小数
+  priority = Math.round(priority * 10) / 10;
+
+  if (!checkPriorityConflict(editingAudience, priority, editingId)) {
+    return;
+  }
+
+  if (pushType === 'auto') {
+    triggerType = document.getElementById('triggerTypeSelect').value;
+    if (!triggerType) { showToast('请选择触发方式'); return; }
+
+    if (triggerType === 'scheduled') {
+      const scheduledTime = document.getElementById('scheduledTime').value;
+      if (!scheduledTime) { showToast('请选择发送时间'); return; }
+      pushTime = scheduledTime;
+      triggerDesc = `定时发送 ${scheduledTime}`;
+    } else if (triggerType === 'fixed') {
+      const cycle = document.getElementById('fixedCycle').value;
+      const time = document.getElementById('fixedTime').value;
+      triggerCycle = cycle;
+      triggerTimeVal = time;
+      if (cycle === 'daily') {
+        triggerDesc = `每日 ${time}`;
+      } else if (cycle === 'weekly') {
+        const dow = parseInt(document.getElementById('fixedDayOfWeek').value);
+        triggerDayOfWeek = dow;
+        const dowMap = { 1:'周一',2:'周二',3:'周三',4:'周四',5:'周五',6:'周六',0:'周日' };
+        triggerDesc = `每${dowMap[dow] || '周一'} ${time}`;
+      } else {
+        const day = document.getElementById('fixedDayOfMonth').value;
+        triggerDayOfMonth = parseInt(day) || 1;
+        triggerDesc = `每月${day}日 ${time}`;
+      }
+    } else if (triggerType === 'relative') {
+      const field = document.getElementById('relativeField').value;
+      const delay = parseInt(document.getElementById('relativeDelay').value);
+      if (!field) { showToast('请选择触发节点'); return; }
+      if (isNaN(delay) || delay < 0 || delay > 999) { showToast('延迟时间需为0-999的整数'); return; }
+      relativeFieldVal = field;
+      relativeDelayVal = delay;
+      const fieldDef = findAudienceFieldDef(field);
+      triggerDesc = `${fieldDef ? formatTriggerNodeLabel(fieldDef.label) : field} 延迟${delay}小时`;
+    }
+  } else {
+    pushTime = ''; // 手动推送只能立即发送
+  }
+
+  // 手动推送：定时发送 => 待发送；立即发送 => 已发送
+  const manualScheduled = pushType === 'manual' && !!pushTime;
+  const manualStatus = manualScheduled ? 'pending' : 'sent';
+
+  const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+
+  if (editingId) {
+    const p = pushes.find(e => e.id === editingId);
+    if (p) {
+      p.name = name;
+      p.type = pushType;
+      p.channels = [...editingChannels];
+      p.audience = [...editingAudience];
+      if (useAudienceBuilder) {
+        p.audienceSummary = buildAudienceSummary();
+        delete p.audienceRule;
+        delete p.audienceFlat;
+        delete p.audienceCombine;
+      }
+      p.triggerType = triggerType;
+      p.triggerDesc = triggerDesc;
+      p.triggerCycle = triggerCycle;
+      p.triggerDayOfWeek = triggerDayOfWeek;
+      p.triggerDayOfMonth = triggerDayOfMonth;
+      p.triggerTime = triggerTimeVal;
+      p.relativeField = relativeFieldVal;
+      p.relativeDelay = relativeDelayVal;
+      delete p.relativeFrom;
+      delete p.relativeTo;
+      p.priority = priority;
+      p.title = title;
+      p.subtitle = subtitle;
+      p.link = link;
+      p.linkUrl = linkUrl;
+      p.pushTime = pushTime;
+      p.noRepeat = noRepeat;
+      if (action === 'save') {
+        // 自动规则：定时发送为待发送，其他为运行中；手动推送：定时发送为待发送，立即发送为已发送
+        p.status = pushType === 'auto' 
+          ? (triggerType === 'scheduled' ? 'pending' : 'running')
+          : manualStatus;
+      }
+    }
+  } else {
+    pushes.unshift({
+      id: nextId++,
+      name,
+      type: pushType,
+      channels: [...editingChannels],
+      audience: [...editingAudience],
+      audienceSummary: useAudienceBuilder ? buildAudienceSummary() : '',
+      triggerType,
+      triggerDesc,
+      triggerCycle,
+      triggerDayOfWeek,
+      triggerDayOfMonth,
+      triggerTime: triggerTimeVal,
+      relativeField: relativeFieldVal,
+      relativeDelay: relativeDelayVal,
+      priority,
+      status: action === 'save' 
+        ? (pushType === 'auto' 
+          ? (triggerType === 'scheduled' ? 'pending' : 'running')
+          : manualStatus) 
+        : 'draft',
+      title,
+      subtitle,
+      link,
+      linkUrl,
+      pushTime,
+      noRepeat,
+      createTime: now,
+      creator: '当前用户'
+    });
+  }
+
+  if (action === 'save' && pushType === 'manual') {
+    showToast(manualScheduled ? '已设置定时发送' : '推送已发送', 'success');
+  } else {
+    showToast('保存成功', 'success');
+  }
+  closeDrawer();
+  refreshTable();
+}
+
+// ===== 发送确认 =====
+let sendTargetId = null;
+
+function openSendConfirm(id) {
+  sendTargetId = id;
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+
+  const channelStr = (p.channels || []).map(c => getChannelLabel(c)).join('、');
+  const totalAudienceTags = audienceTags.length;
+  let audienceStr;
+  if (p.audienceSummary !== undefined && p.audienceSummary !== '') {
+    audienceStr = p.audienceSummary || '全部用户';
+  } else if ((p.audience || []).length === totalAudienceTags) {
+    audienceStr = '全部用户';
+  } else {
+    audienceStr = (p.audience || []).map(a => getAudienceLabel(a)).join('、');
+  }
+
+  document.getElementById('sendModalMsg').innerHTML = `
+    即将发送推送「<b>${escapeHtml(p.name)}</b>」<br><br>
+    渠道：${channelStr}<br>
+    目标人群：${audienceStr}<br>
+    标题：${escapeHtml(p.title)}<br>
+    副标题：${escapeHtml(p.subtitle || '(无)')}
+  `;
+
+  document.getElementById('sendModalWarning').style.display = 'none';
+  document.getElementById('sendModal').style.display = 'flex';
+}
+
+function closeSendModal() {
+  sendTargetId = null;
+  document.getElementById('sendModal').style.display = 'none';
+}
+
+function confirmSend() {
+  if (sendTargetId !== null) {
+    const p = pushes.find(e => e.id === sendTargetId);
+    if (p) {
+      p.status = 'sent';
+      const now = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+      p.createTime = now;
+    }
+    sendTargetId = null;
+    document.getElementById('sendModal').style.display = 'none';
+    refreshTable();
+    showToast('推送已发送', 'success');
+  }
+}
+
+// ===== 自动规则开关 =====
+function toggleAutoRule(id) {
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+  if (p.status === 'running') {
+    p.status = 'paused';
+    showToast('规则已暂停');
+  } else if (p.status === 'paused') {
+    if (!checkPriorityConflict(p.audience || [], p.priority, p.id)) {
+      return;
+    }
+    p.status = 'running';
+    showToast('规则已启用');
+  }
+  refreshTable();
+}
+
+// ===== 取消定时（待发送 → 草稿）=====
+function cancelSchedule(id) {
+  const p = pushes.find(e => e.id === id);
+  if (!p) return;
+  if (confirm('确定取消该推送的定时发送吗？取消后将转为草稿。')) {
+    p.status = 'draft';
+    p.pushTime = '';
+    refreshTable();
+    showToast('已取消定时，转为草稿');
+  }
+}
+
+// ===== 删除确认弹窗（与语料包后台一致）=====
+let pendingDeleteAction = null;
+
+function openDeleteModal(title, msg, onConfirm) {
+  document.getElementById('deleteModalTitle').textContent = title;
+  document.getElementById('deleteModalMsg').innerHTML = msg;
+  pendingDeleteAction = onConfirm;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  pendingDeleteAction = null;
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDeleteModal() {
+  const action = pendingDeleteAction;
+  closeDeleteModal();
+  if (action) action();
+}
+
+// ===== 删除 =====
+function deletePush(id) {
+  const p = pushes.find(e => e.id === id);
+  const name = p ? p.name : '';
+  openDeleteModal('删除推送', `确定删除推送${name ? '「' + escapeHtml(name) + '」' : ''}吗？删除后不可恢复。`, () => {
+    pushes = pushes.filter(e => e.id !== id);
+    refreshTable();
+    showToast('已删除');
+  });
+}
+
+// ===== 优先级输入失焦校验 =====
+function onPriorityBlur() {
+  const input = document.getElementById('pushPriority');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  // 非数值或超出范围 → 清空+标红+提示
+  if (isNaN(num) || num < 0 || num > 100) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入0-100范围内的数值', 'error');
+    return;
+  }
+  // 合法数值 → 四舍五入保留1位小数
+  input.value = Math.round(num * 10) / 10;
+  input.classList.remove('input-error');
+}
+
+function onMonthDayBlur() {
+  const input = document.getElementById('fixedDayOfMonth');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  if (isNaN(num) || num < 1 || num > 28) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入1-28范围内的整数', 'error');
+    return;
+  }
+  input.value = Math.round(num);
+  input.classList.remove('input-error');
+}
+
+// 小时输入校验（0-999 整数），用于「相对时间」的延迟时间
+function clampHourInput(id) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') {
+    input.classList.remove('input-error');
+    return;
+  }
+  const num = parseFloat(val);
+  if (isNaN(num) || num < 0 || num > 999) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('请输入0-999范围内的整数', 'error');
+    return;
+  }
+  input.value = Math.round(num);
+  input.classList.remove('input-error');
+}
+
+function updateSubtitleHint() {
+  const hint = document.getElementById('subtitleHint');
+  if (!hint) return;
+  hint.innerHTML = '';
+}
+
+// ===== Toast =====
+function showToast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+// ===== Modal =====
+function showModal(htmlContent, onConfirm) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  const cancelBtn = document.getElementById('modalCancel');
+  if (!overlay || !content) return;
+  content.innerHTML = htmlContent;
+  overlay.style.display = 'flex';
+  const close = function() { overlay.style.display = 'none'; };
+  cancelBtn.onclick = function() { close(); if (typeof onConfirm === 'function') onConfirm(false); };
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+// ===== 初始化 =====
+refreshTable();
+</script>
+
+</body>
+</html>
