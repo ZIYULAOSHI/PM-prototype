@@ -1889,12 +1889,9 @@ const audienceTags = audienceTagGroups.flatMap(g => g.tags);
 // 相对时间触发节点（datetime 类字段，供「注册后 / 创建策略后」等延迟推送使用）
 const relativeTriggerFieldRegistry = [
   { field: 'reg_time',              label: '注册时间',           type: 'datetime' },
-  { field: 'first_login_time',      label: '首次登录时间',       type: 'datetime' },
   { field: 'last_login_time',       label: '最近登录时间',       type: 'datetime' },
   { field: 'last_strategy_time',    label: '最近创建策略时间',   type: 'datetime' },
-  { field: 'first_real_trade_time', label: '首次实盘时间',       type: 'datetime' },
-  { field: 'broker_open_time',      label: '开通券商账户时间',   type: 'datetime' },
-  { field: 'wechat_bind_time',      label: '微信绑定时间',       type: 'datetime' }
+  { field: 'first_real_trade_time', label: '首次实盘时间',       type: 'datetime' }
 ];
 
 function findAudienceFieldDef(field) {
