@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -276,6 +276,38 @@ body {
 
 .btn-new { margin-left: auto; }
 
+/* 高级筛选 */
+.adv-conn { margin: 6px 0 6px 2px; }
+.adv-combine-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
+/* 多标签关系（快捷人群容器顶部，单选圆圈） */
+.adv-tagrel { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px dashed var(--border); }
+.adv-tagrel.adv-tagrel-inline { padding: 0; margin: 0; border: none; gap: 12px; font-weight: 400; }
+.adv-tagrel-label { font-size: 12px; line-height: 16px; color: var(--text-secondary); font-weight: 600; }
+.adv-tagrel-inline { align-items: center; }
+.adv-radio { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; line-height: 16px; color: var(--text); cursor: pointer; }
+.adv-radio input {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  cursor: pointer; margin: 0; width: 16px; height: 16px; flex-shrink: 0;
+  border: 1.5px solid #c4c8d0; border-radius: 50%; background: #fff;
+  position: relative; box-sizing: border-box; transition: border-color .15s;
+}
+.adv-radio input:checked { border-color: var(--accent); }
+.adv-radio input:checked::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  transform: translate(-50%, -50%);
+}
+.adv-radio span { font-size: 12px; line-height: 16px; }
+.aud-del-text { border: none; background: none; color: var(--danger); font-size: 12.5px; cursor: pointer; padding: 0 4px; font-family: var(--font); white-space: nowrap; flex-shrink: 0; }
+.aud-del-text:hover { text-decoration: underline; }
+.aud-reset-link { background: none; border: none; color: var(--text-secondary); font-size: 13px; cursor: pointer; font-family: var(--font); }
+.aud-reset-link:hover { color: var(--accent); }
+/* 高级筛选生效后的状态胶囊 */
+.adv-pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 6px 0 12px; border: 1px solid var(--accent); background: var(--accent-light); color: var(--accent); border-radius: var(--radius); font-size: 12.5px; max-width: 260px; }
+.adv-pill .adv-pill-label { cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.adv-pill .adv-pill-x { cursor: pointer; font-size: 15px; line-height: 1; opacity: 0.7; padding: 0 2px; }
+.adv-pill .adv-pill-x:hover { opacity: 1; color: var(--danger); }
+
 .btn-danger-text {
   color: var(--danger);
   background: none;
@@ -351,6 +383,24 @@ thead th.col-actions {
   background: #f8f9fb;
   box-shadow: -4px 0 8px -4px rgba(0,0,0,0.08);
 }
+
+/* 列排序控件 */
+.sort-ctrl {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 0.75;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.sort-arrow {
+  font-size: 8px;
+  color: #c4c8d0;
+  cursor: pointer;
+  transition: color 0.15s;
+  user-select: none;
+}
+.sort-arrow:hover { color: var(--text-secondary); }
+.sort-arrow.active { color: var(--accent); }
 
 tbody td {
   padding: 12px 14px;
@@ -930,6 +980,7 @@ tbody tr:last-child td { border-bottom: none; }
 .aud-quick-head .hint { font-size:11px; font-weight:400; color:var(--text-muted); }
 .aud-quick-foot { border-top:1px dashed var(--border); margin-top:6px; padding-top:10px; display:flex; flex-direction:column; gap:10px; }
 .aud-estimate-inline { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.aud-builder-foot { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); flex-wrap:wrap; }
 .aud-quick-chip.custom { position:relative; background:#fff7ed; border:1px solid #fdba74; color:#b45309; max-width:100%; }
 .aud-quick-chip.custom:hover { border-color:#f59e0b; }
 .aud-chip-close { position:absolute; top:-7px; right:-7px; width:16px; height:16px; border-radius:50%; background:#ef4444; color:#fff; font-size:12px; line-height:16px; text-align:center; display:none; box-shadow:0 1px 3px rgba(0,0,0,.25); }
@@ -1319,8 +1370,9 @@ tbody tr:last-child td { border-bottom: none; }
           <option value="paused">已暂停</option>
           <option value="sent">已发送</option>
         </select>
-        <select id="audienceFilter">
-          <option value="">全部人群</option>
+        <select id="audienceFilter" onchange="onAudienceFilterChange(this.value)">
+          <option value="">全部人群标签</option>
+          <option value="__all_users__">全部用户</option>
           <option value="top_user">头部用户</option>
           <option value="non_top_user">非头部用户</option>
           <option value="new_user">新用户</option>
@@ -1331,7 +1383,10 @@ tbody tr:last-child td { border-bottom: none; }
           <option value="warning">预警用户</option>
           <option value="low_active">低活跃用户</option>
           <option value="dormant">沉睡用户</option>
+          <option value="__custom__">自定义条件</option>
+          <option value="__advanced__">高级筛选…</option>
         </select>
+        <span id="advFilterBox"></span>
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:var(--text-muted)">优先级</span>
           <input type="number" id="priorityMin" min="0" max="100" step="0.1" placeholder="最小" style="width:70px">
@@ -1348,16 +1403,16 @@ tbody tr:last-child td { border-bottom: none; }
           <thead>
             <tr>
               <th style="width:50px">序号</th>
-              <th style="width:160px">推送名称</th>
+              <th style="width:160px">推送名称<span class="sort-ctrl" data-field="name"><span class="sort-arrow up" onclick="setSort('name','asc')">▲</span><span class="sort-arrow down" onclick="setSort('name','desc')">▼</span></span></th>
               <th style="width:80px">推送类型</th>
               <th style="width:100px">推送渠道</th>
               <th style="width:140px">目标人群</th>
               <th style="width:110px">触发方式</th>
               <th style="width:160px">选择文章</th>
               <th style="width:140px">跳转链接</th>
-              <th style="width:60px">优先级</th>
-              <th style="width:80px">状态</th>
-              <th style="width:120px">创建时间</th>
+              <th style="width:60px">优先级<span class="sort-ctrl" data-field="priority"><span class="sort-arrow up" onclick="setSort('priority','asc')">▲</span><span class="sort-arrow down" onclick="setSort('priority','desc')">▼</span></span></th>
+              <th style="width:80px">状态<span class="sort-ctrl" data-field="status"><span class="sort-arrow up" onclick="setSort('status','asc')">▲</span><span class="sort-arrow down" onclick="setSort('status','desc')">▼</span></span></th>
+              <th style="width:120px">创建时间<span class="sort-ctrl" data-field="createTime"><span class="sort-arrow up" onclick="setSort('createTime','asc')">▲</span><span class="sort-arrow down" onclick="setSort('createTime','desc')">▼</span></span></th>
               <th class="col-actions" style="width:200px">操作</th>
             </tr>
           </thead>
@@ -1388,7 +1443,6 @@ tbody tr:last-child td { border-bottom: none; }
           <thead>
             <tr>
               <th style="width:50px">序号</th>
-              <th style="width:160px">文章ID</th>
               <th style="width:200px">文章标题</th>
               <th style="width:80px">状态</th>
               <th style="width:100px">关联推送数</th>
@@ -1455,6 +1509,9 @@ tbody tr:last-child td { border-bottom: none; }
     <button class="btn btn-primary" id="btnContentSave" onclick="saveContent()">保存</button>
   </div>
 </div>
+
+<!-- 高级筛选弹窗宿主 -->
+<div id="advFilterHost"></div>
 
 <!-- Toast Container -->
 <div id="toastContainer"></div>
@@ -2032,8 +2089,7 @@ const audienceFieldRegistry = [
 const relativeTriggerFieldRegistry = [
   { field: 'reg_time',              label: '注册时间',           type: 'datetime' },
   { field: 'last_login_time',       label: '最近登录时间',       type: 'datetime' },
-  { field: 'last_strategy_time',    label: '最近创建策略时间',   type: 'datetime' },
-  { field: 'first_real_trade_time', label: '首次实盘时间',       type: 'datetime' }
+  { field: 'last_strategy_time',    label: '最近创建策略时间',   type: 'datetime' }
 ];
 
 // 各数据类型支持的算子
@@ -2115,7 +2171,9 @@ let editingChannels = [];
 let editingAudienceRule = { logic: 'AND', conditions: [], ops: [] };
 let editingAudienceEstimate = '';
 // 快捷人群（预设标签多选）与「快捷人群 ↔ 自定义条件」之间的关系
-let editingAudienceCombine = 'AND';
+let editingAudienceCombine = 'OR';
+// 快捷人群标签之间的关系（或/且）；「且」时各分层仅可单选
+let editingAudienceTagCombine = 'OR';
 // 目标人群编辑区收起/展开（默认收起）
 let audienceBuilderCollapsed = true;
 // 非高级模式下，预览区中被展开编辑的条件索引（null 表示未展开）
@@ -2305,6 +2363,50 @@ function renderPagination(total, page, pageSize) {
 let currentPage = 1;
 const pageSize = 10;
 
+// ===== 列表排序 =====
+let sortField = '';   // name | priority | status | createTime
+let sortDir = '';     // asc | desc
+const statusSortOrder = { draft: 0, pending: 1, running: 2, paused: 3, sent: 4 };
+
+function setSort(field, dir) {
+  if (sortField === field && sortDir === dir) {
+    // 再次点击当前方向 → 取消排序
+    sortField = ''; sortDir = '';
+  } else {
+    sortField = field; sortDir = dir;
+  }
+  currentPage = 1;
+  refreshTable();
+}
+
+function comparePush(a, b) {
+  let r = 0;
+  if (sortField === 'name') {
+    r = String(a.name || '').localeCompare(String(b.name || ''), 'zh');
+  } else if (sortField === 'priority') {
+    const av = (a.priority === null || a.priority === undefined || a.priority === '') ? Infinity : Number(a.priority);
+    const bv = (b.priority === null || b.priority === undefined || b.priority === '') ? Infinity : Number(b.priority);
+    r = av - bv;
+  } else if (sortField === 'status') {
+    r = (statusSortOrder[a.status] ?? -1) - (statusSortOrder[b.status] ?? -1);
+  } else if (sortField === 'createTime') {
+    const ad = new Date(a.createTime).getTime();
+    const bd = new Date(b.createTime).getTime();
+    r = (isNaN(ad) || isNaN(bd)) ? String(a.createTime).localeCompare(String(b.createTime)) : ad - bd;
+  }
+  return sortDir === 'desc' ? -r : r;
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('.sort-ctrl').forEach(ctrl => {
+    const f = ctrl.dataset.field;
+    const up = ctrl.querySelector('.up');
+    const down = ctrl.querySelector('.down');
+    if (up) up.classList.toggle('active', sortField === f && sortDir === 'asc');
+    if (down) down.classList.toggle('active', sortField === f && sortDir === 'desc');
+  });
+}
+
 // ===== 页面切换 =====
 let currentMainPage = 'pushManage';
 function switchToPage(page) {
@@ -2346,7 +2448,19 @@ function refreshTable() {
   }
   if (typeFilter) data = data.filter(d => d.type === typeFilter);
   if (statusFilter) data = data.filter(d => d.status === statusFilter);
-  if (audienceFilter) data = data.filter(d => d.audience && d.audience.includes(audienceFilter));
+  // 目标人群筛选：高级筛选优先；否则走下拉（全部用户 / 自定义条件 / 预设标签）
+  if (advFilter.active) {
+    data = data.filter(d => advMatch(d));
+  } else if (audienceFilter === '__all_users__') {
+    data = data.filter(d => {
+      const tags = d.audience || [];
+      return tags.length === audienceTags.length || (tags.length === 0 && !hasCustomAudienceRule(d));
+    });
+  } else if (audienceFilter === '__custom__') {
+    data = data.filter(d => hasCustomAudienceRule(d));
+  } else if (audienceFilter) {
+    data = data.filter(d => d.audience && d.audience.includes(audienceFilter));
+  }
   if (priorityMin !== '' && priorityMin !== undefined && priorityMin !== null) {
     const min = Number(priorityMin);
     data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) >= min);
@@ -2355,11 +2469,13 @@ function refreshTable() {
     const max = Number(priorityMax);
     data = data.filter(d => d.priority !== null && d.priority !== undefined && d.priority !== '' && Number(d.priority) <= max);
   }
+  if (sortField && sortDir) data = data.slice().sort(comparePush);
   const total = data.length;
   const start = (currentPage - 1) * pageSize;
   const paged = data.slice(start, start + pageSize);
   renderTable(paged);
   document.getElementById('pagination').innerHTML = renderPagination(total, currentPage, pageSize);
+  updateSortIndicators();
 }
 
 function goPage(page) { currentPage = page; refreshTable(); }
@@ -2368,7 +2484,17 @@ function resetFilters() {
   document.getElementById('searchInput').value = '';
   document.getElementById('typeFilter').value = '';
   document.getElementById('statusFilter').value = '';
-  document.getElementById('audienceFilter').value = '';
+  advFilter.active = false;
+  advFilter.tags = [];
+  advFilter.tagCombine = 'OR';
+  advFilter.conds = [];
+  advFilter.ops = [];
+  advFilter.combine = 'OR';
+  lastAudSelect = '';
+  const audSel = document.getElementById('audienceFilter');
+  audSel.disabled = false;
+  audSel.value = '';
+  updateAdvFilterBtn();
   document.getElementById('priorityMin').value = '';
   document.getElementById('priorityMax').value = '';
   currentPage = 1;
@@ -2413,7 +2539,8 @@ function openDrawer(mode, id) {
     editingAudienceRule = { logic: 'AND', conditions: [], ops: [] };
   }
   editingAudienceEstimate = '';
-  editingAudienceCombine = (p && p.audienceCombine) ? p.audienceCombine : 'AND';
+  editingAudienceCombine = (p && p.audienceCombine) ? p.audienceCombine : 'OR';
+  editingAudienceTagCombine = (p && p.audienceTagCombine) ? p.audienceTagCombine : 'OR';
   audienceBuilderCollapsed = true;
   audiencePreviewExpanded = null;
   audienceCustomPopupOpen = false;
@@ -2471,7 +2598,7 @@ function renderDrawerForm(p, isView) {
     audienceInner = renderAudienceSelector(isView, isPendingEdit);
   }
   html += `<div class="form-group" id="audienceGroup">
-    <label><span class="required">*</span> 目标人群</label>
+    <label><span class="required">*</span> 目标人群 <span class="hint">不选择任何标签默认为全部用户</span></label>
     <div id="audienceSelector">${audienceInner}</div>
   </div>`;
 
@@ -2511,7 +2638,7 @@ function renderDrawerForm(p, isView) {
     </div>
   </div>
   <div class="form-group">
-    <label>优先级</label>
+    <label><span class="required">*</span> 优先级</label>
     ${isView
       ? `<div style="font-size:13px;color:var(--text)">${p && p.priority !== null && p.priority !== undefined ? p.priority : '--'}</div>`
       : `<input type="number" id="pushPriority" min="0" max="100" step="0.1" value="${p && p.priority !== null && p.priority !== undefined ? p.priority : ''}" placeholder="0-100，数值越小优先级越高" style="width:100%" ${pendingDisabled} onblur="onPriorityBlur()">`}
@@ -2531,9 +2658,9 @@ function renderDrawerForm(p, isView) {
   </div>`;
 
   html += `<div class="form-group">
-    <label>副标题 <span class="hint">（非必填，消息列表中的描述文本）</span></label>
-    <textarea id="pushSubtitle" rows="2" placeholder="如不填写，将自动截取所选文章正文前30字；若未选文章，则消息列表仅展示标题" ${disabled || pendingDisabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
-    <div id="subtitleHint" style="font-size:11px;margin-top:4px"></div>
+    <label>副标题 <span class="hint">（非必填，不超过500字符）</span></label>
+    <textarea id="pushSubtitle" rows="2" maxlength="500" placeholder="如不填写，将自动截取所选文章正文前30字；若未选文章，则消息列表仅展示标题" ${disabled || pendingDisabled} oninput="updateSubtitleHint()">${escapeHtml(p ? (p.subtitle || '') : '')}</textarea>
+    <div style="text-align:right;margin-top:4px"><span id="subtitleHint" class="char-counter"></span></div>
   </div>`;
 
   html += `<div class="form-group">
@@ -2603,10 +2730,10 @@ function renderTriggerParams(triggerType, p, disabled, audience, isPendingEdit) 
 
   if (triggerType === 'scheduled') {
     const scheduledTime = (p && p.pushTime) || '';
-    // 待发送状态：仅发送时间可编辑
+    // 待发送状态：仅发送时间可编辑；限制不可选择当前时间之前的历史时间
     html += `<div class="form-group">
       <label>发送时间</label>
-      <input type="datetime-local" id="scheduledTime" value="${scheduledTime}" ${disabled} onclick="this.showPicker && this.showPicker()" style="cursor:pointer">
+      <input type="datetime-local" id="scheduledTime" value="${scheduledTime}" min="${getNowDatetimeLocal()}" ${disabled} onclick="this.showPicker && this.showPicker()" onchange="onScheduledTimeChange()" style="cursor:pointer">
     </div>`;
   } else if (triggerType === 'fixed') {
     const cycle = (p && p.triggerCycle) || 'monthly';
@@ -3047,7 +3174,7 @@ function generateRandomAudienceFlat(options) {
   return { logic: 'AND', conditions, ops };
 }
 
-function buildAudienceSummaryFromData(audience, flatRule, combine) {
+function buildAudienceSummaryFromData(audience, flatRule, combine, tagCombine) {
   const allTagValues = audienceTags.map(t => t.value);
   const eff = (flatRule && flatRule.conditions && flatRule.conditions.length)
     ? buildRuleFromFlat(flatRule.conditions, flatRule.ops || [])
@@ -3059,7 +3186,8 @@ function buildAudienceSummaryFromData(audience, flatRule, combine) {
     tagPart = '全部用户';
   } else if (audience.length > 0) {
     const names = audience.map(getAudienceLabel);
-    tagPart = names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+    const tagJoin = tagCombine === 'AND' ? ' 且 ' : ' 或 ';
+    tagPart = names.length > 1 ? '（' + names.join(tagJoin) + '）' : names[0];
   }
 
   let customPart = '';
@@ -3105,17 +3233,18 @@ function randomizePushAudienceData() {
       p.audience = shuffleArray(allTagValues).slice(0, cnt);
     }
     p.audienceCombine = randBool(0.2) ? 'OR' : 'AND';
+    p.audienceTagCombine = randBool(0.5) ? 'AND' : 'OR';  // 多标签之间的关系
 
     if (customIndices.includes(idx)) {
       const flat = generateRandomAudienceFlat({ requireGroupChat: idx === groupChatIndex });
       const eff = buildRuleFromFlat(flat.conditions, flat.ops || []);
       p.audienceFlat = flat;
       p.audienceRule = JSON.parse(JSON.stringify(eff));
-      p.audienceSummary = buildAudienceSummaryFromData(p.audience, flat, p.audienceCombine);
+      p.audienceSummary = buildAudienceSummaryFromData(p.audience, flat, p.audienceCombine, p.audienceTagCombine);
     } else {
       delete p.audienceFlat;
       delete p.audienceRule;
-      p.audienceSummary = buildAudienceSummaryFromData(p.audience, null, p.audienceCombine);
+      p.audienceSummary = buildAudienceSummaryFromData(p.audience, null, p.audienceCombine, p.audienceTagCombine);
     }
 
     return p;
@@ -3144,41 +3273,23 @@ function renderAudienceBuilder() {
       </div>
     </div>`).join('');
 
-  // 自定义条件：作为「快捷人群」模块底部的一组，以标签形式呈现，点 + 弹出 AI/条件编辑
+  // 自定义条件（独立容器）
   const eff = getEffectiveRule();
   const hasCustom = countConditions(eff) > 0;
   const hasTags = editingAudience.length > 0;
   const customChip = hasCustom
     ? `<span class="aud-quick-chip custom on" title="点击编辑自定义条件" onclick="openCustomPopup()">${escapeHtml(summarizeRule(eff))}<span class="aud-chip-close" title="删除自定义条件" onclick="event.stopPropagation();confirmDeleteCustom()">×</span></span>`
     : '';
-  const customGroup = `
-    <div class="aud-quick-group">
-      <div class="aud-quick-group-label">自定义</div>
-      <div class="aud-quick-chips">
-        ${customChip}
-        <button type="button" class="aud-custom-add" onclick="openCustomPopup()" title="添加 / 编辑自定义条件">+</button>
-      </div>
-    </div>`;
 
   // 两者关系（快捷人群 ↔ 自定义条件），仅在两者都存在时出现
   const combineRow = (hasTags && hasCustom) ? `
-    <div class="aud-combine">
-      <span class="aud-combine-label">快捷人群与自定义条件的关系</span>
-      <div class="aud-logic-seg">
-        <button type="button" class="${editingAudienceCombine === 'AND' ? 'active' : ''}" onclick="setAudienceCombine('AND')">且（都满足）</button>
-        <button type="button" class="${editingAudienceCombine === 'OR' ? 'active' : ''}" onclick="setAudienceCombine('OR')">或（满足其一）</button>
+    <div class="aud-section">
+      <div class="adv-tagrel adv-tagrel-inline">
+        <span class="adv-tagrel-label">快捷人群 与 自定义条件 的关系</span>
+        <label class="adv-radio"><input type="radio" name="edTvC" ${editingAudienceCombine === 'OR' ? 'checked' : ''} onclick="setAudienceCombine('OR')"><span>或（满足其一）</span></label>
+        <label class="adv-radio"><input type="radio" name="edTvC" ${editingAudienceCombine === 'AND' ? 'checked' : ''} onclick="setAudienceCombine('AND')"><span>且（都满足）</span></label>
       </div>
     </div>` : '';
-
-  // 模块底部：两者关系 + 预估人数
-  const footer = `
-    <div class="aud-quick-foot">
-      ${combineRow}
-      <div class="aud-estimate-inline">
-        <button type="button" class="aud-est-btn" onclick="estimateAudience()">预估人数</button>
-        <span class="aud-est-result" id="audEstResult">${editingAudienceEstimate || ''}</span>
-      </div>
-    </div>`;
 
   return `<div class="aud-builder">
     <div class="aud-collapse-bar" onclick="toggleAudienceCollapse()">
@@ -3187,9 +3298,30 @@ function renderAudienceBuilder() {
     </div>
     <div class="aud-section">
       <div class="aud-quick">
-        <div class="aud-quick-head">快捷人群 ${renderAudienceHelp()} <span class="hint">点击选择，可多选；不选择任何标签默认为全部用户</span></div>
-        ${quickHTML}${customGroup}${footer}
+        <div class="aud-quick-head">
+          <span>快捷人群 ${renderAudienceHelp()}</span>
+          <span class="adv-tagrel adv-tagrel-inline" style="margin-left:auto">
+            <span class="adv-tagrel-label">快捷人群标签之间的关系</span>
+            <label class="adv-radio"><input type="radio" name="edTagCombine" ${editingAudienceTagCombine === 'OR' ? 'checked' : ''} onclick="setAudienceTagCombine('OR')"><span>或</span></label>
+            <label class="adv-radio"><input type="radio" name="edTagCombine" ${editingAudienceTagCombine === 'AND' ? 'checked' : ''} onclick="setAudienceTagCombine('AND')"><span>且</span></label>
+          </span>
+        </div>
+        ${quickHTML}
       </div>
+    </div>
+    ${combineRow}
+    <div class="aud-section">
+      <div class="aud-quick">
+        <div class="aud-quick-head">自定义条件</div>
+        <div class="aud-quick-chips">
+          ${customChip}
+          <button type="button" class="aud-custom-add" onclick="openCustomPopup()" title="添加 / 编辑自定义条件">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="aud-builder-foot">
+      <button type="button" class="aud-est-btn" onclick="estimateAudience()">预估人数</button>
+      <span class="aud-est-result" id="audEstResult">${editingAudienceEstimate || ''}</span>
     </div>
     ${audienceCustomPopupOpen ? renderAudienceCustomPopup() : ''}
   </div>`;
@@ -3316,6 +3448,11 @@ function togglePreviewCond(i) {
 }
 
 function addPreviewCondition() {
+  // 存在未完成的条件时，禁止再添加
+  if ((editingAudienceRule.conditions || []).some(c => !isConditionComplete(c))) {
+    showToast('存在未完成的条件');
+    return;
+  }
   if (editingAudienceRule.conditions.length > 0) {
     if (!Array.isArray(editingAudienceRule.ops)) editingAudienceRule.ops = [];
     editingAudienceRule.ops.push('AND');
@@ -3346,7 +3483,8 @@ function buildAudienceSummary() {
     tagPart = '全部用户';
   } else if (editingAudience.length > 0) {
     const names = editingAudience.map(getAudienceLabel);
-    tagPart = names.length > 1 ? '（' + names.join(' 或 ') + '）' : names[0];
+    const tagJoin = editingAudienceTagCombine === 'AND' ? ' 且 ' : ' 或 ';
+    tagPart = names.length > 1 ? '（' + names.join(tagJoin) + '）' : names[0];
   }
 
   let customPart = '';
@@ -3362,13 +3500,35 @@ function buildAudienceSummary() {
 
 function toggleQuickTag(v) {
   const i = editingAudience.indexOf(v);
-  if (i >= 0) editingAudience.splice(i, 1); else editingAudience.push(v);
+  if (i >= 0) { editingAudience.splice(i, 1); }
+  else {
+    // 「且」模式下各分层仅可单选：先移除同分层已选标签
+    if (editingAudienceTagCombine === 'AND') {
+      const g = advTagGroupOf(v);
+      if (g) { const vals = g.tags.map(t => t.value); editingAudience = editingAudience.filter(x => !vals.includes(x)); }
+    }
+    editingAudience.push(v);
+  }
   editingAudienceEstimate = '';
   rerenderAudienceBuilder();
 }
 
 function setAudienceCombine(v) {
   editingAudienceCombine = v;
+  editingAudienceEstimate = '';
+  rerenderAudienceBuilder();
+}
+
+// 标签之间的关系（或/且）。切换为「且」时，若某分层已多选，则清空全部选中
+function setAudienceTagCombine(v) {
+  if (v === 'AND') {
+    const hasMultiInLayer = audienceTagGroups.some(g => g.tags.filter(t => editingAudience.includes(t.value)).length > 1);
+    if (hasMultiInLayer) {
+      editingAudience = [];
+      showToast('已清空多选标签，「且」模式下每个分层仅可选一个');
+    }
+  }
+  editingAudienceTagCombine = v;
   editingAudienceEstimate = '';
   rerenderAudienceBuilder();
 }
@@ -3745,8 +3905,15 @@ function savePush(action) {
     if (!triggerType) { showToast('请选择触发方式'); return; }
 
     if (triggerType === 'scheduled') {
-      const scheduledTime = document.getElementById('scheduledTime').value;
+      const scheduledInput = document.getElementById('scheduledTime');
+      const scheduledTime = scheduledInput.value;
       if (!scheduledTime) { showToast('请选择发送时间'); return; }
+      if (new Date(scheduledTime).getTime() < Date.now()) {
+        scheduledInput.value = '';
+        scheduledInput.classList.add('input-error');
+        showToast('发送时间已过期，请重新选择发送时间', 'error');
+        return;
+      }
       pushTime = scheduledTime;
       triggerDesc = `定时发送 ${scheduledTime}`;
     } else if (triggerType === 'fixed') {
@@ -3797,6 +3964,7 @@ function savePush(action) {
         p.audienceRule = countConditions(getEffectiveRule()) > 0 ? JSON.parse(JSON.stringify(getEffectiveRule())) : null;
         p.audienceFlat = countConditions(getEffectiveRule()) > 0 ? JSON.parse(JSON.stringify(editingAudienceRule)) : null;
         p.audienceCombine = editingAudienceCombine;
+        p.audienceTagCombine = editingAudienceTagCombine;
         p.audienceSummary = buildAudienceSummary();
       }
       p.triggerType = triggerType;
@@ -3834,6 +4002,7 @@ function savePush(action) {
       audienceRule: (useAudienceBuilder && countConditions(getEffectiveRule()) > 0) ? JSON.parse(JSON.stringify(getEffectiveRule())) : null,
       audienceFlat: (useAudienceBuilder && countConditions(getEffectiveRule()) > 0) ? JSON.parse(JSON.stringify(editingAudienceRule)) : null,
       audienceCombine: useAudienceBuilder ? editingAudienceCombine : 'AND',
+      audienceTagCombine: useAudienceBuilder ? editingAudienceTagCombine : 'OR',
       audienceSummary: useAudienceBuilder ? buildAudienceSummary() : '',
       triggerType,
       triggerDesc,
@@ -4015,7 +4184,7 @@ function refreshContentTable() {
 function renderContentTable(data) {
   const tbody = document.getElementById('contentTableBody');
   if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无文章</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:48px;color:#9ca3af;font-size:13px">暂无文章</td></tr>';
     return;
   }
   tbody.innerHTML = data.map((item, idx) => {
@@ -4023,12 +4192,6 @@ function renderContentTable(data) {
     return `
       <tr>
         <td>${idx + 1}</td>
-        <td>
-          <span style="font-family:monospace;font-size:12px;color:var(--accent)">${escapeHtml(item.id)}</span>
-          <span class="copy-id-btn" onclick="copyArticleId('${escapeHtml(item.id)}')" title="复制ID">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          </span>
-        </td>
         <td><div class="td-ellipsis" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div></td>
         <td>
           <label class="toggle-switch">
@@ -4503,10 +4666,33 @@ function clampHourInput(id) {
   input.classList.remove('input-error');
 }
 
+// 当前时间的 datetime-local 字符串（YYYY-MM-DDTHH:MM），用作定时发送时间选择器的最小值
+function getNowDatetimeLocal() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// 定时发送时间失焦/变更校验：禁止选择当前时间之前的历史时间
+function onScheduledTimeChange() {
+  const input = document.getElementById('scheduledTime');
+  if (!input || !input.value) return;
+  if (new Date(input.value).getTime() < Date.now()) {
+    input.value = '';
+    input.classList.add('input-error');
+    showToast('发送时间不能早于当前时间', 'error');
+  } else {
+    input.classList.remove('input-error');
+  }
+}
+
 function updateSubtitleHint() {
-  const hint = document.getElementById('subtitleHint');
-  if (!hint) return;
-  hint.innerHTML = '';
+  const ta = document.getElementById('pushSubtitle');
+  const el = document.getElementById('subtitleHint');
+  if (!ta || !el) return;
+  const len = ta.value.length;
+  el.textContent = len + ' / 500';
+  el.className = 'char-counter' + (len >= 500 ? ' over' : len >= 450 ? ' warn' : '');
 }
 
 // ===== Toast =====
@@ -4535,7 +4721,361 @@ function closeModal() {
   if (overlay) overlay.style.display = 'none';
 }
 
+// ===== 列表-高级筛选（复用编辑抽屉的自定义人群条件组件，入口在人群下拉最后一项）=====
+let advFilter = { active: false, open: false, tags: [], tagCombine: 'OR', conds: [], ops: [], combine: 'OR' };
+let lastAudSelect = '';  // 记录人群下拉上一次的非「高级筛选」取值，供取消时回退
+
+// 人群下拉变更：选「高级筛选…」打开弹窗；选其它项则清除已生效的高级筛选
+function onAudienceFilterChange(val) {
+  if (val === '__advanced__') {
+    openAdvFilter();
+    return;
+  }
+  lastAudSelect = val;
+  if (advFilter.active) { advFilter.active = false; updateAdvFilterBtn(); }
+}
+
+// —— 匹配底层工具 ——
+function advCollectLeaves(item) {
+  const leaves = [];
+  const walk = (node) => {
+    if (!node) return;
+    if (isRuleGroup(node)) node.conditions.forEach(walk);
+    else if (node.field) leaves.push(node);
+  };
+  const rule = getPushEffectiveRule(item);
+  if (rule) walk(rule);
+  if (item.audienceFlat && Array.isArray(item.audienceFlat.conditions)) item.audienceFlat.conditions.forEach(walk);
+  return leaves;
+}
+function advIsAllUsers(item) {
+  const tags = item.audience || [];
+  const tagIsAll = audienceTags.length > 0 && tags.length === audienceTags.length;
+  if (!hasCustomAudienceRule(item)) return tags.length === 0 || tagIsAll;
+  return tagIsAll;
+}
+function advNumInterval(op, value, value2) {
+  const v = parseFloat(value);
+  const NEG = { v: -Infinity, incl: true }, POS = { v: Infinity, incl: true };
+  switch (op) {
+    case 'gt':  return isNaN(v) ? null : { lo: { v, incl: false }, hi: POS };
+    case 'gte': return isNaN(v) ? null : { lo: { v, incl: true },  hi: POS };
+    case 'lt':  return isNaN(v) ? null : { lo: NEG, hi: { v, incl: false } };
+    case 'lte': return isNaN(v) ? null : { lo: NEG, hi: { v, incl: true } };
+    case 'eq':  return isNaN(v) ? null : { lo: { v, incl: true }, hi: { v, incl: true } };
+    case 'between': { const a = parseFloat(value), b = parseFloat(value2); if (isNaN(a) || isNaN(b)) return null; return { lo: { v: Math.min(a, b), incl: true }, hi: { v: Math.max(a, b), incl: true } }; }
+    default: return null;
+  }
+}
+function advLoCovers(f, p) { if (f.v < p.v) return true; if (f.v > p.v) return false; return f.incl || !p.incl; }
+function advHiCovers(f, p) { if (f.v > p.v) return true; if (f.v < p.v) return false; return f.incl || !p.incl; }
+function advEnumSubset(fOp, fVals, pOp, pVals) {
+  const fIn = (fOp !== 'not_in'), pIn = (pOp !== 'not_in');
+  if (fIn && pIn) return pVals.every(x => fVals.includes(x));
+  if (!fIn && !pIn) return fVals.every(x => pVals.includes(x));
+  if (fIn && !pIn) return false;
+  return pVals.every(x => !fVals.includes(x));
+}
+// 推送叶子 pLeaf 圈定集合 ⊆ 筛选条件 fCond 集合（模糊/包含匹配）
+function advLeafSubset(fCond, pLeaf) {
+  const def = findAudienceFieldDef(fCond.field);
+  if (!def || pLeaf.field !== fCond.field) return false;
+  if (def.type === 'enum') {
+    const fv = Array.isArray(fCond.value) ? fCond.value : [];
+    const pv = Array.isArray(pLeaf.value) ? pLeaf.value : [];
+    return advEnumSubset(fCond.op, fv, pLeaf.op, pv);
+  }
+  if (def.type === 'bool') return String(pLeaf.value) === String(fCond.value);
+  const F = advNumInterval(fCond.op, fCond.value, fCond.value2);
+  const P = advNumInterval(pLeaf.op, pLeaf.value, pLeaf.value2);
+  if (!F || !P) return false;
+  return advLoCovers(F.lo, P.lo) && advHiCovers(F.hi, P.hi);
+}
+
+// —— 表达式树规范化（精准匹配用）——
+function advNorm(node) {
+  if (!node) return null;
+  if (node.tag !== undefined || node.field !== undefined) return node;
+  const kids = (node.conditions || []).map(advNorm).filter(Boolean);
+  if (kids.length === 0) return null;
+  if (kids.length === 1) return kids[0];
+  return { logic: node.logic || 'AND', conditions: kids };
+}
+function advCanonCond(c) {
+  const def = findAudienceFieldDef(c.field);
+  let val;
+  if (def && def.type === 'enum') val = (Array.isArray(c.value) ? c.value : []).slice().sort().join('/');
+  else if (c.op === 'between') val = c.value + '~' + c.value2;
+  else val = String(c.value);
+  return 'C:' + c.field + ':' + c.op + ':' + val;
+}
+function advCanon(node) {
+  if (!node) return '';
+  if (node.tag !== undefined) return 'T:' + node.tag;
+  if (node.field !== undefined) return advCanonCond(node);
+  return (node.logic || 'AND') + '(' + node.conditions.map(advCanon).sort().join(',') + ')';
+}
+function advSubnodes(node) {
+  if (!node) return [];
+  const out = [node];
+  if (node.conditions) node.conditions.forEach(k => out.push(...advSubnodes(k)));
+  return out;
+}
+function advPushTree(item) {
+  const tags = item.audience || [];
+  let tagNode = null;
+  if (advIsAllUsers(item)) tagNode = { tag: '__ALL__' };
+  else if (tags.length > 1) tagNode = { logic: item.audienceTagCombine || 'OR', conditions: tags.map(t => ({ tag: t })) };
+  else if (tags.length === 1) tagNode = { tag: tags[0] };
+  const custom = hasCustomAudienceRule(item) ? getPushEffectiveRule(item) : null;
+  if (tagNode && custom) return { logic: item.audienceCombine || 'AND', conditions: [tagNode, custom] };
+  return tagNode || custom || null;
+}
+function advCompleteConds() { return advFilter.conds.filter(isConditionComplete); }
+function advAlignedOps() {
+  const ops = [];
+  for (let i = 1; i < advFilter.conds.length; i++) {
+    if (isConditionComplete(advFilter.conds[i]) && isConditionComplete(advFilter.conds[i - 1])) ops.push(advFilter.ops[i - 1] || 'AND');
+  }
+  return ops;
+}
+function advFilterTree() {
+  const tags = advFilter.tags;
+  let tagNode = null;
+  // 不同分层标签之间的关系可切换「且/或」
+  if (tags.length > 1) tagNode = { logic: advFilter.tagCombine, conditions: tags.map(t => ({ tag: t })) };
+  else if (tags.length === 1) tagNode = { tag: tags[0] };
+  const conds = advCompleteConds();
+  const custom = conds.length ? buildRuleFromFlat(conds, advAlignedOps()) : null;
+  if (tagNode && custom) return { logic: advFilter.combine, conditions: [tagNode, custom] };
+  return tagNode || custom || null;
+}
+function advAtomCount() { return advFilter.tags.length + advCompleteConds().length; }
+
+// 匹配：单原子(无且/或) → 模糊(包含/子集)；多原子(含且/或) → 精准(子表达式规范化相等)
+function advMatch(item) {
+  const atoms = advAtomCount();
+  if (atoms === 0) return true;
+  if (atoms === 1) {
+    if (advFilter.tags.length === 1) {
+      const T = advFilter.tags[0];
+      return !advIsAllUsers(item) && (item.audience || []).includes(T);
+    }
+    const C = advCompleteConds()[0];
+    return advCollectLeaves(item).filter(l => l.field === C.field).some(l => advLeafSubset(C, l));
+  }
+  const fc = advCanon(advNorm(advFilterTree()));
+  return advSubnodes(advNorm(advPushTree(item))).map(advCanon).includes(fc);
+}
+
+// —— 摘要 / 匹配方式提示 ——
+function advBuildSummary() {
+  const tags = advFilter.tags.map(getAudienceLabel);
+  const tagJoin = advFilter.tagCombine === 'OR' ? ' 或 ' : ' 且 ';
+  const tagPart = tags.length ? (tags.length > 1 ? '（' + tags.join(tagJoin) + '）' : tags[0]) : '';
+  const conds = advCompleteConds();
+  let customPart = '';
+  if (conds.length) {
+    const eff = buildRuleFromFlat(conds, advAlignedOps());
+    const s = summarizeRule(eff);
+    customPart = countConditions(eff) > 1 ? '（' + s + '）' : s;
+  }
+  if (!tagPart && !customPart) return '';
+  if (tagPart && customPart) return tagPart + (advFilter.combine === 'AND' ? ' 且 ' : ' 或 ') + customPart;
+  return tagPart || customPart;
+}
+function advMatchMode() { return advAtomCount() <= 1 ? '模糊（包含即命中）' : '精准（完全匹配）'; }
+
+// —— 弹窗渲染 ——
+function advRenderValue(c, def, i) {
+  if (def.type === 'number') {
+    const unit = def.unit ? `<span class="aud-unit">${def.unit}</span>` : '';
+    if (c.op === 'between') {
+      return `<input type="number" style="width:66px" placeholder="最小" value="${c.value ?? ''}" oninput="advSetVal(${i}, this.value)">
+        <span class="aud-unit">~</span>
+        <input type="number" style="width:66px" placeholder="最大" value="${c.value2 ?? ''}" oninput="advSetVal2(${i}, this.value)">${unit}`;
+    }
+    return `<input type="number" style="width:100px" placeholder="数值" value="${c.value ?? ''}" oninput="advSetVal(${i}, this.value)">${unit}`;
+  }
+  if (def.type === 'enum') {
+    const sel = Array.isArray(c.value) ? c.value : [];
+    return `<span class="aud-enum-chips">${def.options.map(o => `<span class="aud-enum-chip ${sel.includes(o) ? 'on' : ''}" onclick="advToggleEnum(${i},'${o}')">${o}</span>`).join('')}</span>`;
+  }
+  if (def.type === 'bool') {
+    return `<select onchange="advSetVal(${i}, this.value)">
+      <option value="">是/否</option>
+      <option value="true" ${c.value === 'true' ? 'selected' : ''}>是</option>
+      <option value="false" ${c.value === 'false' ? 'selected' : ''}>否</option>
+    </select>`;
+  }
+  return '';
+}
+function advRenderCondRow(c, i) {
+  const fieldOptions = audienceFieldRegistry.map(g =>
+    `<optgroup label="${g.group}">${g.fields.map(f => `<option value="${f.field}" ${c.field === f.field ? 'selected' : ''}>${f.label}</option>`).join('')}</optgroup>`).join('');
+  const def = findAudienceFieldDef(c.field);
+  let opSelect = '';
+  let val = '<span class="aud-unit">请先选择字段</span>';
+  if (def) {
+    const ops = audienceOperators[def.type] || [];
+    opSelect = `<select class="aud-op" onchange="advCondOp(${i}, this.value)">${ops.map(o => `<option value="${o.op}" ${c.op === o.op ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`;
+    val = advRenderValue(c, def, i);
+  }
+  return `<div class="aud-cond">
+    <select class="aud-field" onchange="advCondField(${i}, this.value)"><option value="">选择字段…</option>${fieldOptions}</select>
+    ${opSelect}
+    <span class="aud-val">${val}</span>
+    <button class="aud-del-text" onclick="advRemoveCond(${i})">删除</button>
+  </div>`;
+}
+function advCondsHtml() {
+  if (!advFilter.conds.length) return '<div class="aud-empty">暂无自定义条件，点下方按钮添加</div>';
+  return advFilter.conds.map((c, i) => {
+    const conn = i > 0
+      ? `<div class="adv-conn"><span class="aud-logic-seg"><button class="${advFilter.ops[i - 1] !== 'OR' ? 'active' : ''}" onclick="advSetConnOp(${i - 1},'AND')">且</button><button class="${advFilter.ops[i - 1] === 'OR' ? 'active' : ''}" onclick="advSetConnOp(${i - 1},'OR')">或</button></span></div>`
+      : '';
+    return conn + advRenderCondRow(c, i);
+  }).join('');
+}
+// 「快捷人群标签 与 自定义条件」关系：两者都存在时才显示（放入稳定容器，随取值实时更新，单选圆圈）
+function advCombineRowHtml() {
+  const hasTags = advFilter.tags.length > 0;
+  const hasConds = advFilter.conds.some(isConditionComplete);
+  if (!(hasTags && hasConds)) return '';
+  return `<span class="adv-tagrel adv-tagrel-inline">
+      <span class="adv-tagrel-label">与快捷人群标签的关系</span>
+      <label class="adv-radio"><input type="radio" name="advTvC" ${advFilter.combine === 'OR' ? 'checked' : ''} onclick="advSetCombine('OR')"><span>或（满足其一）</span></label>
+      <label class="adv-radio"><input type="radio" name="advTvC" ${advFilter.combine === 'AND' ? 'checked' : ''} onclick="advSetCombine('AND')"><span>且（都满足）</span></label>
+    </span>`;
+}
+function renderAdvFilterPopup() {
+  const tagsHtml = audienceTagGroups.map(g => `
+    <div class="aud-quick-group-label">${g.label}</div>
+    <div class="aud-quick-chips">
+      ${g.tags.map(t => `<span class="aud-quick-chip ${advFilter.tags.includes(t.value) ? 'on' : ''}" title="${escapeHtml(t.label)}" onclick="advToggleTag('${t.value}')">${t.label.split('（')[0]}</span>`).join('')}
+    </div>`).join('');
+  return `<div class="aud-popup-mask" onclick="if(event.target===this)advCloseNoApply()">
+    <div class="aud-popup" style="width:640px">
+      <div class="aud-popup-head">
+        <span class="aud-popup-title">高级筛选</span>
+        <button class="aud-popup-close" onclick="advCloseNoApply()">&times;</button>
+      </div>
+      <div class="aud-section-title">快捷人群标签</div>
+      <div class="aud-quick">
+        ${advFilter.tags.length > 1 ? `
+        <div class="adv-tagrel">
+          <span class="adv-tagrel-label">多个标签之间的关系</span>
+          <label class="adv-radio"><input type="radio" name="advTagCombine" ${advFilter.tagCombine === 'OR' ? 'checked' : ''} onclick="advSetTagCombine('OR')"><span>或（满足其一）</span></label>
+          <label class="adv-radio"><input type="radio" name="advTagCombine" ${advFilter.tagCombine === 'AND' ? 'checked' : ''} onclick="advSetTagCombine('AND')"><span>且（都满足）</span></label>
+        </div>` : ''}
+        ${tagsHtml}
+      </div>
+      <div class="aud-section-title" style="margin-top:14px;justify-content:space-between">
+        <span>自定义条件</span>
+        <span id="advCombineRow">${advCombineRowHtml()}</span>
+      </div>
+      <div id="advCondList">${advCondsHtml()}</div>
+      <button class="aud-add-btn" onclick="advAddCond()">＋ 添加条件</button>
+      <div class="aud-preview">
+        <div class="aud-preview-title">筛选预览 · 匹配方式：<span id="advPreviewMode">${advMatchMode()}</span></div>
+        <div style="font-size:12px;color:#3730a3;line-height:1.6" id="advPreviewText">${advBuildSummary() || '未设置任何条件'}</div>
+      </div>
+      <div class="aud-popup-foot">
+        <button class="aud-reset-link" onclick="advReset()">重置</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-cancel" onclick="advCloseNoApply()">取消</button>
+          <button class="aud-popup-done" onclick="advApply()">确定筛选</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function advRerender() {
+  const h = document.getElementById('advFilterHost');
+  if (h) h.innerHTML = advFilter.open ? renderAdvFilterPopup() : '';
+}
+function advUpdatePreview() {
+  const s = document.getElementById('advPreviewText');
+  if (s) s.textContent = advBuildSummary() || '未设置任何条件';
+  const m = document.getElementById('advPreviewMode');
+  if (m) m.textContent = advMatchMode();
+  // 数值/文本类取值可能使某条件由「不完整」变「完整」，需同步刷新关系行
+  const cr = document.getElementById('advCombineRow');
+  if (cr) cr.innerHTML = advCombineRowHtml();
+}
+
+// —— 弹窗交互 ——
+function openAdvFilter() { advFilter.open = true; advRerender(); }
+function advCloseNoApply() {
+  advFilter.open = false;
+  // 未生效时，把下拉从「高级筛选…」回退到上一次选择，避免卡在该项
+  const sel = document.getElementById('audienceFilter');
+  if (sel && !advFilter.active) sel.value = lastAudSelect;
+  advRerender();
+}
+function advTagGroupOf(v) { for (const g of audienceTagGroups) if (g.tags.some(t => t.value === v)) return g; return null; }
+function advToggleTag(v) {
+  const i = advFilter.tags.indexOf(v);
+  if (i >= 0) { advFilter.tags.splice(i, 1); }
+  else {
+    // 同一分层单选：先移除同组已选标签，避免「头部用户 且 非头部用户」这类同层矛盾
+    const g = advTagGroupOf(v);
+    if (g) { const groupVals = g.tags.map(t => t.value); advFilter.tags = advFilter.tags.filter(x => !groupVals.includes(x)); }
+    advFilter.tags.push(v);
+  }
+  advRerender();
+}
+function advSetCombine(v) { advFilter.combine = v; advRerender(); }
+function advAddCond() { if (advFilter.conds.length) advFilter.ops.push('AND'); advFilter.conds.push(newEmptyCondition()); advRerender(); }
+function advRemoveCond(i) { advFilter.conds.splice(i, 1); advFilter.ops.splice(i > 0 ? i - 1 : 0, 1); advRerender(); }
+function advCondField(i, field) { const def = findAudienceFieldDef(field); const op = def ? (audienceOperators[def.type][0]?.op || '') : ''; advFilter.conds[i] = { field, op, value: def && def.type === 'enum' ? [] : '', value2: '' }; advRerender(); }
+function advCondOp(i, op) { if (advFilter.conds[i]) advFilter.conds[i].op = op; advRerender(); }
+function advSetConnOp(i, op) { advFilter.ops[i] = op; advRerender(); }
+function advSetVal(i, v) { if (advFilter.conds[i]) advFilter.conds[i].value = v; advUpdatePreview(); }
+function advSetVal2(i, v) { if (advFilter.conds[i]) advFilter.conds[i].value2 = v; advUpdatePreview(); }
+function advToggleEnum(i, opt) { const c = advFilter.conds[i]; if (!c) return; if (!Array.isArray(c.value)) c.value = []; const k = c.value.indexOf(opt); if (k >= 0) c.value.splice(k, 1); else c.value.push(opt); advRerender(); }
+function advSetTagCombine(v) { advFilter.tagCombine = v; advRerender(); }
+function advReset() { advFilter.tags = []; advFilter.tagCombine = 'OR'; advFilter.conds = []; advFilter.ops = []; advFilter.combine = 'OR'; advRerender(); }
+function advApply() {
+  // 丢弃不完整条件并对齐连接符
+  const keep = [], newOps = [];
+  advFilter.conds.forEach((c, i) => { if (isConditionComplete(c)) { if (keep.length > 0) newOps.push(advFilter.ops[i - 1] || 'AND'); keep.push(c); } });
+  advFilter.conds = keep; advFilter.ops = newOps;
+  if (advAtomCount() === 0) { showToast('请至少设置一个标签或自定义条件'); return; }
+  advFilter.active = true;
+  advFilter.open = false;
+  // 生效后禁用下拉并置空（实际筛选由高级筛选接管），旁边以状态胶囊展示
+  const sel = document.getElementById('audienceFilter');
+  if (sel) { sel.value = ''; sel.disabled = true; }
+  advRerender();
+  updateAdvFilterBtn();
+  currentPage = 1;
+  refreshTable();
+}
+function advClear() {
+  advFilter.active = false;
+  const sel = document.getElementById('audienceFilter');
+  if (sel) { sel.disabled = false; sel.value = ''; }
+  lastAudSelect = '';
+  updateAdvFilterBtn();
+  currentPage = 1;
+  refreshTable();
+}
+// 高级筛选生效时，在下拉旁展示状态胶囊（点击可编辑，×可清除）；未生效时不展示
+function updateAdvFilterBtn() {
+  const box = document.getElementById('advFilterBox');
+  if (!box) return;
+  if (advFilter.active) {
+    const sum = advBuildSummary();
+    const short = sum.length > 18 ? sum.slice(0, 18) + '…' : sum;
+    box.innerHTML = `<span class="adv-pill" title="${escapeHtml(sum)}"><span class="adv-pill-label" onclick="openAdvFilter()">高级筛选：${escapeHtml(short)}</span><span class="adv-pill-x" title="清除高级筛选" onclick="advClear()">&times;</span></span>`;
+  } else {
+    box.innerHTML = '';
+  }
+}
+
 // ===== 初始化 =====
+updateAdvFilterBtn();
 refreshTable();
 </script>
 
