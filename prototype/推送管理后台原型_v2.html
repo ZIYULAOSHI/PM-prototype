@@ -3004,7 +3004,6 @@ function renderDrawerForm(p, isView) {
     ${isView
       ? `<div style="font-size:13px;color:var(--text)">${p && p.priority !== null && p.priority !== undefined ? p.priority : '--'}</div>`
       : `<input type="number" id="pushPriority" min="0" max="100" step="0.1" value="${p && p.priority !== null && p.priority !== undefined ? p.priority : ''}" placeholder="0-100，数值越小优先级越高" style="width:100%" ${pendingDisabled} onblur="onPriorityBlur()">`}
-    <div class="hint">0-100，最多1位小数，数值越小优先级越高。同一用户同时命中多条规则时，仅下发优先级最高的一条，其余按全局规则进入队列等待下个窗口</div>
   </div>`;
 
   // 内容配置
