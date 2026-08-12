@@ -959,6 +959,26 @@ tbody tr:last-child td { border-bottom: none; }
 .aud-help-g-label { font-size:11px; font-weight:600; color:var(--accent); margin-bottom:3px; }
 .aud-help-item { font-size:11px; color:var(--text-secondary); line-height:1.65; }
 .aud-help-item b { color:var(--text-primary); font-weight:600; }
+/* 表单字段说明（点击 icon 展示） */
+.field-help { position:relative; display:inline-flex; align-items:center; flex-shrink:0; }
+.field-help-icon {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:15px; height:15px; border-radius:50%;
+  background:var(--text-muted); color:#fff;
+  font-size:10px; font-weight:700; font-style:normal;
+  cursor:pointer; line-height:1;
+}
+.field-help-icon:hover { background:var(--accent); }
+.field-help-pop {
+  display:none; position:absolute; top:22px; left:0; z-index:300;
+  width:320px; background:#fff; border:1px solid var(--border);
+  border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.14);
+  padding:10px 12px; font-weight:400; text-align:left; cursor:default;
+}
+.field-help-pop::before { content:''; position:absolute; top:-10px; left:0; right:0; height:10px; }
+.field-help.open .field-help-pop { display:block; }
+.field-help-item { font-size:12px; color:var(--text-secondary); line-height:1.65; margin-bottom:6px; }
+.field-help-item:last-child { margin-bottom:0; }
 /* AI 自然语言圈人 */
 .aud-ai { background:linear-gradient(135deg,#eef2ff,#f5f3ff); border:1px solid #c7d2fe; border-radius:8px; padding:10px 12px; margin-bottom:10px; }
 .aud-ai-head { font-size:12px; color:#4338ca; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
@@ -3025,10 +3045,9 @@ function renderDrawerForm(p, isView) {
   </div>`;
 
   html += `<div class="form-group">
-    <label>选择文章 <span class="hint">（非必填，从「推送内容」中选择已发布的文章）</span></label>
+    <label>选择文章 ${renderArticleFieldHelp()}</label>
     <div id="articleSelector">${renderArticleSelector(p ? (p.content_id || '') : '', isView, isPendingEdit)}</div>
     ${isPendingEdit && p && p.content_id ? `<input type="hidden" id="articleSelect" value="${p.content_id}">` : ''}
-    <div class="hint">选择文章后，用户点击「查看详情」将跳转到文章详情页；不选则按原有跳转链接处理</div>
   </div>`;
 
   // 跳转链接显示
@@ -3048,7 +3067,7 @@ function renderDrawerForm(p, isView) {
   }
 
   html += `<div class="form-group">
-    <label>跳转链接 <span class="hint">（点击推送后跳转的App内页面，选择文章时自动指向文章详情页）</span></label>
+    <label>跳转链接</label>
     ${linkFieldHtml}
     ${isPendingEdit && p && !p.content_id ? `<input type="hidden" id="pushLink" value="${p.link || 'msg_detail'}">` : ''}
   </div>
@@ -3426,7 +3445,28 @@ document.addEventListener('click', function(e) {
   if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
     dd.classList.remove('open');
   }
+  document.querySelectorAll('.field-help.open').forEach(el => {
+    if (!el.contains(e.target)) el.classList.remove('open');
+  });
 });
+
+function renderArticleFieldHelp() {
+  return `<span class="field-help" onclick="toggleFieldHelp(event, this)">
+    <span class="field-help-icon">i</span>
+    <span class="field-help-pop" onclick="event.stopPropagation()">
+      <div class="field-help-item">非必填，从「推送内容」中选择已发布的文章</div>
+      <div class="field-help-item">选择文章后，用户点击「查看详情」将跳转到文章详情页</div>
+      <div class="field-help-item">选择文章时，跳转链接自动指向文章详情页</div>
+    </span>
+  </span>`;
+}
+
+function toggleFieldHelp(e, el) {
+  e.stopPropagation();
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.field-help.open').forEach(n => n.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
 
 // ===== 目标人群条件构造器（新建面板）=====
 function newEmptyCondition() {
